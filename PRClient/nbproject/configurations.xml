@@ -38,6 +38,9 @@
         <ccTool>
           <standard>8</standard>
         </ccTool>
+        <linkerTool>
+          <commandLine>-lSDL2main -lSDL2 -lSDL2_net</commandLine>
+        </linkerTool>
       </compileType>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -62,6 +65,9 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+        <linkerTool>
+          <commandLine>-lSDL2main -lSDL2 -lSDL2_net -static</commandLine>
+        </linkerTool>
       </compileType>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
