@@ -1,22 +1,12 @@
-/*
- */
-
-/* 
- * File:   main.cpp
- * Author: rocik
- *
- * Created on February 25, 2017, 1:53 PM
- */
-
 #include <cstdlib>
+#include <cstdio>
 
-using namespace std;
-
-/*
- * 
- */
 int main(int argc, char** argv) {
 
+	printf("Terminal test. Press enter to exit.");
+	
+	getchar();
+	
 	return 0;
 }
 
