@@ -3,10 +3,10 @@
 
 class Server {
 public:
-	Server();
+	Server(int argc, const char* argv[]);
 	~Server();
 	
-	int start(int argc, char* argv[]);
+	int start();
 private:
 
 };

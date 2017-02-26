@@ -3,11 +3,11 @@
 
 #include "Server.h"
 
-Server::Server() { }
+Server::Server(int argc, const char* argv[]) { }
 
 Server::~Server() { }
 
-int Server::start(int argc, char* argv[]) {
+int Server::start() {
 	printf("Terminal test. Press enter to exit.");
 	
 	getchar();

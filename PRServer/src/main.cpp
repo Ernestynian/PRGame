@@ -1,6 +1,6 @@
 #include "Server.h"
 
-int main(int argc, char** argv) {
-	return Server().start(argc, argv);
+int main(int argc, const char* argv[]) {
+	return Server(argc, argv).start();
 }
 
