@@ -2,15 +2,23 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
+#include "Video.h"
 
 class Game {
 public:
-	Game();
-	int run(int argc, char* argv[]);
+	Game(int argc, const char* argv[]);
 	~Game();
 	
+	int run();
+
 private:
-	SDL_Window* window;
+	void processEvents();
+	
+	Video* video;
+	bool running;
+	
+	unsigned int currentTime, lastTime;
+	const unsigned int ticksPerFrame;
 };
 
 #endif /* GAME_H */

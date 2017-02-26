@@ -1,25 +1,46 @@
 #include "Game.h"
 
-Game::Game() {
-	window = nullptr;
+Game::Game(int argc, const char* argv[]) : ticksPerFrame(16) {	
+	video = new Video();
 }
+
 
 Game::~Game() {
-	if (window != nullptr)
-		SDL_DestroyWindow(window);
-	SDL_Quit();
+	delete video;
 }
 
-int Game::run(int argc, char* argv[]) {
-	// TODO: create Video class, or something similar
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+
+int Game::run() {
+	if (video->failed())
 		return -1;
 	
-	window = SDL_CreateWindow("SDL 2.0 Test",
-				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-				800, 600, SDL_WINDOW_SHOWN);
+	running = true;
+	lastTime = SDL_GetTicks();
 	
-	SDL_Delay(3000);
+	while (running) {
+		processEvents();
+		
+		currentTime = SDL_GetTicks();
+		int delta = currentTime - lastTime;
+		lastTime = currentTime;
+
+		//world->update(delta);
+		
+		video->render();
+		
+		// Upper bound of FPS
+		if (delta > ticksPerFrame)
+			SDL_Delay(delta - ticksPerFrame);
+	}
 	
 	return 0;
+}
+
+
+void Game::processEvents() {
+	SDL_Event e;
+	while (SDL_PollEvent( &e ) != 0) {
+		if (e.type == SDL_QUIT)
+			running = false;
+	}
 }

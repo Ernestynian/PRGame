@@ -1,7 +1,5 @@
 #include "Game.h"
 
-int main(int argc, char* argv[]) {
-	return Game().run(argc, argv);	
-	
-	return 0;
+int main(int argc, const char* argv[]) {
+	return Game(argc, argv).run();
 }
