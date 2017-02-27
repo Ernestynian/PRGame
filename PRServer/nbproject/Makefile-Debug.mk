@@ -35,16 +35,16 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/src/src/main.o \
-	${OBJECTDIR}/src/src/server.o
+	${OBJECTDIR}/src/Server.o \
+	${OBJECTDIR}/src/main.o
 
 
 # C Compiler Flags
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-lSDL
+CXXFLAGS=-lSDL
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -61,17 +61,17 @@ LDLIBSOPTIONS=
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prserver: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prserver ${OBJECTFILES} ${LDLIBSOPTIONS} -lSDL2_net
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prserver ${OBJECTFILES} ${LDLIBSOPTIONS} -lSDL2_net
 
-${OBJECTDIR}/src/src/main.o: src/src/main.c
-	${MKDIR} -p ${OBJECTDIR}/src/src
+${OBJECTDIR}/src/Server.o: src/Server.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/src/main.o src/src/main.c
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Server.o src/Server.cpp
 
-${OBJECTDIR}/src/src/server.o: src/src/server.c
-	${MKDIR} -p ${OBJECTDIR}/src/src
+${OBJECTDIR}/src/main.o: src/main.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/src/server.o src/src/server.c
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
 
 # Subprojects
 .build-subprojects:
