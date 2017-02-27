@@ -35,7 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/src/Server.o \
 	${OBJECTDIR}/src/main.o
 
 
@@ -62,11 +61,6 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prserver: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prserver ${OBJECTFILES} ${LDLIBSOPTIONS} -lSDL2_net
-
-${OBJECTDIR}/src/Server.o: src/Server.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Server.o src/Server.cpp
 
 ${OBJECTDIR}/src/main.o: src/main.cpp
 	${MKDIR} -p ${OBJECTDIR}/src

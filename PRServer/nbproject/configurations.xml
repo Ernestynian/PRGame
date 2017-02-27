@@ -4,7 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>src/Server.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -13,7 +12,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>src/Server.cpp</itemPath>
       <itemPath>src/main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -48,10 +46,6 @@
           <commandLine>-lSDL2_net</commandLine>
         </linkerTool>
       </compileType>
-      <item path="src/Server.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/Server.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -79,10 +73,6 @@
           <commandLine>-lSDL2_net</commandLine>
         </linkerTool>
       </compileType>
-      <item path="src/Server.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/Server.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>

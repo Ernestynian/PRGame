@@ -1,6 +1,8 @@
-#include "Server.h"
+#include <stdio.h>
 
 int main(int argc, const char* argv[]) {
-	return Server(argc, argv).start();
+	printf("Terminal test. Press enter to exit.");
+	
+	getchar();
 }
 
