@@ -4,6 +4,8 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>../Common/byteConverter.h</itemPath>
+      <itemPath>../Common/networkInterface.h</itemPath>
       <itemPath>src/server.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -13,7 +15,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>../Common/byteConverter.c</itemPath>
       <itemPath>src/main.c</itemPath>
+      <itemPath>../Common/networkInterface.c</itemPath>
       <itemPath>src/server.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -47,6 +51,14 @@
           <commandLine>-lSDL2_net</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../Common/byteConverter.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../Common/byteConverter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Common/networkInterface.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../Common/networkInterface.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/server.c" ex="false" tool="0" flavor2="0">
@@ -78,6 +90,14 @@
           <commandLine>-lSDL2_net</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../Common/byteConverter.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../Common/byteConverter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Common/networkInterface.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../Common/networkInterface.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/server.c" ex="false" tool="0" flavor2="0">

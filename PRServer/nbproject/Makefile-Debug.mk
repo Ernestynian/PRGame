@@ -35,6 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/7daaf93a/byteConverter.o \
+	${OBJECTDIR}/_ext/7daaf93a/networkInterface.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/server.o
 
@@ -62,6 +64,16 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prserver: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prserver ${OBJECTFILES} ${LDLIBSOPTIONS} -lSDL2_net
+
+${OBJECTDIR}/_ext/7daaf93a/byteConverter.o: ../Common/byteConverter.c
+	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o ../Common/byteConverter.c
+
+${OBJECTDIR}/_ext/7daaf93a/networkInterface.o: ../Common/networkInterface.c
+	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/networkInterface.o ../Common/networkInterface.c
 
 ${OBJECTDIR}/src/main.o: src/main.c
 	${MKDIR} -p ${OBJECTDIR}/src
