@@ -1,0 +1,99 @@
+#include <string.h>
+#include <stdarg.h>
+#include <stdint.h>
+
+#include "byteConverter.h"
+
+char buffer[128];
+int  pos;
+
+void convertInt(int a) {
+	buffer[pos + 0] =  a        & 0xFF;
+	buffer[pos + 1] = (a >> 8)  & 0xFF;
+	buffer[pos + 2] = (a >> 16) & 0xFF;
+	buffer[pos + 3] = (a >> 24) & 0xFF;
+	
+	pos += sizeof(a);
+}
+
+void convertShort(short a) {
+	buffer[pos + 0] =  a        & 0xFF;
+	buffer[pos + 1] = (a >> 8)  & 0xFF;
+	
+	pos += sizeof(a);
+}
+
+void convertByte(char a) {
+	buffer[pos] =  a;
+	
+	pos += sizeof(a);
+}
+
+///////////////
+// INTERFACE //
+///////////////
+
+char* toBytes(const char* types, ...) {
+	pos = 0;
+	
+	int num = strlen(types);
+	
+	va_list valist;
+	va_start(valist, types);
+	
+	
+	for (int i = 0; i < num; i++) {
+		switch (types[i]) {
+			case '4':
+				convertInt(va_arg(valist, int32_t));
+				break;
+			case '2':
+				convertShort(va_arg(valist, int32_t));
+				break;
+			case '1':
+				convertByte(va_arg(valist, int32_t));
+				break;
+		}
+	}
+	
+	va_end(valist);
+	
+	return buffer;
+}
+
+
+const char* reader_bytes;
+int reader_position;
+
+void initBinaryReader(const char* bytes) {
+	reader_bytes = bytes;
+	reader_position = 0;
+}
+
+
+int32_t binaryRead4B() {
+	int32_t var;
+	
+	var = reader_bytes[reader_position] + 
+		 (reader_bytes[reader_position + 1] << 8)  +
+		 (reader_bytes[reader_position + 2] << 16) +
+		 (reader_bytes[reader_position + 3] << 24);
+	
+	reader_position += sizeof(int32_t);
+	return var;
+}
+
+int16_t binaryRead2B() {
+	int16_t var;
+	
+	var = reader_bytes[reader_position] +
+		 (reader_bytes[reader_position + 1] << 8);
+
+	
+	reader_position += sizeof(int16_t);
+	return var;
+}
+
+int8_t binaryRead1B() {
+	return reader_bytes[reader_position++];
+}
