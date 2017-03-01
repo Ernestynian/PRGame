@@ -5,7 +5,10 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>src/Game.h</itemPath>
+      <itemPath>src/Network.h</itemPath>
       <itemPath>src/Video.h</itemPath>
+      <itemPath>../Common/byteConverter.h</itemPath>
+      <itemPath>../Common/networkInterface.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -15,8 +18,11 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>src/Game.cpp</itemPath>
+      <itemPath>src/Network.cpp</itemPath>
       <itemPath>src/Video.cpp</itemPath>
+      <itemPath>../Common/byteConverter.c</itemPath>
       <itemPath>src/main.cpp</itemPath>
+      <itemPath>../Common/networkInterface.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -49,9 +55,21 @@
           <commandLine>-lSDL2main -lSDL2 -lSDL2_net</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../Common/byteConverter.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../Common/byteConverter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Common/networkInterface.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../Common/networkInterface.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Game.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Network.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Network.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/Video.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -84,9 +102,21 @@
           <commandLine>-lSDL2main -lSDL2 -lSDL2_net</commandLine>
         </linkerTool>
       </compileType>
+      <item path="../Common/byteConverter.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../Common/byteConverter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Common/networkInterface.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../Common/networkInterface.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Game.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Network.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Network.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/Video.cpp" ex="false" tool="1" flavor2="0">
       </item>

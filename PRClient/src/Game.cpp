@@ -1,6 +1,9 @@
 #include "Game.h"
 
-Game::Game(int argc, const char* argv[]) : ticksPerFrame(16) {	
+#include "../../Common/byteConverter.h"
+
+Game::Game(int argc, const char* argv[]) : msPerFrame(1000 / 60), 
+										   networkTickrate(30) {	
 	video = new Video();
 }
 
@@ -15,22 +18,24 @@ int Game::run() {
 		return -1;
 	
 	running = true;
-	lastTime = SDL_GetTicks();
 	
+	int frames = 0;
 	while (running) {
-		processEvents();
+		int startTime = SDL_GetTicks();
 		
-		currentTime = SDL_GetTicks();
-		int delta = currentTime - lastTime;
-		lastTime = currentTime;
+		network.checkForData();
+		processEvents();
+		network.sendPacket();
 
 		//world->update(delta);
 		
 		video->render();
 		
+		int delta = startTime - SDL_GetTicks();
+		
 		// Upper bound of FPS
-		if (delta > ticksPerFrame)
-			SDL_Delay(delta - ticksPerFrame);
+		if (msPerFrame > delta)
+			SDL_Delay(msPerFrame - delta);
 	}
 	
 	return 0;
@@ -39,8 +44,15 @@ int Game::run() {
 
 void Game::processEvents() {
 	SDL_Event e;
-	while (SDL_PollEvent( &e ) != 0) {
+	while (SDL_PollEvent(&e) != 0) {
 		if (e.type == SDL_QUIT)
 			running = false;
+		else if (e.type == SDL_KEYDOWN) {
+			short he = 'h';
+			he = he << 8 + 'e';
+			network.addEvent(EVENT_PLAYER_MOVED, toBytes("44", 15, 260), 8);
+		} else if (e.type == SDL_KEYUP) {
+			network.addEvent(EVENT_PLAYER_LEFT, "world", 6);
+		}
 	}
 }

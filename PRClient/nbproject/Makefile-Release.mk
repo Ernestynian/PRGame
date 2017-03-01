@@ -35,7 +35,10 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/7daaf93a/byteConverter.o \
+	${OBJECTDIR}/_ext/7daaf93a/networkInterface.o \
 	${OBJECTDIR}/src/Game.o \
+	${OBJECTDIR}/src/Network.o \
 	${OBJECTDIR}/src/Video.o \
 	${OBJECTDIR}/src/main.o
 
@@ -64,10 +67,25 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prclient: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prclient ${OBJECTFILES} ${LDLIBSOPTIONS} -lSDL2main -lSDL2 -lSDL2_net
 
+${OBJECTDIR}/_ext/7daaf93a/byteConverter.o: ../Common/byteConverter.c
+	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o ../Common/byteConverter.c
+
+${OBJECTDIR}/_ext/7daaf93a/networkInterface.o: ../Common/networkInterface.c
+	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/networkInterface.o ../Common/networkInterface.c
+
 ${OBJECTDIR}/src/Game.o: src/Game.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Game.o src/Game.cpp
+
+${OBJECTDIR}/src/Network.o: src/Network.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Network.o src/Network.cpp
 
 ${OBJECTDIR}/src/Video.o: src/Video.cpp
 	${MKDIR} -p ${OBJECTDIR}/src

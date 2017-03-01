@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "Video.h"
+#include "Network.h"
 
 class Game {
 public:
@@ -17,8 +18,10 @@ private:
 	Video* video;
 	bool running;
 	
-	unsigned int currentTime, lastTime;
-	const unsigned int ticksPerFrame;
+	const unsigned int msPerFrame;
+	const unsigned int networkTickrate;
+	
+	Network network;
 };
 
 #endif /* GAME_H */

@@ -37,5 +37,6 @@ bool Video::failed() {
 
 
 void Video::render() {
-	SDL_UpdateWindowSurface(window);	
+	//SDL_Delay(8); // Simulation
+	SDL_UpdateWindowSurface(window);
 }
