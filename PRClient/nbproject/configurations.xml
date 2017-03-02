@@ -7,6 +7,7 @@
       <itemPath>src/Game.h</itemPath>
       <itemPath>src/Network.h</itemPath>
       <itemPath>src/Video.h</itemPath>
+      <itemPath>src/World.h</itemPath>
       <itemPath>../Common/byteConverter.h</itemPath>
       <itemPath>../Common/networkInterface.h</itemPath>
     </logicalFolder>
@@ -20,6 +21,7 @@
       <itemPath>src/Game.cpp</itemPath>
       <itemPath>src/Network.cpp</itemPath>
       <itemPath>src/Video.cpp</itemPath>
+      <itemPath>src/World.cpp</itemPath>
       <itemPath>../Common/byteConverter.c</itemPath>
       <itemPath>src/main.cpp</itemPath>
       <itemPath>../Common/networkInterface.c</itemPath>
@@ -38,6 +40,7 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>src</Elem>
+    <Elem>../Common</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -74,6 +77,10 @@
       <item path="src/Video.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Video.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/World.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/World.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -121,6 +128,10 @@
       <item path="src/Video.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Video.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/World.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/World.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>

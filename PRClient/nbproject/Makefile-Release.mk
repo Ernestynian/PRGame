@@ -40,6 +40,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/Game.o \
 	${OBJECTDIR}/src/Network.o \
 	${OBJECTDIR}/src/Video.o \
+	${OBJECTDIR}/src/World.o \
 	${OBJECTDIR}/src/main.o
 
 
@@ -91,6 +92,11 @@ ${OBJECTDIR}/src/Video.o: src/Video.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Video.o src/Video.cpp
+
+${OBJECTDIR}/src/World.o: src/World.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/World.o src/World.cpp
 
 ${OBJECTDIR}/src/main.o: src/main.cpp
 	${MKDIR} -p ${OBJECTDIR}/src

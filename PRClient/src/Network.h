@@ -15,13 +15,13 @@ public:
 	void checkForData();
 	
 	void addEvent(EventTypes eventType, const char* data, int length);
-	bool sendPacket();
+	bool sendPacket(unsigned char frameTime);
 private:
 	bool init();
 	bool setServer(const char* host, uint16_t port);
 	bool createPackets(int32_t packetSize);
 	
-	bool sendEvent(EventTypes eventType, const std::string& str);
+	void sendEvent(EventTypes eventType, const char* data, int length);
 	
 	bool initialized;
 	

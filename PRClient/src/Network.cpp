@@ -4,12 +4,12 @@
 Network::Network() {
 	if (!init()
 	 || !setServer(LOCALHOST, PORT)
-	 || !createPackets(PACKET_SIZE))
+	 || !createPackets(MAX_PACKET_SIZE))
 		initialized = false;
 	
 	initialized = true;
 	
-	sendEvent(EVENT_CLIENT_JOIN, std::string(""));
+	sendEvent(EVENT_CLIENT_JOIN, 0, 0);
 }
 
 
@@ -17,7 +17,7 @@ Network::~Network() {
 	if(initialized) {
 		// Notify Server
 		packetOut->len = 0;
-		sendEvent(EVENT_CLIENT_EXIT, std::string(""));
+		sendEvent(EVENT_CLIENT_EXIT, 0, 0);
 		
 		// Clean up
 		SDLNet_FreePacket(packetIn);
@@ -75,7 +75,7 @@ bool Network::createPackets(int32_t packetSize) {
 
 	packetOut->address.host = serverAddress.host;
 	packetOut->address.port = serverAddress.port;
-	packetOut->len          = 0;
+	packetOut->len          = 1;
 	
 	
 	packetIndep = SDLNet_AllocPacket(packetSize);
@@ -94,8 +94,6 @@ bool Network::createPackets(int32_t packetSize) {
 
 /**
  * Append a new event to the packet
- * 
- * @return true on success
  */
 void Network::addEvent(EventTypes eventType, const char* data, int length) {
 	NetworkEvent* event = createEvent(eventType, data, length);
@@ -109,33 +107,36 @@ void Network::addEvent(EventTypes eventType, const char* data, int length) {
 }
 
 
-bool Network::sendEvent(EventTypes eventType, const std::string& str) {
-	NetworkEvent* event = createEvent(eventType, str.c_str(), str.length());
+void Network::sendEvent(EventTypes eventType, const char* data, int length) {
+	NetworkEvent* event = createEvent(eventType, data, length);
 	
-	memcpy(packetIndep->data, event->data, event->length);
-	packetIndep->len == event->length;
+	memcpy(packetIndep->data + 1, event->data, event->length);
+	packetIndep->len = 1 + event->length;
 	
 	releaseEvent(event);
 	
-	sendPacket();
+	packetIndep->data[0] = 0;
 	
-	return true;
+	if(SDLNet_UDP_Send(UDPSocket, -1, packetIndep) == 0)
+		printf("SDLNet_UDP_Send failed: %s", SDLNet_GetError());
 }
 
 
-bool Network::sendPacket() {
+bool Network::sendPacket(unsigned char frameTime) {
 	// Send PING events when there are no other events to sustain connection
-	if (packetOut->len == 0) {
-		packetOut->len = 1;
+	if (packetOut->len == 1) {
+		packetOut->len = 2;
 		packetOut->data[0] = EVENT_PING;
 	}
+	
+	packetOut->data[0] = frameTime;
 	
 	if(SDLNet_UDP_Send(UDPSocket, -1, packetOut) == 0) {
 		printf("SDLNet_UDP_Send failed: %s", SDLNet_GetError());
 		return false;
 	}
 
-	packetOut->len = 0;
+	packetOut->len = 1;
 	
 	return true;
 }

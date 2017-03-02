@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "Video.h"
 #include "Network.h"
+#include "World.h"
 
 class Game {
 public:
@@ -15,13 +16,15 @@ public:
 private:
 	void processEvents();
 	
-	Video* video;
 	bool running;
+	Video* video;
+	World* world;
 	
 	const unsigned int msPerFrame;
 	const unsigned int networkTickrate;
 	
 	Network network;
+	unsigned char frame;
 };
 
 #endif /* GAME_H */
