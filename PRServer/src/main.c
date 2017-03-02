@@ -8,7 +8,7 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	
 	for (;;) {
-		while(srv_getPacket());
+		while(srv_checkForNewClients());
 
 		usleep(1);
 	}
@@ -16,6 +16,6 @@ int main(int argc, const char* argv[]) {
 	printf("Press enter to exit.");
 	getchar();
 	
-	srv_release();
+	srv_stop();
 	return 0;
 }

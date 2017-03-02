@@ -6,15 +6,19 @@
 #include <fcntl.h>
 
 #include "server.h"
+#include "client.h"
 
 #include "../../Common/networkInterface.h"
-#include "../../Common/byteConverter.h"
 
 
 int listenfd = 0;
-struct sockaddr_in serv_addr;
+struct sockaddr_in srv_address;
 
-char buf[PACKET_SIZE];
+
+struct sockaddr_in client_address;
+socklen_t addrlen = sizeof(client_address);
+char buf[MAX_PACKET_SIZE];
+
 
 int srv_start() {
 	// Create IP/UDP socket
@@ -22,13 +26,13 @@ int srv_start() {
 		perror("ERROR: Cannot create socket");
 		return 0;
 	}
+	
+	memset(&srv_address, 0, sizeof(srv_address));
+	srv_address.sin_family      = AF_INET;
+	srv_address.sin_addr.s_addr = htonl(INADDR_ANY);
+	srv_address.sin_port        = htons(PORT);
 
-	memset(&serv_addr, '0', sizeof (serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port = htons(PORT);
-
-	if (bind(listenfd, (struct sockaddr *) &serv_addr, sizeof (serv_addr)) < 0) {
+	if (bind(listenfd, (struct sockaddr*)&srv_address, sizeof(srv_address)) < 0) {
 		perror("ERROR: Bind failed");
 		return 0;
 	}
@@ -45,29 +49,24 @@ int srv_start() {
 }
 
 
-void srv_release() {
+void srv_stop() {
 	close(listenfd);	
 }
 
-
-struct sockaddr_in client_addr;
-socklen_t addrlen = sizeof(client_addr);
 	
-int srv_getPacket() {
-	int recvlen = recvfrom(listenfd, buf, PACKET_SIZE, 0, (struct sockaddr*)&client_addr, &addrlen);
+int srv_checkForNewClients() {
+	int recvlen = recvfrom(listenfd, buf, MAX_PACKET_SIZE, 0, (struct sockaddr*)&client_address, &addrlen);
 	
 	if (recvlen > 0) {
-		buf[recvlen] = 0;
-		if (buf[1] > 0) {
-			printf("received message: \"%s\" [%d %d]\n", buf + 2, buf[0], buf[1]);
-			if (buf[0] == EVENT_PLAYER_MOVED) {
-				initBinaryReader(buf + 2);
-				int a = binaryRead4B();
-				int b = binaryRead4B();
-				printf("%d %d\n", a, b);
-			}
-		} else
-			printf("received ping message: %d\n", buf[0]);
+		if (buf[1] == EVENT_CLIENT_JOIN) {
+			printf("EVENT_CLIENT_JOIN\n");
+			client_create(client_address);
+			// TODO: reply success if created
+		} else {
+			//printf("buf: %hhu\n", buf[0]);
+			client_transferPacket(client_address, buf);
+		}
+		
 		return 1;
 	}
 	
