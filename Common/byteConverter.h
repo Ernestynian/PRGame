@@ -6,9 +6,9 @@ extern "C" {
  * Convert parameters to array of bytes that can be send over network
  * @param Each number is one variable, allowed numbers are: 1, 2, 3
  * @param ...
- * @return Array of bytes
+ * @return Array of bytes that needs to be freed
  */
-char* toBytes(const char* types, ...);
+char*   toBytes(const char* types, ...);
 
 void    initBinaryReader(const char* bytes);
 int32_t binaryRead4B();

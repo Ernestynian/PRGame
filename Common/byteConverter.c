@@ -1,10 +1,11 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "byteConverter.h"
 
-char buffer[128];
+char* buffer;
 int  pos;
 
 void convertInt(int a) {
@@ -36,13 +37,18 @@ void convertByte(char a) {
 char* toBytes(const char* types, ...) {
 	pos = 0;
 	
-	int num = strlen(types);
+	int args = strlen(types);
 	
 	va_list valist;
 	va_start(valist, types);
 	
+	int size = 0;
+	for (int i = 0; i < args; i++)
+		size += types[i] - '0';
 	
-	for (int i = 0; i < num; i++) {
+	buffer = malloc(size);
+	
+	for (int i = 0; i < args; i++) {
 		switch (types[i]) {
 			case '4':
 				convertInt(va_arg(valist, int32_t));

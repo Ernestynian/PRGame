@@ -3,8 +3,8 @@
 #include "networkInterface.h"
 
 
-struct NetworkEvent* createEvent(char type, const char* data, int dataLength) {
-	struct NetworkEvent* event = (struct NetworkEvent*)malloc(sizeof(struct NetworkEvent));
+NetworkEvent* createEvent(char type, const char* data, int dataLength) {
+	NetworkEvent* event = (NetworkEvent*)malloc(sizeof(NetworkEvent));
 	
 	event->length = 2 + dataLength;
 	
@@ -18,7 +18,7 @@ struct NetworkEvent* createEvent(char type, const char* data, int dataLength) {
 };
 
 
-void releaseEvent(struct NetworkEvent* event) {
+void releaseEvent(NetworkEvent* event) {
 	free(event->data);
 	free(event);
 }
