@@ -14,6 +14,7 @@ public:
 	int run();
 
 private:
+	void makeConnection();
 	void processEvents();
 	
 	bool running;
@@ -23,7 +24,7 @@ private:
 	const unsigned int msPerFrame;
 	const unsigned int networkTickrate;
 	
-	Network network;
+	Network* network;
 	unsigned char frame;
 };
 

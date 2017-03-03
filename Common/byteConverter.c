@@ -6,7 +6,7 @@
 #include "byteConverter.h"
 
 char* buffer;
-int  pos;
+int   pos;
 
 void convertInt(int a) {
 	buffer[pos + 0] =  a        & 0xFF;

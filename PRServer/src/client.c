@@ -17,10 +17,15 @@ typedef struct {
 	char buf[MAX_PACKET_SIZE];
 	char bufHasNewData;
 	pthread_mutex_t bufMutex;
-	
-	// PRIVATE RESOURCES
-	unsigned char previousTick;
 } client_data;
+
+
+typedef struct {
+	unsigned char currentTick;
+	unsigned char previousTick;
+	
+	clock_t lastPacketTime, diff;
+} client_privateData;
 
 
 struct {
@@ -33,10 +38,10 @@ unsigned int currentClients = 0;
 pthread_mutex_t clientsMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
-int isPacketNewer(client_data* data) {
-	unsigned char tick = data->buf[0];
-	unsigned char diff = tick - data->previousTick;
-	data->previousTick = tick;
+int isPacketNewer(client_privateData* data) {
+	unsigned char diff = data->currentTick - data->previousTick;
+	data->previousTick = data->currentTick;
+	printf("%d\n", diff);
 	
 	if (diff >= 1 && diff <= 100)
 		return 1;
@@ -68,31 +73,31 @@ void* client_stop(client_data* data) {
 
 
 void* client_process(void* dataPointer) {
-	client_data* data = (client_data*)dataPointer;
-	//pthread_mutex_lock(&data->mutex);
-	data->previousTick = 0;
-	
+	client_data* data = dataPointer;
 	printf("Hello World! It's me, thread #%ld!\n", data->thread);
-	//pthread_mutex_unlock(&data->mutex);
 	
 	pthread_mutex_lock(&clientsMutex);
 	currentClients++;
 	pthread_mutex_unlock(&clientsMutex);
 	
-	clock_t lastPacketTime = clock(), diff;
+	client_privateData private;
+	private.previousTick = 0;
+	private.lastPacketTime = clock();
 	for (;;) {
 		pthread_mutex_lock(&data->bufMutex);
 		if (data->bufHasNewData) {
-			if (data->buf[1] == EVENT_CLIENT_EXIT) {
+			if (data->buf[1] == NET_EVENT_CLIENT_EXIT) {
 				printf("EVENT_CLIENT_EXIT #%ld\n", data->thread);
 				return client_stop(data);
 			}
 			
+			private.currentTick = data->buf[0];
+			
 			printf("[%3hhu] ", data->buf[0]);
-			if (isPacketNewer(data)) {
+			if (isPacketNewer(&private)) {
 				if (data->buf[1] > 0) {
 					printf("received message: ");
-					if (data->buf[1] == EVENT_PLAYER_MOVED) {
+					if (data->buf[1] == NET_EVENT_PLAYER_MOVED) {
 						initBinaryReader(data->buf + 3);
 						int a = binaryRead4B();
 						int b = binaryRead4B();
@@ -104,15 +109,16 @@ void* client_process(void* dataPointer) {
 				} else
 					printf("received ping message: %d\n", data->buf[1]);
 				
-				lastPacketTime = clock();
+				private.currentTick = data->buf[0];
 			}
-
+			
+			private.lastPacketTime = clock();
 			data->bufHasNewData = 0;
 		}
 		pthread_mutex_unlock(&data->bufMutex);
 		
-		diff = (clock() - lastPacketTime) * 1000 / CLOCKS_PER_SEC;
-		if (diff > MS_TO_TIMEOUT) {
+		private.diff = (clock() - private.lastPacketTime) * 1000 / CLOCKS_PER_SEC;
+		if (private.diff > MS_TO_TIMEOUT) {
 			printf("TIMEOUTED #%ld\n", data->thread);
 				return client_stop(data);
 		}

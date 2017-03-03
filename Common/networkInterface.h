@@ -1,9 +1,10 @@
 /* Network Interface Specification
  * 
- * Packet consists of tick ID (1 ~ 255) of current second
+ * Packet consists of tick ID (1 ~ 255) of the current second
  *  and list of events
+ * Tick of ID 0 is reserved for special packets
  * 
- * Event is built as Byte(Type) Byte(data length) Bytes(data)
+ * Event is built as Byte(tick) Byte(Type) Byte(data length) Bytes(data)
  * 
  */
 
@@ -18,16 +19,16 @@ extern "C" {
 #endif
 
 enum EventTypes {
-	EVENT_PING = 0,
+	NET_EVENT_PING = 42,
 	
-	EVENT_CLIENT_JOIN,
-	EVENT_CLIENT_ACCEPTED,
-	EVENT_CLIENT_EXIT,
+	NET_EVENT_CLIENT_JOIN,
+	NET_EVENT_CLIENT_ACCEPTED,
+	NET_EVENT_CLIENT_EXIT,
 	
-	EVENT_PLAYER_SPAWN,
-	EVENT_PLAYER_LEFT,
-	EVENT_PLAYER_DIED,
-	EVENT_PLAYER_MOVED
+	NET_EVENT_PLAYER_SPAWN,
+	NET_EVENT_PLAYER_LEFT,
+	NET_EVENT_PLAYER_DIED,
+	NET_EVENT_PLAYER_MOVED
 };
 
 

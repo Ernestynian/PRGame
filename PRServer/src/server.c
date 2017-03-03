@@ -9,9 +9,10 @@
 #include "client.h"
 
 #include "../../Common/networkInterface.h"
+#include "players.h"
 
 
-int listenfd = 0;
+int srv_sock = 0;
 struct sockaddr_in srv_address;
 
 
@@ -22,7 +23,7 @@ char buf[MAX_PACKET_SIZE];
 
 int srv_start() {
 	// Create IP/UDP socket
-	if ((listenfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+	if ((srv_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
 		perror("ERROR: Cannot create socket");
 		return 0;
 	}
@@ -32,13 +33,13 @@ int srv_start() {
 	srv_address.sin_addr.s_addr = htonl(INADDR_ANY);
 	srv_address.sin_port        = htons(PORT);
 
-	if (bind(listenfd, (struct sockaddr*)&srv_address, sizeof(srv_address)) < 0) {
+	if (bind(srv_sock, (struct sockaddr*)&srv_address, sizeof(srv_address)) < 0) {
 		perror("ERROR: Bind failed");
 		return 0;
 	}
 
 	int nonBlocking = 1;
-	if (fcntl(listenfd, F_SETFL, O_NONBLOCK, nonBlocking) < 0) {
+	if (fcntl(srv_sock, F_SETFL, O_NONBLOCK, nonBlocking) < 0) {
 		printf("ERROR: Failed to set non-blocking\n");
 		return 0;
 	}
@@ -50,18 +51,34 @@ int srv_start() {
 
 
 void srv_stop() {
-	close(listenfd);	
+	close(srv_sock);	
 }
 
-	
-int srv_checkForNewClients() {
-	int recvlen = recvfrom(listenfd, buf, MAX_PACKET_SIZE, 0, (struct sockaddr*)&client_address, &addrlen);
+
+void srv_send(char eventType) {
+	NetworkEvent* event = createEvent(eventType, 0, 0);
+
+	buf[0] = 0;
+	memcpy(buf + 1, event->data, event->length);
+	int buflen = 1 + event->length;
+
+	releaseEvent(event);
+
+	sendto(srv_sock, buf, buflen, 0, (struct sockaddr *)&client_address, addrlen);
+}
+
+
+int srv_transferPackets() {
+	int recvlen = recvfrom(srv_sock, buf, MAX_PACKET_SIZE, 0, (struct sockaddr*)&client_address, &addrlen);
 	
 	if (recvlen > 0) {
-		if (buf[1] == EVENT_CLIENT_JOIN) {
+		if (buf[1] == NET_EVENT_CLIENT_JOIN) {
 			printf("EVENT_CLIENT_JOIN\n");
-			client_create(client_address);
-			// TODO: reply success if created
+			int newClientID = client_create(client_address);
+			if (newClientID != CLIENT_NOT_CREATED) {
+				srv_send(NET_EVENT_CLIENT_ACCEPTED);
+				player_reset(newClientID);
+			}
 		} else {
 			//printf("buf: %hhu\n", buf[0]);
 			client_transferPacket(client_address, buf);
@@ -72,5 +89,3 @@ int srv_checkForNewClients() {
 	
 	return 0;
 }
-
-// sendto(s, buf, strlen(buf), 0, (struct sockaddr *)&remaddr, addrlen)

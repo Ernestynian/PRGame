@@ -39,6 +39,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/7daaf93a/networkInterface.o \
 	${OBJECTDIR}/src/client.o \
 	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/players.o \
 	${OBJECTDIR}/src/server.o
 
 
@@ -85,6 +86,11 @@ ${OBJECTDIR}/src/main.o: src/main.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
+
+${OBJECTDIR}/src/players.o: src/players.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/players.o src/players.c
 
 ${OBJECTDIR}/src/server.o: src/server.c
 	${MKDIR} -p ${OBJECTDIR}/src

@@ -8,7 +8,7 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	
 	for (;;) {
-		while(srv_checkForNewClients());
+		while(srv_transferPackets());
 
 		usleep(1);
 	}

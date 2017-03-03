@@ -13,8 +13,9 @@ public:
 	~Network();
 	
 	void checkForData();
+	bool checkIfHasBeenAccepted(); // TODO: rename
 	
-	void addEvent(EventTypes eventType, const char* data, int length);
+	void addNewEvent(EventTypes eventType, const char* data, int length);
 	bool sendPacket(unsigned char frameTime);
 private:
 	bool init();
@@ -29,7 +30,9 @@ private:
 	IPaddress serverAddress;
 	UDPpacket* packetOut;
 	UDPpacket* packetIn;
-	UDPpacket* packetIndep;
+	UDPpacket* packetDirect;
+	
+	uint8_t* packetType;
 	
 	const char* LOCALHOST = "127.0.0.1";
 };
