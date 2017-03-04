@@ -9,7 +9,8 @@
  */
 
 #define PORT 1337
-#define MAX_PACKET_SIZE 512
+#define MAX_CLIENT_PACKET_SIZE 256
+#define MAX_SERVER_PACKET_SIZE 2048
 #define MAX_CLIENTS 32
 
 #define MS_TO_TIMEOUT 1000
@@ -19,7 +20,7 @@ extern "C" {
 #endif
 
 enum EventTypes {
-	NET_EVENT_PING = 42,
+	NET_EVENT_PING = 0,
 	
 	NET_EVENT_CLIENT_JOIN,
 	NET_EVENT_CLIENT_ACCEPTED,
@@ -42,6 +43,7 @@ typedef struct {
 NetworkEvent* createEvent(char type, const char* data, int dataLength);
 void releaseEvent(NetworkEvent* event);
 
+int isPacketNewer(unsigned char currentTick, unsigned char* previousTick);
 
 #ifdef __cplusplus
 }

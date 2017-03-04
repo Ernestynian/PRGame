@@ -7,16 +7,19 @@
 
 Game::Game(int argc, const char* argv[]) : msPerFrame(1000 / DESIRED_FRAMERATE), 
 										   networkTickrate(30) {	
-	video = new Video();
-	world = nullptr;
+	video   = new Video();
+	world   = nullptr;
+	network = nullptr;
 	
 	running = true;
 	
-	frame = 0;
+	frame   = 0;
 }
 
 
 Game::~Game() {
+	if (network != nullptr)
+		delete network;
 	if (world != nullptr)
 		delete world;
 	delete video;
@@ -27,10 +30,12 @@ int Game::run() {
 	if (video->failed())
 		return -1;
 	
-	world = new World();
 	network = new Network();
 	
 	makeConnection();
+	
+	// network creates the world
+	world = new World();
 	
 	while (running) {
 		int startTime = SDL_GetTicks();
@@ -68,9 +73,10 @@ void Game::makeConnection() {
 	while(running) {
 		processEvents();
 		
-		if (network->checkIfHasBeenAccepted())
+		if (network->recieviedAcceptMessage())
 			break;
 		else if (SDL_GetTicks() - timeoutStart > MS_TO_TIMEOUT) {
+			video->showError("Network error.", "Server did not respond.");
 			running = false;
 			break;
 		}
@@ -87,9 +93,7 @@ void Game::processEvents() {
 			running = false;
 		// Test events TODO: remove
 		else if (e.type == SDL_KEYDOWN) {
-			char* bytes = toBytes("44", 15, 260);
-			network->addNewEvent(NET_EVENT_PLAYER_MOVED, bytes, 8);
-			free(bytes);
+			network->addNewEvent(NET_EVENT_PLAYER_MOVED, "44", 8, 123);
 		} else if (e.type == SDL_KEYUP) {
 			network->addNewEvent(NET_EVENT_PLAYER_LEFT, "world", 6);
 		}

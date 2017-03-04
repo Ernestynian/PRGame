@@ -34,33 +34,44 @@ void convertByte(char a) {
 // INTERFACE //
 ///////////////
 
-char* toBytes(const char* types, ...) {
+char* toBytes(const char* types, int* bytesCount, va_list valist) {
 	pos = 0;
 	
 	int args = strlen(types);
-	
-	va_list valist;
-	va_start(valist, types);
 	
 	int size = 0;
 	for (int i = 0; i < args; i++)
 		size += types[i] - '0';
 	
+	*bytesCount = 0;
 	buffer = malloc(size);
 	
 	for (int i = 0; i < args; i++) {
 		switch (types[i]) {
 			case '4':
 				convertInt(va_arg(valist, int32_t));
+				*bytesCount += 4;
 				break;
 			case '2':
 				convertShort(va_arg(valist, int32_t));
+				*bytesCount += 2;
 				break;
 			case '1':
 				convertByte(va_arg(valist, int32_t));
+				(*bytesCount)++;
 				break;
 		}
 	}
+	
+	return buffer;
+}
+
+
+char* toBytesV(const char* types, int* bytesCount, ...) {
+	va_list valist;
+	va_start(valist, types);
+	
+	char* buffer = toBytes(types, bytesCount, valist);
 	
 	va_end(valist);
 	

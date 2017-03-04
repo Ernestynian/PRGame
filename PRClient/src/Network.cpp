@@ -1,10 +1,11 @@
 #include "Network.h"
 
+#include "../../Common/byteConverter.h"
 
 Network::Network() {
 	if (!init()
 	 || !setServer(LOCALHOST, PORT)
-	 || !createPackets(MAX_PACKET_SIZE))
+	 || !createPackets())
 		initialized = false;
 	
 	initialized = true;
@@ -16,7 +17,6 @@ Network::Network() {
 Network::~Network() {
 	if(initialized) {
 		// Notify Server
-		packetOut->len = 0;
 		sendEvent(NET_EVENT_CLIENT_EXIT, 0, 0);
 		
 		// Clean up
@@ -57,18 +57,16 @@ bool Network::setServer(const char* host, uint16_t port) {
 }
 
 
-bool Network::createPackets(int32_t packetSize) {
-	packetIn = SDLNet_AllocPacket(packetSize);
+bool Network::createPackets() {
+	packetIn = SDLNet_AllocPacket(MAX_SERVER_PACKET_SIZE);
 
 	if(packetIn == nullptr) {
 		printf("SDLNet_AllocPacket failed: %s", SDLNet_GetError());
 		return false;
 	}
 	
-	packetType = packetIn->data + 1;
 	
-	
-	packetOut = SDLNet_AllocPacket(packetSize);
+	packetOut = SDLNet_AllocPacket(MAX_CLIENT_PACKET_SIZE);
 
 	if(packetOut == nullptr) {
 		printf("SDLNet_AllocPacket failed: %s", SDLNet_GetError());
@@ -80,7 +78,7 @@ bool Network::createPackets(int32_t packetSize) {
 	packetOut->len          = 1;
 	
 	
-	packetDirect = SDLNet_AllocPacket(packetSize);
+	packetDirect = SDLNet_AllocPacket(MAX_CLIENT_PACKET_SIZE);
 
 	if(packetDirect == nullptr) {
 		printf("SDLNet_AllocPacket failed: %s", SDLNet_GetError());
@@ -94,10 +92,10 @@ bool Network::createPackets(int32_t packetSize) {
 }
 
 
-bool Network::checkIfHasBeenAccepted() {
+bool Network::recieviedAcceptMessage() {
 	checkForData();
 	
-	if (*packetType == NET_EVENT_CLIENT_ACCEPTED) {
+	if (packetIn->data[1] == NET_EVENT_CLIENT_ACCEPTED) {
 		printf("NET_EVENT_CLIENT_ACCEPTED\n");
 		return true;
 	}
@@ -108,9 +106,16 @@ bool Network::checkIfHasBeenAccepted() {
 
 /**
  * Append a new event to the packet
+ * Format and arguments are byteConverter.h
+ * Look in there for more informations
  */
-void Network::addNewEvent(EventTypes eventType, const char* data, int length) {
-	NetworkEvent* event = createEvent(eventType, data, length);
+void Network::addNewEvent(EventTypes eventType, const char* format, ...) {
+	va_list args;
+    va_start(args, format);
+	
+	int size;
+	char* bytes = toBytes(format, &size, args);
+	NetworkEvent* event = createEvent(eventType, bytes, size);
 	
 	if (packetOut->len + event->length < packetOut->maxlen) {
 		memcpy(packetOut->data + packetOut->len, event->data, event->length);
@@ -118,6 +123,9 @@ void Network::addNewEvent(EventTypes eventType, const char* data, int length) {
 	}
 	
 	releaseEvent(event);
+	free(bytes);
+	
+	va_end(args);
 }
 
 
@@ -136,6 +144,11 @@ void Network::sendEvent(EventTypes eventType, const char* data, int length) {
 }
 
 
+/**
+ * Packet consist of multiple events and an ID.
+ * @param frameTime - also packet ID, newer must be higher (or 0)
+ * @return true on success
+ */
 bool Network::sendPacket(unsigned char frameTime) {
 	// Send PING events when there are no other events to sustain connection
 	if (packetOut->len == 1) {
@@ -158,4 +171,17 @@ bool Network::sendPacket(unsigned char frameTime) {
 
 void Network::checkForData() {
 	SDLNet_UDP_Recv(UDPSocket, packetIn);
+	currentEvent = packetIn->data + 1;
+}
+
+
+EventTypes Network::getNextEvent() {
+	currentEvent += currentEvent[1];
+	
+	return (EventTypes)*currentEvent;
+}
+
+
+uint8_t* Network::getCurrentEventData() {
+	return currentEvent + 2;
 }

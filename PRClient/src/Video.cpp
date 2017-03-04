@@ -40,3 +40,8 @@ void Video::render() {
 	//SDL_Delay(8); // Simulation
 	SDL_UpdateWindowSurface(window);
 }
+
+
+void Video::showError(const char* title, const char* message) {
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
+}

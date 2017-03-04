@@ -22,3 +22,17 @@ void releaseEvent(NetworkEvent* event) {
 	free(event->data);
 	free(event);
 }
+
+int isPacketNewer(unsigned char currentTick, unsigned char* previousTick) {
+	unsigned char diff = currentTick - *previousTick;
+	*previousTick = currentTick;
+	
+	if (diff >= 1 && diff <= 100)
+		return 1;
+	
+	diff += 255;
+	if (diff >= 1 && diff <= 100)
+		return 1;
+	
+	return 0;
+}

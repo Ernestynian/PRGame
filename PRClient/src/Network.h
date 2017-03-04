@@ -7,32 +7,36 @@
 
 #include "../../Common/networkInterface.h"
 
+
 class Network {
 public:
 	Network();
 	~Network();
 	
 	void checkForData();
-	bool checkIfHasBeenAccepted(); // TODO: rename
+	EventTypes getNextEvent();
+	uint8_t* getCurrentEventData();
 	
-	void addNewEvent(EventTypes eventType, const char* data, int length);
+	bool recieviedAcceptMessage();
+	
+	void addNewEvent(EventTypes eventType, const char* format, ...);
 	bool sendPacket(unsigned char frameTime);
 private:
 	bool init();
 	bool setServer(const char* host, uint16_t port);
-	bool createPackets(int32_t packetSize);
+	bool createPackets();
 	
 	void sendEvent(EventTypes eventType, const char* data, int length);
 	
 	bool initialized;
 	
-	UDPsocket UDPSocket;
-	IPaddress serverAddress;
+	UDPsocket  UDPSocket;
+	IPaddress  serverAddress;
 	UDPpacket* packetOut;
 	UDPpacket* packetIn;
 	UDPpacket* packetDirect;
-	
-	uint8_t* packetType;
+
+	uint8_t*   currentEvent;
 	
 	const char* LOCALHOST = "127.0.0.1";
 };
