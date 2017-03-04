@@ -11,7 +11,6 @@
             <make-dep-projects/>
             <sourceRootList>
                 <sourceRootElem>src</sourceRootElem>
-                <sourceRootElem>../Common</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>
