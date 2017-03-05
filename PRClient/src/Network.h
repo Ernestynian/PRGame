@@ -13,7 +13,7 @@ public:
 	Network();
 	~Network();
 	
-	void checkForData();
+	void checkForOneNewPacket();
 	EventTypes getNextEvent();
 	uint8_t* getCurrentEventData();
 	

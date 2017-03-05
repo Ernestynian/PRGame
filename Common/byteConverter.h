@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -9,7 +11,7 @@ extern "C" {
  * @param List of parameters
  * @return Array of bytes that needs to be freed
  */
-char*   toBytes(const char* types, int* bytesCount, va_list valist);
+char*   toBytes(int* bytesCount, const char* types, va_list valist);
 /**
  * Convert parameters to array of bytes that can be send over network
  * @param Each number is one variable, allowed numbers are: 1, 2, 3
@@ -17,7 +19,7 @@ char*   toBytes(const char* types, int* bytesCount, va_list valist);
  * @param ...
  * @return Array of bytes that needs to be freed
  */
-char*   toBytesV(const char* types, int* bytesCount, ...);
+char*   toBytesV(int* bytesCount, const char* types, ...);
 
 /**
  * Reset binaryRead functions

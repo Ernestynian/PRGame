@@ -93,7 +93,7 @@ bool Network::createPackets() {
 
 
 bool Network::recieviedAcceptMessage() {
-	checkForData();
+	checkForOneNewPacket();
 	
 	if (packetIn->data[1] == NET_EVENT_CLIENT_ACCEPTED) {
 		printf("NET_EVENT_CLIENT_ACCEPTED\n");
@@ -114,7 +114,7 @@ void Network::addNewEvent(EventTypes eventType, const char* format, ...) {
     va_start(args, format);
 	
 	int size;
-	char* bytes = toBytes(format, &size, args);
+	char* bytes = toBytes(&size, format, args);
 	NetworkEvent* event = createEvent(eventType, bytes, size);
 	
 	if (packetOut->len + event->length < packetOut->maxlen) {
@@ -169,7 +169,7 @@ bool Network::sendPacket(unsigned char frameTime) {
 }
 
 
-void Network::checkForData() {
+void Network::checkForOneNewPacket() {
 	SDLNet_UDP_Recv(UDPSocket, packetIn);
 	currentEvent = packetIn->data + 1;
 }

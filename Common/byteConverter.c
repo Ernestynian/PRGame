@@ -34,7 +34,7 @@ void convertByte(char a) {
 // INTERFACE //
 ///////////////
 
-char* toBytes(const char* types, int* bytesCount, va_list valist) {
+char* toBytes(int* bytesCount, const char* types, va_list valist) {
 	pos = 0;
 	
 	int args = strlen(types);
@@ -67,11 +67,11 @@ char* toBytes(const char* types, int* bytesCount, va_list valist) {
 }
 
 
-char* toBytesV(const char* types, int* bytesCount, ...) {
+char* toBytesV(int* bytesCount, const char* types, ...) {
 	va_list valist;
 	va_start(valist, types);
 	
-	char* buffer = toBytes(types, bytesCount, valist);
+	char* buffer = toBytes(bytesCount, types, valist);
 	
 	va_end(valist);
 	

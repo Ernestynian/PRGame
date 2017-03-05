@@ -42,7 +42,7 @@ int Game::run() {
 		
 		processEvents();
 		
-		network->checkForData();
+		network->checkForOneNewPacket();
 		
 		world->update();
 		
@@ -66,13 +66,16 @@ int Game::run() {
 
 
 /**
- * Make sure the server is running and has slot for us
+ * Make sure the server is running and has a slot for us
  */
 void Game::makeConnection() {
 	int timeoutStart = SDL_GetTicks();
 	while(running) {
 		processEvents();
 		
+		// Normally there should be also NEGATIVE response and so repetitive
+		//  JOIN messages, but we won't go into such lengths. Let's just
+		//  try once and if no response - end the suffering
 		if (network->recieviedAcceptMessage())
 			break;
 		else if (SDL_GetTicks() - timeoutStart > MS_TO_TIMEOUT) {
