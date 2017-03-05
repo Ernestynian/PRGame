@@ -1,47 +1,52 @@
 #include <SDL2/SDL.h>
 
-#include "Video.h"
+#include "Window.h"
 
-Video::Video() {
+#include "Renderer.h"
+
+Window::Window() {
 	window = nullptr;
 		
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		return;
 	
-	window = SDL_CreateWindow("SDL 2.0 Test",
+	window = SDL_CreateWindow("Game",
 				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 				getScreenWidth(), getScreenHeight(), SDL_WINDOW_SHOWN);
+	
+	renderer = new Renderer(window);
 }
 
 
-Video::~Video() {
+Window::~Window() {
+	delete renderer;
+	
 	if (window != nullptr)
 		SDL_DestroyWindow(window);
 	SDL_Quit();
 }
 
 
-int Video::getScreenWidth() {
+int Window::getScreenWidth() {
 	return 800;	
 }
 
 
-int Video::getScreenHeight() {
+int Window::getScreenHeight() {
 	return 600;
 }
 
 
-bool Video::failed() {
+bool Window::failed() {
 	return window == nullptr;
 }
 
 
-void Video::render() {
-	//SDL_Delay(8); // Simulation
-	SDL_UpdateWindowSurface(window);
+Renderer* Window::getRenderer() {
+	return renderer;
 }
 
 
-void Video::showError(const char* title, const char* message) {
+void Window::showError(const char* title, const char* message) {
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
 }

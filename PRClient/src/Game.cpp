@@ -1,3 +1,8 @@
+#include <SDL2/SDL.h>
+#include "Renderer.h"
+#include "Window.h"
+#include "Network.h"
+#include "World.h"
 #include "Game.h"
 
 #include "../../Common/byteConverter.h"
@@ -7,13 +12,13 @@
 
 Game::Game(int argc, const char* argv[]) : msPerFrame(1000 / DESIRED_FRAMERATE), 
 										   networkTickrate(30) {	
-	video   = new Video();
-	world   = nullptr;
-	network = nullptr;
+	window = new Window();
+	world    = nullptr;
+	network  = nullptr;
 	
-	running = true;
+	running  = true;
 	
-	frame   = 0;
+	frame    = 0;
 }
 
 
@@ -22,12 +27,12 @@ Game::~Game() {
 		delete network;
 	if (world != nullptr)
 		delete world;
-	delete video;
+	delete window;
 }
 
 
 int Game::run() {
-	if (video->failed())
+	if (window->failed())
 		return -1;
 	
 	network = new Network();
@@ -35,7 +40,7 @@ int Game::run() {
 	makeConnection();
 	
 	// network creates the world
-	world = new World();
+	world = new World(window->getRenderer());
 	
 	while (running) {
 		int startTime = SDL_GetTicks();
@@ -48,7 +53,7 @@ int Game::run() {
 		
 		network->sendPacket(frame);
 		
-		video->render();
+		world->draw();
 		
 		int delta = startTime - SDL_GetTicks();
 		
@@ -79,7 +84,7 @@ void Game::makeConnection() {
 		if (network->recieviedAcceptMessage())
 			break;
 		else if (SDL_GetTicks() - timeoutStart > MS_TO_TIMEOUT) {
-			video->showError("Network error.", "Server did not respond.");
+			window->showError("Network error.", "Server did not respond.");
 			running = false;
 			break;
 		}

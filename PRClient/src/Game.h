@@ -2,9 +2,10 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
-#include "Video.h"
-#include "Network.h"
+
+#include "Window.h"
 #include "World.h"
+#include "Network.h"
 
 class Game {
 public:
@@ -18,7 +19,7 @@ private:
 	void processEvents();
 	
 	bool running;
-	Video* video;
+	Window* window;
 	World* world;
 	
 	const unsigned int msPerFrame;

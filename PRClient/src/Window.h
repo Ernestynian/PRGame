@@ -1,22 +1,26 @@
-#ifndef VIDEO_H
-#define VIDEO_H
+#ifndef WINDOW_H
+#define WINDOW_H
 
-class Video {
+#include "Renderer.h"
+
+class Window {
 public:
-	Video();
-	~Video();
+	Window();
+	~Window();
 	
 	inline int getScreenWidth();
 	inline int getScreenHeight();
 	
 	bool failed();
 	
-	void render();
+	Renderer* getRenderer();
+	
 	void showError(const char* title, const char* message);
 	
 private:
 	SDL_Window* window;
+	Renderer* renderer;
 };
 
-#endif /* VIDEO_H */
+#endif /* WINDOW_H */
 

@@ -39,7 +39,11 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/7daaf93a/networkInterface.o \
 	${OBJECTDIR}/src/Game.o \
 	${OBJECTDIR}/src/Network.o \
-	${OBJECTDIR}/src/Video.o \
+	${OBJECTDIR}/src/Player.o \
+	${OBJECTDIR}/src/Renderer.o \
+	${OBJECTDIR}/src/Sprite.o \
+	${OBJECTDIR}/src/Texture.o \
+	${OBJECTDIR}/src/Window.o \
 	${OBJECTDIR}/src/World.o \
 	${OBJECTDIR}/src/main.o
 
@@ -88,10 +92,30 @@ ${OBJECTDIR}/src/Network.o: src/Network.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Network.o src/Network.cpp
 
-${OBJECTDIR}/src/Video.o: src/Video.cpp
+${OBJECTDIR}/src/Player.o: src/Player.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Video.o src/Video.cpp
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Player.o src/Player.cpp
+
+${OBJECTDIR}/src/Renderer.o: src/Renderer.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Renderer.o src/Renderer.cpp
+
+${OBJECTDIR}/src/Sprite.o: src/Sprite.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Sprite.o src/Sprite.cpp
+
+${OBJECTDIR}/src/Texture.o: src/Texture.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Texture.o src/Texture.cpp
+
+${OBJECTDIR}/src/Window.o: src/Window.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Window.o src/Window.cpp
 
 ${OBJECTDIR}/src/World.o: src/World.cpp
 	${MKDIR} -p ${OBJECTDIR}/src

@@ -6,7 +6,11 @@
                    projectFiles="true">
       <itemPath>src/Game.h</itemPath>
       <itemPath>src/Network.h</itemPath>
-      <itemPath>src/Video.h</itemPath>
+      <itemPath>src/Player.h</itemPath>
+      <itemPath>src/Renderer.h</itemPath>
+      <itemPath>src/Sprite.h</itemPath>
+      <itemPath>src/Texture.h</itemPath>
+      <itemPath>src/Window.h</itemPath>
       <itemPath>src/World.h</itemPath>
       <itemPath>../Common/byteConverter.h</itemPath>
       <itemPath>../Common/networkInterface.h</itemPath>
@@ -14,13 +18,19 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
+      <itemPath>res/background.bmp</itemPath>
+      <itemPath>res/player.bmp</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>src/Game.cpp</itemPath>
       <itemPath>src/Network.cpp</itemPath>
-      <itemPath>src/Video.cpp</itemPath>
+      <itemPath>src/Player.cpp</itemPath>
+      <itemPath>src/Renderer.cpp</itemPath>
+      <itemPath>src/Sprite.cpp</itemPath>
+      <itemPath>src/Texture.cpp</itemPath>
+      <itemPath>src/Window.cpp</itemPath>
       <itemPath>src/World.cpp</itemPath>
       <itemPath>../Common/byteConverter.c</itemPath>
       <itemPath>src/main.cpp</itemPath>
@@ -41,6 +51,7 @@
   <sourceRootList>
     <Elem>src</Elem>
     <Elem>../Common</Elem>
+    <Elem>res</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -67,6 +78,10 @@
       </item>
       <item path="../Common/networkInterface.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="res/background.bmp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/player.bmp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Game.h" ex="false" tool="3" flavor2="0">
@@ -75,9 +90,25 @@
       </item>
       <item path="src/Network.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/Video.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/Player.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/Video.h" ex="false" tool="3" flavor2="0">
+      <item path="src/Player.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Renderer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Renderer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Sprite.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Sprite.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Window.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Window.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/World.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -118,6 +149,10 @@
       </item>
       <item path="../Common/networkInterface.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="res/background.bmp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/player.bmp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Game.h" ex="false" tool="3" flavor2="0">
@@ -126,9 +161,25 @@
       </item>
       <item path="src/Network.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/Video.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/Player.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/Video.h" ex="false" tool="3" flavor2="0">
+      <item path="src/Player.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Renderer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Renderer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Sprite.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Sprite.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Window.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Window.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/World.cpp" ex="false" tool="1" flavor2="0">
       </item>
