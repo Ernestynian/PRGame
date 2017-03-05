@@ -9,15 +9,17 @@
 #include "../../Common/networkInterface.h"
 #include "../../Common/byteConverter.h"
 
+#include "players.h"
+
 
 typedef struct {
 	const pthread_t thread;	
 	const unsigned int id;
 	
+	pthread_mutex_t mutex;
 	char buf[MAX_CLIENT_PACKET_SIZE];
 	char bufHasNewData;
-	pthread_mutex_t bufMutex;
-} client_data;
+} client_publicData;
 
 
 typedef struct {
@@ -29,7 +31,7 @@ typedef struct {
 
 
 struct {
-	client_data* cd;
+	client_publicData* cd;
 	struct sockaddr_in address;
 } clients[MAX_CLIENTS];
 pthread_mutex_t clientListMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -38,7 +40,7 @@ unsigned int currentClients = 0;
 pthread_mutex_t clientsMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
-void* client_stop(client_data* data) {
+void* client_stop(client_publicData* data) {
 	pthread_mutex_lock(&clientsMutex);
 	currentClients--;
 	pthread_mutex_unlock(&clientsMutex);
@@ -57,7 +59,7 @@ void* client_stop(client_data* data) {
 
 
 void* client_process(void* dataPointer) {
-	client_data* data = dataPointer;
+	client_publicData* data = dataPointer;
 	
 	pthread_mutex_lock(&clientsMutex);
 	currentClients++;
@@ -67,7 +69,7 @@ void* client_process(void* dataPointer) {
 	private.previousTick = 0;
 	private.lastPacketTime = clock();
 	for (;;) {
-		pthread_mutex_lock(&data->bufMutex);
+		pthread_mutex_lock(&data->mutex);
 		if (data->bufHasNewData) {
 			if (data->buf[1] == NET_EVENT_CLIENT_EXIT) {
 				printf("EVENT_CLIENT_EXIT %d\n", data->id);
@@ -77,13 +79,15 @@ void* client_process(void* dataPointer) {
 			private.currentTick = data->buf[0];
 			
 			if (isPacketNewer(private.currentTick, &private.previousTick)) {
-				printf("[%3hhu] ", data->buf[0]);
+				//printf("[%3hhu] ", data->buf[0]);
 				if (data->buf[1] > 0) {
 					printf("received message: ");
+					
+					initBinaryReader(data->buf + 3);
+					
 					switch(data->buf[1]) {
 						case NET_EVENT_PLAYER_MOVED:
 							player_moved(data->id, data->buf + 3);
-							//printf(" %d %d", a, b);
 							break;
 						default:
 							printf("\"%s\"", data->buf + 3);
@@ -91,8 +95,8 @@ void* client_process(void* dataPointer) {
 					}						
 
 					printf(" [%d %d]\n", data->buf[1], data->buf[2]);
-				} else
-					printf("received ping message: %d\n", data->buf[1]);
+				} //else
+				//	printf("received ping message: %d\n", data->buf[1]);
 				
 				private.currentTick = data->buf[0];
 			}
@@ -100,7 +104,7 @@ void* client_process(void* dataPointer) {
 			private.lastPacketTime = clock();
 			data->bufHasNewData = 0;
 		}
-		pthread_mutex_unlock(&data->bufMutex);
+		pthread_mutex_unlock(&data->mutex);
 		
 		private.diff = (clock() - private.lastPacketTime) * 1000 / CLOCKS_PER_SEC;
 		if (private.diff > MS_TO_TIMEOUT) {
@@ -129,9 +133,9 @@ uint32_t client_create(struct sockaddr_in client_address) {
 	if (id == MAX_CLIENTS)
 		return id;
 	
-	client_data* data = (client_data*)malloc(sizeof(client_data));
+	client_publicData* data = (client_publicData*)malloc(sizeof(client_publicData));
 	*(unsigned int*)&data->id = id;
-	pthread_mutex_init(&(data->bufMutex), NULL);
+	pthread_mutex_init(&(data->mutex), NULL);
 	data->bufHasNewData = 0;
 	
 	int rc = pthread_create((pthread_t*)&(data->thread), NULL, client_process, (void*)data);
@@ -157,11 +161,11 @@ void client_transferPacket(struct sockaddr_in client_address, char* data) {
 		
 		if (clients[i].address.sin_addr.s_addr == client_address.sin_addr.s_addr
 		 && clients[i].address.sin_port        == client_address.sin_port) {
-			pthread_mutex_lock(&(clients[i].cd->bufMutex));
+			pthread_mutex_lock(&(clients[i].cd->mutex));
 			// TODO: change const length into dynamic
 			memcpy(clients[i].cd->buf, data, MAX_CLIENT_PACKET_SIZE);
 			clients[i].cd->bufHasNewData = 1;
-			pthread_mutex_unlock(&(clients[i].cd->bufMutex));
+			pthread_mutex_unlock(&(clients[i].cd->mutex));
 		}
 	}
 	pthread_mutex_unlock(&clientListMutex);

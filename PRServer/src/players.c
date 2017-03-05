@@ -3,6 +3,7 @@
 #include "players.h"
 
 #include "../../Common/networkInterface.h"
+#include "../../Common/byteConverter.h"
 
 
 player players[MAX_CLIENTS];
@@ -24,9 +25,9 @@ void player_reset(int id) {
 }
 
 void player_moved(int id, char* data) {
-	initBinaryReader(data);
 	int newX = binaryRead4B();
 	int newY = binaryRead4B();
+	printf(" %d %d", newX, newY);
 	
 	// Check collisions
 	

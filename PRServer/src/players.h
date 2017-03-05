@@ -1,6 +1,8 @@
 #ifndef PLAYERS_H
 #define PLAYERS_H
 
+#include "pthread.h"
+
 typedef struct {
 	pthread_mutex_t mutex;
 	

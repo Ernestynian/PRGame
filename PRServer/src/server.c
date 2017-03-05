@@ -7,9 +7,9 @@
 
 #include "server.h"
 #include "client.h"
+#include "players.h"
 
 #include "../../Common/networkInterface.h"
-#include "players.h"
 
 
 int srv_fd = 0;
@@ -19,8 +19,8 @@ char srv_buf[MAX_SERVER_PACKET_SIZE];
 
 
 int srv_start() {
-	// Create IP/UDP socket
-	if ((srv_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+	srv_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (srv_fd < 0) {
 		printf("ERROR: Cannot create socket");
 		return 0;
 	}
@@ -37,7 +37,8 @@ int srv_start() {
 	}
 	
 	unsigned char* ip = (unsigned char*)&srv_address.sin_addr.s_addr;
-	printf("Binded the server to %d.%d.%d.%d:%d\n", ip[0], ip[1], ip[2], ip[3], PORT);
+	printf("Binded the server to %d.%d.%d.%d:%d\n", 
+			ip[0], ip[1], ip[2], ip[3], PORT);
 
 	int nonBlocking = 1;
 	if (fcntl(srv_fd, F_SETFL, O_NONBLOCK, nonBlocking) < 0) {
@@ -46,8 +47,6 @@ int srv_start() {
 	}
 
 	memset(inbuffer, 0, sizeof(inbuffer));
-	
-	players_init();
 
 	return 1;
 }
@@ -83,9 +82,9 @@ int srv_transferPackets() {
 			if (newClientID != CLIENT_NOT_CREATED) {
 				srv_send(NET_EVENT_CLIENT_ACCEPTED, client_address, addrlen);
 				player_reset(newClientID);
-				printf("EVENT_CLIENT_JOIN not accepted\n");
+				printf("EVENT_CLIENT_JOIN assigned to: %d\n", newClientID);
 			} else
-				printf("EVENT_CLIENT_JOIN %d\n", newClientID);
+				printf("EVENT_CLIENT_JOIN not accepted\n");
 		} else {
 			client_transferPacket(client_address, inbuffer);
 		}

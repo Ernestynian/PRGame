@@ -2,10 +2,14 @@
 #include <unistd.h>
 
 #include "server.h"
+#include "players.h"
+
 
 int main(int argc, const char* argv[]) {
 	if (!srv_start())
 		return 1;
+	
+	players_init();
 	
 	for (;;) {
 		while(srv_transferPackets());
