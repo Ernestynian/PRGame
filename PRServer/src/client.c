@@ -9,31 +9,22 @@
 #include "../../Common/networkInterface.h"
 #include "../../Common/byteConverter.h"
 
+#include "server.h"
+#include "client.h"
 #include "players.h"
-
-
-typedef struct {
-	const pthread_t thread;	
-	const unsigned int id;
-	
-	pthread_mutex_t mutex;
-	char buf[MAX_CLIENT_PACKET_SIZE];
-	char bufHasNewData;
-} client_publicData;
 
 
 typedef struct {
 	unsigned char currentTick;
 	unsigned char previousTick;
 	
-	clock_t lastPacketTime, diff;
+	clock_t lastPacketTime;
+	int spawningPlayer;
+	clock_t spawnTimerStart;
 } client_privateData;
 
 
-struct {
-	client_publicData* cd;
-	struct sockaddr_in address;
-} clients[MAX_CLIENTS];
+client clients[MAX_CLIENTS];
 pthread_mutex_t clientListMutex = PTHREAD_MUTEX_INITIALIZER;
 
 unsigned int currentClients = 0;
@@ -41,6 +32,8 @@ pthread_mutex_t clientsMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 void* client_stop(client_publicData* data) {
+	srv_addNewEvent(NET_EVENT_CLIENT_EXIT, "1", data->id);
+	
 	pthread_mutex_lock(&clientsMutex);
 	currentClients--;
 	pthread_mutex_unlock(&clientsMutex);
@@ -68,6 +61,10 @@ void* client_process(void* dataPointer) {
 	client_privateData private;
 	private.previousTick = 0;
 	private.lastPacketTime = clock();
+	// Spawn player at the start (right after he joins)
+	private.spawningPlayer = 1;
+	private.spawnTimerStart = private.lastPacketTime;
+	
 	for (;;) {
 		pthread_mutex_lock(&data->mutex);
 		if (data->bufHasNewData) {
@@ -95,8 +92,7 @@ void* client_process(void* dataPointer) {
 					}						
 
 					printf(" [%d %d]\n", data->buf[1], data->buf[2]);
-				} //else
-				//	printf("received ping message: %d\n", data->buf[1]);
+				} //else printf("received ping message: %d\n", data->buf[1]);
 				
 				private.currentTick = data->buf[0];
 			}
@@ -106,10 +102,23 @@ void* client_process(void* dataPointer) {
 		}
 		pthread_mutex_unlock(&data->mutex);
 		
-		private.diff = (clock() - private.lastPacketTime) * 1000 / CLOCKS_PER_SEC;
-		if (private.diff > MS_TO_TIMEOUT) {
+		clock_t timerDiff = (clock() - private.lastPacketTime) * 1000 / CLOCKS_PER_SEC;
+		if (timerDiff > MS_TO_TIMEOUT) {
 			printf("TIMEOUTED %d\n", data->id);
-				return client_stop(data);
+			return client_stop(data);
+		}
+		
+		if (private.spawningPlayer) {
+			timerDiff = (clock() - private.spawnTimerStart) * 1000 / CLOCKS_PER_SEC;
+			if (timerDiff > MS_TO_SPAWN) {
+				private.spawningPlayer = 0;
+				printf("SPAWN REQUESTED\n");
+				// TODO: randomize and not collide with map
+				int x = 20 + 30 * data->id;
+				int y = 40;
+				player_spawn(data->id, x, y);
+				srv_addNewEvent(NET_EVENT_PLAYER_SPAWN, "144", data->id, x, y);
+			}
 		}
 	}
 	

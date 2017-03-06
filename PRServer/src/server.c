@@ -1,21 +1,28 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <pthread.h>
+#include <stdlib.h>
+
+#include "../../Common/networkInterface.h"
+#include "../../Common/byteConverter.h"
 
 #include "server.h"
 #include "client.h"
 #include "players.h"
 
-#include "../../Common/networkInterface.h"
-
-
 int srv_fd = 0;
+clock_t lastSentPacketTime;
 
-char inbuffer[MAX_CLIENT_PACKET_SIZE];
-char srv_buf[MAX_SERVER_PACKET_SIZE];
+char            inBuffer[MAX_CLIENT_PACKET_SIZE];
+char            outBuffer[MAX_SERVER_PACKET_SIZE];
+int             outBufferPosition;
+unsigned char   outBufferTick;
+pthread_mutex_t outBufferMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 int srv_start() {
@@ -46,7 +53,11 @@ int srv_start() {
 		return 0;
 	}
 
-	memset(inbuffer, 0, sizeof(inbuffer));
+	outBufferTick = 1;
+	
+	memset(inBuffer, 0, sizeof(inBuffer));
+	memset(outBuffer, 0, sizeof(outBuffer));
+	outBufferPosition = 1;
 
 	return 1;
 }
@@ -57,16 +68,104 @@ void srv_stop() {
 }
 
 
-void srv_send(char eventType, struct sockaddr_in client_address, socklen_t addrlen) {
-	NetworkEvent* event = createEvent(eventType, 0, 0);
+void srv_send(char eventType, struct sockaddr_in client_address, socklen_t addrlen, const char* format, ...) {
+	va_list args;
+	va_start(args, format);
+	
+	int size;
+	char* bytes = toBytes(&size, format, args);
+	NetworkEvent* event = createEvent(eventType, bytes, size);
 
-	srv_buf[0] = 0;
-	memcpy(srv_buf + 1, event->data, event->length);
 	int buflen = 1 + event->length;
+	char* buffer = (char*)malloc(buflen);
 
+	buffer[0] = 0;
+	memcpy(buffer + 1, event->data, event->length);
+	
 	releaseEvent(event);
 
-	sendto(srv_fd, srv_buf, buflen, 0, (struct sockaddr *)&client_address, addrlen);
+	sendto(srv_fd, buffer, buflen, 0, (struct sockaddr *)&client_address, addrlen);
+	
+	free(buffer);
+	
+	va_end(args);
+}
+
+
+void srv_addNewEventTo(char* buffer, int* pos, char eventType, const char* format, ...) {
+	va_list args;
+    va_start(args, format);
+	
+	int size;
+	char* bytes = toBytes(&size, format, args);
+	NetworkEvent* event = createEvent(eventType, bytes, size);
+	
+	if (*pos + event->length < MAX_SERVER_PACKET_SIZE) {
+		memcpy(buffer + *pos, event->data, event->length);
+		*pos += event->length;
+	}
+	
+	releaseEvent(event);
+	free(bytes);
+	
+	va_end(args);
+}
+
+
+void srv_sendCurrentState(int newClientID, struct sockaddr_in client_address, socklen_t addrlen) {
+	int len = 1;
+	char buffer[MAX_SERVER_PACKET_SIZE];
+	
+	pthread_mutex_lock(&clientListMutex);
+	for (int i = 0; i < MAX_CLIENTS; ++i) {
+		if (newClientID != i && clients[i].cd != NULL) {
+			srv_addNewEventTo(buffer, &len, NET_EVENT_CLIENT_JOIN, 
+					"1", (char)clients[i].cd->id);
+			
+			pthread_mutex_lock(&players[i].mutex);
+			if (players[i].alive) {
+				srv_addNewEventTo(buffer, &len, NET_EVENT_PLAYER_SPAWN, 
+					"144", (char)clients[i].cd->id, players[i].pos.x, players[i].pos.y);
+			}
+			pthread_mutex_unlock(&players[i].mutex);
+		}
+	}
+	pthread_mutex_unlock(&clientListMutex);
+	
+	sendto(srv_fd, buffer, len, 0, (struct sockaddr *)&client_address, addrlen);
+}
+
+
+/**
+ * 
+ * @param tick
+ * @return false when no events were send
+ */
+int srv_sendEventsToAll(unsigned char tick) {
+	int result;
+	
+	pthread_mutex_lock(&outBufferMutex);
+	if (outBufferPosition > 1) {
+		outBuffer[0] = tick;
+		printf("Sent %d bytes to everyone\n", outBufferPosition);
+
+		//send(srv_fd, srv_buf, buflen, 0);
+		pthread_mutex_lock(&clientListMutex);
+		for (int i = 0; i < MAX_CLIENTS; ++i) {
+			sendto(srv_fd, outBuffer, outBufferPosition, 0, 
+					(struct sockaddr *)&clients[i].address, 
+					sizeof(clients[i].address));
+		}
+		pthread_mutex_unlock(&clientListMutex);
+
+		outBufferPosition = 1;
+		result = 1;
+	} else
+		result = 0;
+	// outBufferPosition must be reset before unlocking mutex
+	pthread_mutex_unlock(&outBufferMutex);
+	
+	return result;
 }
 
 
@@ -74,32 +173,59 @@ int srv_transferPackets() {
 	struct sockaddr_in client_address;
 	socklen_t addrlen = sizeof(client_address);
 	
-	int recvlen = recvfrom(srv_fd, inbuffer, MAX_CLIENT_PACKET_SIZE, 0, (struct sockaddr*)&client_address, &addrlen);
+	int recvlen = recvfrom(srv_fd, inBuffer, MAX_CLIENT_PACKET_SIZE, 0, (struct sockaddr*)&client_address, &addrlen);
 	
-	if (recvlen > 0) {		
-		if (inbuffer[1] == NET_EVENT_CLIENT_JOIN) {
+	if (recvlen > 0) {
+		if (inBuffer[1] == NET_EVENT_CLIENT_JOIN) {
 			int newClientID = client_create(client_address);
 			if (newClientID != CLIENT_NOT_CREATED) {
-				srv_send(NET_EVENT_CLIENT_ACCEPTED, client_address, addrlen);
+				srv_send(NET_EVENT_CLIENT_ACCEPTED, client_address, addrlen, "1", (char)newClientID);
 				player_reset(newClientID);
+				srv_sendCurrentState(newClientID, client_address, addrlen);
+				
+				srv_addNewEvent(NET_EVENT_CLIENT_JOIN, "1", (char)newClientID);
+				
 				printf("EVENT_CLIENT_JOIN assigned to: %d\n", newClientID);
 			} else
 				printf("EVENT_CLIENT_JOIN not accepted\n");
 		} else {
-			client_transferPacket(client_address, inbuffer);
+			client_transferPacket(client_address, inBuffer);
 		}
 		
 		return 1;
+	}
+	
+	clock_t diff = (clock() - lastSentPacketTime) * 1000 / CLOCKS_PER_SEC;
+	if (diff > 1000 / 60) {
+		if (srv_sendEventsToAll(outBufferTick)) {
+			lastSentPacketTime = clock();
+			outBufferTick++;
+			if (outBufferTick == 0)
+				outBufferTick++;
+		}
 	}
 	
 	return 0;
 }
 
 
-void srv_sendEventsToAll(unsigned char tick, unsigned char* eventsData, size_t dataLength) {
-	srv_buf[0] = tick;
-	memcpy(srv_buf + 1, eventsData, dataLength);
-	int buflen = 1 + dataLength;
+void srv_addNewEvent(char eventType, const char* format, ...) {
+	va_list args;
+    va_start(args, format);
 	
-	send(srv_fd, srv_buf, buflen, 0);
+	int size;
+	char* bytes = toBytes(&size, format, args);
+	NetworkEvent* event = createEvent(eventType, bytes, size);
+	
+	pthread_mutex_lock(&outBufferMutex);	
+	if (outBufferPosition + event->length < MAX_SERVER_PACKET_SIZE) {
+		memcpy(outBuffer + outBufferPosition, event->data, event->length);
+		outBufferPosition += event->length;
+	}
+	pthread_mutex_unlock(&outBufferMutex);	
+	
+	releaseEvent(event);
+	free(bytes);
+	
+	va_end(args);
 }

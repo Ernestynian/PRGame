@@ -1,4 +1,11 @@
+#ifndef SERVER_H
+#define SERVER_H
+
+#include "../../Common/networkInterface.h"
+
 int  srv_start();
 void srv_stop();
 int  srv_transferPackets();
-void srv_sendEventsToAll(unsigned char tick, unsigned char* eventsData, size_t dataLength);
+void srv_addNewEvent(char eventType, const char* format, ...);
+
+#endif /* SERVER_H */
