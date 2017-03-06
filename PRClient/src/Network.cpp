@@ -10,6 +10,8 @@ Network::Network() {
 	
 	initialized = true;
 	
+	previousServerTick = 0;
+	
 	sendEvent(NET_EVENT_CLIENT_JOIN, 0, 0);
 }
 
@@ -93,11 +95,11 @@ bool Network::createPackets() {
 
 
 bool Network::recieviedAcceptMessage() {
-	checkForOneNewPacket();
-	
-	if (packetIn->data[1] == NET_EVENT_CLIENT_ACCEPTED) {
-		printf("NET_EVENT_CLIENT_ACCEPTED\n");
-		return true;
+	if (receivePacket()) {
+		if (packetIn->data[1] == NET_EVENT_CLIENT_ACCEPTED) {
+			printf("NET_EVENT_CLIENT_ACCEPTED\n");
+			return true;
+		}
 	}
 	
 	return false;
@@ -169,16 +171,45 @@ bool Network::sendPacket(unsigned char frameTime) {
 }
 
 
-void Network::checkForOneNewPacket() {
-	SDLNet_UDP_Recv(UDPSocket, packetIn);
-	currentEvent = packetIn->data + 1;
+/**
+ * Receive a single packet from the UDP socket.
+ * @return whether new packet was received
+ */
+bool Network::receivePacket() {
+	int status = SDLNet_UDP_Recv(UDPSocket, packetIn);
+	
+	if (isPacketNewer(packetIn->data[0], &previousServerTick))
+		currentEvent = packetIn->data + 1;
+	else
+		status = 0;
+	
+	return status > 0;
 }
 
 
+bool Network::isThereMoreEvents() {
+	int currentPosition = currentEvent - packetIn->data;
+	// + 1 is a tick byte and another + 1 is a length to index conversion
+	// FIXME: isn't the second +1 a +2 in reality?
+	int lastPosition    = packetIn->len - (getCurrentEventDataLength() + 1 + 1);
+	return currentPosition < lastPosition;
+}
+
 EventTypes Network::getNextEvent() {
-	currentEvent += currentEvent[1];
+	currentEvent += getCurrentEventDataLength() + 2;
 	
+	return getCurrentEventDataType();
+}
+
+
+EventTypes Network::getCurrentEventDataType() {
+	initBinaryReader((char*)getCurrentEventData());
 	return (EventTypes)*currentEvent;
+}
+
+
+char Network::getCurrentEventDataLength() {
+	return currentEvent[1];
 }
 
 

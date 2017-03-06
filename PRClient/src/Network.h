@@ -13,8 +13,11 @@ public:
 	Network();
 	~Network();
 	
-	void checkForOneNewPacket();
+	bool receivePacket();
+	bool isThereMoreEvents();
 	EventTypes getNextEvent();
+	EventTypes getCurrentEventDataType();
+	char getCurrentEventDataLength();
 	uint8_t* getCurrentEventData();
 	
 	bool recieviedAcceptMessage();
@@ -35,7 +38,8 @@ private:
 	UDPpacket* packetOut;
 	UDPpacket* packetIn;
 	UDPpacket* packetDirect;
-
+	unsigned char previousServerTick;
+	
 	uint8_t*   currentEvent;
 	
 	const char* LOCALHOST = "127.0.0.1";

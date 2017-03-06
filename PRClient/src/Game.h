@@ -15,8 +15,9 @@ public:
 	int run();
 
 private:
-	void makeConnection();
+	int makeConnection();
 	void processEvents();
+	void checkPackets();
 	
 	bool running;
 	Window* window;
