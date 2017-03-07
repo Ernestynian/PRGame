@@ -14,7 +14,7 @@ int main(int argc, const char* argv[]) {
 	for (;;) {
 		while(srv_transferPackets());
 
-		usleep(1);
+		usleep(10);
 	}
 	
 	printf("Press enter to exit.");

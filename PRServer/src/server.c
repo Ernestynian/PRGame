@@ -137,8 +137,8 @@ void srv_sendCurrentState(int newClientID, struct sockaddr_in client_address, so
 
 
 /**
- * 
- * @param tick
+ * Send common accumulated events to everyone
+ * @param tick - packet id
  * @return false when no events were send
  */
 int srv_sendEventsToAll(unsigned char tick) {
@@ -147,7 +147,7 @@ int srv_sendEventsToAll(unsigned char tick) {
 	pthread_mutex_lock(&outBufferMutex);
 	if (outBufferPosition > 1) {
 		outBuffer[0] = tick;
-		printf("Sent %d bytes to everyone\n", outBufferPosition);
+		//printf("Sent %d bytes to everyone\n", outBufferPosition);
 
 		//send(srv_fd, srv_buf, buflen, 0);
 		pthread_mutex_lock(&clientListMutex);
@@ -158,11 +158,11 @@ int srv_sendEventsToAll(unsigned char tick) {
 		}
 		pthread_mutex_unlock(&clientListMutex);
 
+		// outBufferPosition must be reset before unlocking mutex
 		outBufferPosition = 1;
 		result = 1;
 	} else
 		result = 0;
-	// outBufferPosition must be reset before unlocking mutex
 	pthread_mutex_unlock(&outBufferMutex);
 	
 	return result;

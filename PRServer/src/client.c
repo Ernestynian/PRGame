@@ -49,6 +49,9 @@ void* client_stop(client_publicData* data) {
 }
 
 
+clock_t getMsDifference(clock_t t) {
+	return (clock() - t) * 1000 / CLOCKS_PER_SEC;
+}
 
 
 void* client_process(void* dataPointer) {
@@ -102,17 +105,16 @@ void* client_process(void* dataPointer) {
 		}
 		pthread_mutex_unlock(&data->mutex);
 		
-		clock_t timerDiff = (clock() - private.lastPacketTime) * 1000 / CLOCKS_PER_SEC;
+		clock_t timerDiff = getMsDifference(private.lastPacketTime);
 		if (timerDiff > MS_TO_TIMEOUT) {
 			printf("TIMEOUTED %d\n", data->id);
 			return client_stop(data);
 		}
 		
 		if (private.spawningPlayer) {
-			timerDiff = (clock() - private.spawnTimerStart) * 1000 / CLOCKS_PER_SEC;
+			timerDiff = getMsDifference( private.spawnTimerStart) ;
 			if (timerDiff > MS_TO_SPAWN) {
 				private.spawningPlayer = 0;
-				printf("SPAWN REQUESTED\n");
 				// TODO: randomize and not collide with map
 				int x = 20 + 30 * data->id;
 				int y = 40;
