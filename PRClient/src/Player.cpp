@@ -29,8 +29,9 @@ void Player::spawn(int x, int y) {
 
 void Player::draw() {
 	SDL_Rect renderQuad = { x, y, 32, 32 };
+        SDL_Rect sourceQuad = { 0, 0, 320, 480 };//temp
 	
-	texture->draw(&renderQuad);
+	texture->draw(&sourceQuad, &renderQuad);
 }
 
 

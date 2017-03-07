@@ -11,14 +11,14 @@ World::World(Renderer* renderer, unsigned int selfID) {
 	this->renderer = renderer;
 	this->selfID   = selfID;
 	
-	Texture* t = new Texture(renderer, "res/background.bmp");
+	Texture* t = new Texture(renderer, "res/background.png");
 	background = new Sprite(t, 0, 0);
 	
 	playersById = new Player*[MAX_CLIENTS];
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 		playersById[i] = nullptr;
 	
-	playerTexture = new Texture(renderer, "res/player.bmp");
+	playerTexture = new Texture(renderer, "res/player_sprites.png");
 	
 	//players.push_back(Player(playerTexture));
 	//playersById[selfID] = &players.back();

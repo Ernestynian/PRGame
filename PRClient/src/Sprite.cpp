@@ -14,5 +14,5 @@ Sprite::~Sprite() { }
 
 
 void Sprite::draw() {
-	texture->draw(&renderQuad);
+	texture->draw(NULL, &renderQuad);
 }

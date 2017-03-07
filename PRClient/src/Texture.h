@@ -11,7 +11,7 @@ public:
 	int getWidth();
 	int getHeight();
 	
-	void draw(SDL_Rect* renderQuad);
+	void draw(SDL_Rect* sourceQuad, SDL_Rect* renderQuad);
 	
 private:
 	SDL_Texture* texture;
