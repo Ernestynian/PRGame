@@ -4,7 +4,7 @@
 
 
 Map::Map(Renderer* renderer) {
-	Texture* t = new Texture(renderer, "res/background.bmp");
+	Texture* t = new Texture(renderer, "res/background.png");
 	background = new Sprite(t, 0, 0, renderer->width, renderer->height);
 	
 	playerSpace.x = 0;

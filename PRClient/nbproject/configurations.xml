@@ -20,8 +20,8 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
-      <itemPath>res/background.bmp</itemPath>
-      <itemPath>res/player.bmp</itemPath>
+      <itemPath>res/background.png</itemPath>
+      <itemPath>res/player_sprites.png</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -81,9 +81,9 @@
       </item>
       <item path="../Common/networkInterface.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/background.bmp" ex="false" tool="3" flavor2="0">
+      <item path="res/background.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/player.bmp" ex="false" tool="3" flavor2="0">
+      <item path="res/player_sprites.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -158,9 +158,9 @@
       </item>
       <item path="../Common/networkInterface.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/background.bmp" ex="false" tool="3" flavor2="0">
+      <item path="res/background.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/player.bmp" ex="false" tool="3" flavor2="0">
+      <item path="res/player_sprites.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
