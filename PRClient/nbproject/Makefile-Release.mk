@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/7daaf93a/byteConverter.o \
 	${OBJECTDIR}/_ext/7daaf93a/networkInterface.o \
 	${OBJECTDIR}/src/Game.o \
+	${OBJECTDIR}/src/Map.o \
 	${OBJECTDIR}/src/Network.o \
 	${OBJECTDIR}/src/Player.o \
 	${OBJECTDIR}/src/Renderer.o \
@@ -86,6 +87,11 @@ ${OBJECTDIR}/src/Game.o: src/Game.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Game.o src/Game.cpp
+
+${OBJECTDIR}/src/Map.o: src/Map.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Map.o src/Map.cpp
 
 ${OBJECTDIR}/src/Network.o: src/Network.cpp
 	${MKDIR} -p ${OBJECTDIR}/src

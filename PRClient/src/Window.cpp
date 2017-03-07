@@ -4,6 +4,7 @@
 
 #include "Renderer.h"
 
+
 Window::Window() {
 	window = nullptr;
 		
@@ -14,7 +15,7 @@ Window::Window() {
 				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 				getScreenWidth(), getScreenHeight(), SDL_WINDOW_SHOWN);
 	
-	renderer = new Renderer(window);
+	renderer = new Renderer(window, getScreenWidth(), getScreenHeight());
 }
 
 

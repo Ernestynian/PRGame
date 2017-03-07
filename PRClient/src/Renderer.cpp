@@ -3,7 +3,8 @@
 #include "Renderer.h"
 
 
-Renderer::Renderer(SDL_Window* window) {
+Renderer::Renderer(SDL_Window* window, int width, int height)
+: width(width), height(height) {
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 }
 

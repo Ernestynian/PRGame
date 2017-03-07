@@ -8,12 +8,12 @@
 class Sprite {
 public:
 	Sprite(Texture* texture, int x, int y);
-	Sprite(const Sprite& orig);
+	Sprite(Texture* texture, int x, int y, int w, int h);
 	virtual ~Sprite();
 
-	void draw();
+	virtual void draw();
 	
-private:
+protected:
 	Texture* texture;
 	SDL_Rect renderQuad;
 };

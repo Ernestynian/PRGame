@@ -3,11 +3,12 @@
 
 #include <vector>
 
+#include "../../Common/networkInterface.h"
+
 #include "Renderer.h"
-#include "Sprite.h"
+#include "Map.h"
 #include "Player.h"
 
-#include "../../Common/networkInterface.h"
 
 class World {
 public:
@@ -23,9 +24,13 @@ public:
 	void parseEvent(EventTypes type, uint8_t* data);
 	
 private:
+	bool isIdCorrect(char id);
+	
+	const int gravity;
+	Map* map;
+	
 	Renderer* renderer;
 	
-	Sprite* background;
 	Texture* playerTexture;
 	std::vector<Player*> players; // Players connected to server 
 	Player** playersById;        // Players "sorted" by their server id

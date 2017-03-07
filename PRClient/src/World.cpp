@@ -1,3 +1,6 @@
+#include <string>
+#include <stdexcept>
+
 #include <SDL2/SDL.h>
 
 #include "Texture.h"
@@ -7,12 +10,11 @@
 #include "../../Common/byteConverter.h"
 
 
-World::World(Renderer* renderer, unsigned int selfID) {
+World::World(Renderer* renderer, unsigned int selfID) : gravity(1) {
 	this->renderer = renderer;
 	this->selfID   = selfID;
 	
-	Texture* t = new Texture(renderer, "res/background.png");
-	background = new Sprite(t, 0, 0);
+	map = new Map(renderer);
 	
 	playersById = new Player*[MAX_CLIENTS];
 	for (int i = 0; i < MAX_CLIENTS; ++i)
@@ -32,19 +34,21 @@ World::~World() {
 	delete[] playersById;
 	players.clear();
 	
-	delete background;
+	delete map;
 }
 
 
 void World::update() {
-	
+	for (auto player : players)
+		player->applyGravity(map, gravity);
 }
 
 
 void World::draw() {
 	renderer->clear();
 	
-	background->draw();
+	map->draw();
+	
 	for (auto player : players)
 		if (player->isAlive())
 			player->draw();
@@ -80,18 +84,37 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 		case NET_EVENT_PLAYER_SPAWN: {
 			printf("NET_EVENT_PLAYER_SPAWN\n");
 			char id = binaryRead1B();
-			int  x  = binaryRead4B();
-			int  y  = binaryRead4B();
-			
-			if (id >= 0 && id <= MAX_CLIENTS)
+			int x   = binaryRead4B();
+			int y   = binaryRead4B();
+			if (isIdCorrect(id))
 				playersById[id]->spawn(x, y);
-			else
-				; // THROW
+				
 			break;
 		}
-		case NET_EVENT_PLAYER_DIED:
+		case NET_EVENT_PLAYER_DIED: {
+			printf("NET_EVENT_PLAYER_SPAWN\n");
+			char id = binaryRead1B();
+			if (isIdCorrect(id))
+				playersById[id]->kill();
+			
 			break;
-		case NET_EVENT_PLAYER_MOVED:
+		}
+		case NET_EVENT_PLAYER_MOVED: {
+			char id = binaryRead1B();
+			int x   = binaryRead4B();
+			int y   = binaryRead4B();
+			if (isIdCorrect(id))
+				playersById[id]->move(x, y);
+			
 			break;
+		}
 	}
+}
+
+
+bool World::isIdCorrect(char id) {
+	if (id >= 0 && id < MAX_CLIENTS)
+		return true;
+	else
+		throw std::runtime_error(std::string("received id not in the correct range"));
 }

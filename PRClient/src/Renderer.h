@@ -5,7 +5,7 @@
 
 class Renderer {
 public:	
-	Renderer(SDL_Window* window);
+	Renderer(SDL_Window* window, int width, int height);
 	~Renderer();
 	
 	void clear();
@@ -14,6 +14,9 @@ public:
 	SDL_Texture* createTextureFromSurface(SDL_Surface* surface);
 	
         void draw(SDL_Texture* texture, SDL_Rect* sourceQuad, SDL_Rect* renderQuad);
+	
+	const int width;
+	const int height;
 	
 private:
 	SDL_Renderer* renderer;
