@@ -36,6 +36,7 @@ SDL_Texture* Renderer::createTextureFromSurface(SDL_Surface* surface) {
 	return temp;
 }
 
-void Renderer::draw(SDL_Texture* texture, SDL_Rect* sourceQuad, SDL_Rect* renderQuad) {	
-	SDL_RenderCopy(renderer, texture, sourceQuad, renderQuad);
+
+void Renderer::draw(SDL_Texture* texture, SDL_Rect* clipQuad, SDL_Rect* renderQuad) {	
+	SDL_RenderCopy(renderer, texture, clipQuad, renderQuad);
 }

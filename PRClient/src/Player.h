@@ -8,7 +8,9 @@ enum PlayerState {
 	PLAYER_MOVING,
 	PLAYER_FALLING,
 	PLAYER_JUMPING,
-	PLAYER_CROUCHING
+	PLAYER_CROUCHING,
+	
+	PLAYER_DYING
 };
 
 class Player {
@@ -18,17 +20,31 @@ public:
 	
 	void spawn(int x, int y);
 	void kill();
-	void move(int x, int y);
+	void moveToPosition(int x, int y);
 	
-	void applyGravity(Map* map, int g);
+	void move(Map* map);
+	void setSpeed(float x, float y);
+	
+	void applyGravity(Map* map, float g);
 	
 	void draw();
 	
 	bool isAlive();
+	bool canMove();
 	
 private:
-	int x;
-	int y;
+	void changeStateTo(PlayerState newState);
+	PlayerState state;
+	
+	const int tileW;
+	const int tileH;
+	
+	float x;
+	float y;
+	int w, h;
+	
+	float x_speed;
+	float y_speed;
 	
 	bool alive;
 	

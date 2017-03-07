@@ -4,6 +4,10 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="f1" displayName="Common" projectFiles="true">
+        <itemPath>../Common/byteConverter.h</itemPath>
+        <itemPath>../Common/networkInterface.h</itemPath>
+      </logicalFolder>
       <itemPath>src/Game.h</itemPath>
       <itemPath>src/Map.h</itemPath>
       <itemPath>src/Network.h</itemPath>
@@ -13,8 +17,6 @@
       <itemPath>src/Texture.h</itemPath>
       <itemPath>src/Window.h</itemPath>
       <itemPath>src/World.h</itemPath>
-      <itemPath>../Common/byteConverter.h</itemPath>
-      <itemPath>../Common/networkInterface.h</itemPath>
       <itemPath>src/stb_image.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -26,6 +28,10 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="f1" displayName="Common" projectFiles="true">
+        <itemPath>../Common/byteConverter.c</itemPath>
+        <itemPath>../Common/networkInterface.c</itemPath>
+      </logicalFolder>
       <itemPath>src/Game.cpp</itemPath>
       <itemPath>src/Map.cpp</itemPath>
       <itemPath>src/Network.cpp</itemPath>
@@ -35,9 +41,7 @@
       <itemPath>src/Texture.cpp</itemPath>
       <itemPath>src/Window.cpp</itemPath>
       <itemPath>src/World.cpp</itemPath>
-      <itemPath>../Common/byteConverter.c</itemPath>
       <itemPath>src/main.cpp</itemPath>
-      <itemPath>../Common/networkInterface.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"

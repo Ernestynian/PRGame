@@ -4,12 +4,19 @@
 #include "Player.h"
 
 
-Player::Player(Texture* texture) {
+Player::Player(Texture* texture) : tileW(320), tileH(480) {
 	this->texture = texture;
 	x = 0;
 	y = 0;
+	w = tileW / 10;
+	h = tileH / 10;
+	
+	x_speed = 0;
+	y_speed = 0;
 	
 	alive = false;
+	
+	state = PLAYER_STILL;
 }
 
 
@@ -23,6 +30,8 @@ void Player::spawn(int x, int y) {
 		alive = true;
 		this->x = x;
 		this->y = y;
+		
+		changeStateTo(PLAYER_STILL);
 	}
 }
 
@@ -32,23 +41,45 @@ void Player::kill() {
 }
 
 
-void Player::move(int x, int y) {
+void Player::moveToPosition(int x, int y) {
 	this->x = x;
 	this->y = y;
 }
 
 
-void Player::applyGravity(Map* map, int g) {
-	SDL_Rect renderQuad = { x, y + g, 32, 32 };
+void Player::move(Map* map) {
+	// TODO: check collisions with world
+	SDL_Rect newBoundaries = { (int)(x + x_speed), (int)(y + y_speed), w, h };
+	if (!map->collides(&newBoundaries)) {
+		x += x_speed;
+		y += y_speed;
+	} else if (state == PLAYER_MOVING || state == PLAYER_FALLING) {
+		x = newBoundaries.x;
+		y = newBoundaries.y;
+		changeStateTo(PLAYER_STILL);
+	}
+}
+
+
+void Player::setSpeed(float x, float y) {
+	x_speed = x;
+	y_speed = y;
+}
+
+
+void Player::applyGravity(Map* map, float g) {
+	SDL_Rect boundaries = { (int)x, (int)y, w, h };
+	if (map->canFall(boundaries))
+		changeStateTo(PLAYER_FALLING);
 	
-	if (!map->collides(renderQuad))
-		this->y += g;
+	if (state == PLAYER_FALLING)
+		this->y_speed += g;
 }
 
 
 void Player::draw() {
-	SDL_Rect renderQuad = { x, y, 32, 32 };
-        SDL_Rect sourceQuad = { 0, 0, 320, 480 };//temp
+	SDL_Rect renderQuad = { (int)x, (int)y, w, h };
+	SDL_Rect sourceQuad = { 0, 0, tileW, tileH };//temp
 	
 	texture->draw(&sourceQuad, &renderQuad);
 }
@@ -56,4 +87,24 @@ void Player::draw() {
 
 bool Player::isAlive() {
 	return alive;
+}
+
+
+bool Player::canMove() {
+	switch (state) {
+	case PLAYER_STILL:
+	case PLAYER_MOVING:
+		return true;
+	default:
+		return false;
+	}
+}
+
+
+void Player::changeStateTo(PlayerState newState) {
+	if (newState == PLAYER_STILL) {
+		x_speed = 0;
+		y_speed = 0;
+	}
+	state = newState;
 }

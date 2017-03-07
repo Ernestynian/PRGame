@@ -10,7 +10,7 @@
 #include "../../Common/byteConverter.h"
 
 
-World::World(Renderer* renderer, unsigned int selfID) : gravity(1) {
+World::World(Renderer* renderer, unsigned int selfID) : gravity(0.0054) {
 	this->renderer = renderer;
 	this->selfID   = selfID;
 	
@@ -21,6 +21,8 @@ World::World(Renderer* renderer, unsigned int selfID) : gravity(1) {
 		playersById[i] = nullptr;
 	
 	playerTexture = new Texture(renderer, "res/player_sprites.png");
+	
+	selfDirection = DIRECTION_NONE;
 	
 	//players.push_back(Player(playerTexture));
 	//playersById[selfID] = &players.back();
@@ -38,9 +40,22 @@ World::~World() {
 }
 
 
-void World::update() {
+void World::update(float delta) {
 	for (auto player : players)
-		player->applyGravity(map, gravity);
+		player->applyGravity(map, gravity * delta);
+	
+	if (playersById[selfID] != nullptr) {
+		if (playersById[selfID]->isAlive()) {
+			if (selfDirection != DIRECTION_NONE) {
+				if (playersById[selfID]->canMove()) {
+					playersById[selfID]->setSpeed(0.1 * delta * selfDirection, 0);
+				}
+			}
+		}
+	}
+	
+	for (auto player : players)
+		player->move(map);
 }
 
 
@@ -104,12 +119,27 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			int x   = binaryRead4B();
 			int y   = binaryRead4B();
 			if (isIdCorrect(id))
-				playersById[id]->move(x, y);
+				playersById[id]->moveToPosition(x, y);
 			
 			break;
 		}
 	}
 }
+
+
+void World::selfStartMoving(int direction) {
+	selfDirection = (PlayerDirections)direction;
+}
+
+
+void World::selfStopMoving(int direction) {
+	if (selfDirection == direction) {
+		selfDirection = DIRECTION_NONE;
+		if (playersById[selfID]->canMove())
+			playersById[selfID]->setSpeed(0, 0);
+	}
+}
+
 
 
 bool World::isIdCorrect(char id) {

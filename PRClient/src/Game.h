@@ -23,7 +23,7 @@ private:
 	Window* window;
 	World* world;
 	
-	const unsigned int msPerFrame;
+	const float msPerFrame;
 	const unsigned int networkTickrate;
 	
 	Network* network;

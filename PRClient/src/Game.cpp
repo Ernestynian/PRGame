@@ -11,15 +11,15 @@
 #define DESIRED_FRAMERATE 60
 
 
-Game::Game(int argc, const char* argv[]) : msPerFrame(1000 / DESIRED_FRAMERATE), 
+Game::Game(int argc, const char* argv[]) : msPerFrame(1000.0 / DESIRED_FRAMERATE), 
 										   networkTickrate(30) {	
-	window = new Window();
-	world    = nullptr;
-	network  = nullptr;
+	window  = new Window();
+	world   = nullptr;
+	network = nullptr;
 	
-	running  = true;
+	running = true;
 	
-	frame    = 0;
+	frame   = 0;
 }
 
 
@@ -51,7 +51,7 @@ int Game::run() {
 		
 		checkPackets();
 		
-		world->update();
+		world->update(msPerFrame); // TODO: make it dynamic
 		
 		network->sendPacket(frame);
 		
@@ -111,6 +111,28 @@ void Game::processEvents() {
 	while (SDL_PollEvent(&e) != 0) {
 		if (e.type == SDL_QUIT)
 			running = false;
+		else if (e.type == SDL_KEYDOWN) {
+			if (e.key.keysym.sym == SDLK_RIGHT
+			 || e.key.keysym.sym == SDLK_d) {
+				world->selfStartMoving(DIRECTION_RIGHT);
+				continue;
+			}
+			if (e.key.keysym.sym == SDLK_LEFT
+			 || e.key.keysym.sym == SDLK_a)
+				world->selfStartMoving(DIRECTION_LEFT);
+			
+		} else if (e.type == SDL_KEYUP) {
+			if (e.key.keysym.sym == SDLK_RIGHT
+			 || e.key.keysym.sym == SDLK_d) {
+				world->selfStopMoving(DIRECTION_RIGHT);
+				continue;
+			}
+
+			if (e.key.keysym.sym == SDLK_LEFT
+			 || e.key.keysym.sym == SDLK_a)
+				world->selfStopMoving(DIRECTION_LEFT);
+			
+		}
 	}
 }
 

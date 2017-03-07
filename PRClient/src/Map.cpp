@@ -10,7 +10,7 @@ Map::Map(Renderer* renderer) {
 	playerSpace.x = 0;
 	playerSpace.y = 0;
 	playerSpace.w = renderer->width;
-	playerSpace.h = renderer->height;
+	playerSpace.h = renderer->height - 30;
 }
 
 
@@ -19,9 +19,19 @@ Map::~Map() {
 }
 
 
-bool Map::collides(SDL_Rect object) {
-	if (object.y + object.h > playerSpace.x + playerSpace.h)
+bool Map::canFall(SDL_Rect object) {
+	if (object.y + object.h + 1 > playerSpace.x + playerSpace.h)
+		return false;
+	
+	return true;
+}
+
+
+bool Map::collides(SDL_Rect* object) {
+	if (object->y + object->h > playerSpace.x + playerSpace.h) {
+		object->y = playerSpace.x + playerSpace.h - object->h;
 		return true;
+	}
 	
 	return false;
 }
