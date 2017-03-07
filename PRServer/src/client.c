@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <time.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <sys/time.h>
 
 #include "../../Common/networkInterface.h"
 #include "../../Common/byteConverter.h"
@@ -18,9 +19,9 @@ typedef struct {
 	unsigned char currentTick;
 	unsigned char previousTick;
 	
-	clock_t lastPacketTime;
+	struct timeval lastPacketTime;
 	int spawningPlayer;
-	clock_t spawnTimerStart;
+	struct timeval spawnTimerStart;
 } client_privateData;
 
 
@@ -49,8 +50,11 @@ void* client_stop(client_publicData* data) {
 }
 
 
-clock_t getMsDifference(clock_t t) {
-	return (clock() - t) * 1000 / CLOCKS_PER_SEC;
+double getMsDifference(struct timeval t) {
+	struct timeval current;
+	gettimeofday(&current, NULL);
+	double diff = (current.tv_sec  - t.tv_sec) * 1000.0;
+	return diff + (current.tv_usec - t.tv_usec) / 1000.0;
 }
 
 
@@ -63,7 +67,7 @@ void* client_process(void* dataPointer) {
 	
 	client_privateData private;
 	private.previousTick = 0;
-	private.lastPacketTime = clock();
+	gettimeofday(&private.lastPacketTime, NULL);
 	// Spawn player at the start (right after he joins)
 	private.spawningPlayer = 1;
 	private.spawnTimerStart = private.lastPacketTime;
@@ -100,19 +104,19 @@ void* client_process(void* dataPointer) {
 				private.currentTick = data->buf[0];
 			}
 			
-			private.lastPacketTime = clock();
+			gettimeofday(&private.lastPacketTime, NULL);
 			data->bufHasNewData = 0;
 		}
 		pthread_mutex_unlock(&data->mutex);
 		
-		clock_t timerDiff = getMsDifference(private.lastPacketTime);
+		double timerDiff = getMsDifference(private.lastPacketTime);
 		if (timerDiff > MS_TO_TIMEOUT) {
 			printf("TIMEOUTED %d\n", data->id);
 			return client_stop(data);
 		}
 		
 		if (private.spawningPlayer) {
-			timerDiff = getMsDifference( private.spawnTimerStart) ;
+			timerDiff = getMsDifference(private.spawnTimerStart);
 			if (timerDiff > MS_TO_SPAWN) {
 				private.spawningPlayer = 0;
 				// TODO: randomize and not collide with map
@@ -122,6 +126,8 @@ void* client_process(void* dataPointer) {
 				srv_addNewEvent(NET_EVENT_PLAYER_SPAWN, "144", data->id, x, y);
 			}
 		}
+		
+		usleep(1);
 	}
 	
 	return client_stop(data);
