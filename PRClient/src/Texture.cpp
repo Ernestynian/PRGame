@@ -67,3 +67,8 @@ int Texture::getHeight() {
 void Texture::draw(SDL_Rect* sourceQuad, SDL_Rect* renderQuad) {
 	renderer->draw(texture, sourceQuad, renderQuad);
 }
+
+
+void Texture::draw(SDL_Rect* sourceQuad, SDL_Rect* renderQuad, double angle, SDL_Point* center, SDL_RendererFlip flip) {
+	renderer->draw(texture, sourceQuad, renderQuad, angle, center, flip);
+}

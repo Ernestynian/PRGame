@@ -12,6 +12,7 @@ public:
 	int getHeight();
 	
 	void draw(SDL_Rect* sourceQuad, SDL_Rect* renderQuad);
+        void draw(SDL_Rect* sourceQuad, SDL_Rect* renderQuad, double angle, SDL_Point* center, SDL_RendererFlip flip);
 	
 private:
 	SDL_Texture* texture;

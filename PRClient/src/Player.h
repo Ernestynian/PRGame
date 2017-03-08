@@ -30,6 +30,7 @@ public:
 	void move(Map* map);
 	bool hasMoved();
 	
+        void calculateAnimation();
 	void draw();
 	
 	bool isAlive();
@@ -51,6 +52,12 @@ private:
 	
 	float x_speed;
 	float y_speed;
+        
+        float delta_anim_time;
+        double anim_cycle_time;//const
+        int anim_frame_count;//const
+        SDL_RendererFlip flip;
+        int anim_frame;
 	
 	bool alive;
 	

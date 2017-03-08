@@ -40,3 +40,7 @@ SDL_Texture* Renderer::createTextureFromSurface(SDL_Surface* surface) {
 void Renderer::draw(SDL_Texture* texture, SDL_Rect* clipQuad, SDL_Rect* renderQuad) {	
 	SDL_RenderCopy(renderer, texture, clipQuad, renderQuad);
 }
+
+void Renderer::draw(SDL_Texture* texture, SDL_Rect* clipQuad, SDL_Rect* renderQuad, double angle, SDL_Point* center, SDL_RendererFlip flip) {
+    SDL_RenderCopyEx( renderer, texture, clipQuad, renderQuad, angle, center, flip );
+}

@@ -4,7 +4,8 @@
 #include "Player.h"
 
 
-Player::Player(Texture* texture) : tileW(320), tileH(480) {
+Player::Player(Texture* texture) : tileW(320), tileH(480), 
+        anim_cycle_time(0.4), anim_frame_count(4) {
 	this->texture = texture;
 	x = 0;
 	y = 0;
@@ -99,11 +100,34 @@ bool Player::hasMoved() {
 }
 
 
+void Player::calculateAnimation() {
+    if(x_speed == 0)
+    {
+        delta_anim_time = 0;
+        flip = SDL_FLIP_NONE;
+    }
+    else
+    {
+        delta_anim_time += fabs(x_speed*0.01);
+        if(delta_anim_time > anim_cycle_time)
+            delta_anim_time = delta_anim_time - anim_cycle_time;
+        if(x_speed >= 0)
+            flip = SDL_FLIP_NONE;
+        else
+            flip = SDL_FLIP_HORIZONTAL;
+    }
+    
+    anim_frame = static_cast<int>(((float)anim_frame_count/anim_cycle_time)*delta_anim_time);
+}
+    
+    
 void Player::draw() {
 	SDL_Rect renderQuad = { (int)x, (int)y, w, h };
-	SDL_Rect sourceQuad = { 0, 0, tileW, tileH };//temp
-	
-	texture->draw(&sourceQuad, &renderQuad);
+	SDL_Rect bodySourceQuad = { 0 + anim_frame * tileW, 0, tileW, tileH };//temp
+	SDL_Rect handsSourceQuad = { 0 + anim_frame * tileW, tileH, tileW, tileH };//temp
+        
+	texture->draw(&bodySourceQuad, &renderQuad, 0, NULL, flip);
+    texture->draw(&handsSourceQuad, &renderQuad, 0, NULL, flip);//
 }
 
 

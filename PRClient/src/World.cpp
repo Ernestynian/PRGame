@@ -51,7 +51,10 @@ void World::update(float delta) {
 	}
 	
 	for (auto player : players)
+    {
 		player->move(map);
+        player->calculateAnimation();
+    }
 }
 
 
