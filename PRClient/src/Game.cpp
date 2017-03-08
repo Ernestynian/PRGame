@@ -128,7 +128,7 @@ void Game::processEvents() {
 					break;
 				case SDLK_SPACE:
 				case SDLK_UP:
-					if (world->selfJump())
+					if (world->selfJump());
 						network->addNewEvent(NET_EVENT_PLAYER_JUMP);
 					break;
 			}		

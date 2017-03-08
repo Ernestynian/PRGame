@@ -58,10 +58,15 @@ double getMsDifference(struct timeval t) {
 }
 
 
-int hasMoreEvents(char* currentEvent, client_publicData* data) {
-	int currentPosition = currentEvent - data->buf;
-	int lastPosition    = data->bufLen - (currentEvent[1] + 1 + 1);
-	return currentPosition < lastPosition;
+int getNextEvent(char** currentEvent, client_publicData* data) {
+	int currentPosition = *currentEvent - data->buf;
+	int lastPosition    = data->bufLen - ((*currentEvent)[1] + 1 + 1);
+	if (currentPosition < lastPosition) {
+		*currentEvent += (*currentEvent)[1] + 2;
+		return 1;
+	}
+	
+	return 0;
 }
 
 
@@ -106,9 +111,12 @@ void* client_process(void* dataPointer) {
 							srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "144", data->id, x, y);
 							break;
 						}
-						// TODO: transfer jump status
+						case NET_EVENT_PLAYER_JUMP: {
+
+							break;
+						}
 					}
-				} while (hasMoreEvents(currentEvent, data));
+				} while (getNextEvent(&currentEvent, data));
 				
 				gettimeofday(&private.lastPacketTime, NULL);
 			}
