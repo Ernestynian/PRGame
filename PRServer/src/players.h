@@ -4,8 +4,8 @@
 #include "pthread.h"
 
 typedef struct {
-	int x;
-	int y;
+	float x;
+	float y;
 } position;
 
 typedef struct {
@@ -25,7 +25,7 @@ void players_init();
 
 void player_reset(int id);
 
-void player_moved(int id, char* data);
+void player_moved(char id, int x, int y);
 
 void player_spawn(int id, int x, int y);
 

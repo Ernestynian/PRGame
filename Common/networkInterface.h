@@ -12,6 +12,7 @@
 #define NETWORK_INTERFACE_H
 
 #define PORT 1337
+#define PACKETS_PER_SECOND 60
 #define MAX_CLIENT_PACKET_SIZE 256
 #define MAX_SERVER_PACKET_SIZE 2048
 #define MAX_CLIENTS 32
@@ -34,17 +35,20 @@ enum EventTypes {
 	NET_EVENT_CLIENT_JOIN,
 	// [S] <1:new client id>
 	NET_EVENT_CLIENT_ACCEPTED,
-	// [S] <1:new client id>
+	// [S] <1:client id>
 	// [C] none
 	NET_EVENT_CLIENT_EXIT,
 	
-	// [S] <1:new client id> <4:pos_x> <4:pos_y>
+	// [S] <1:client id> <4:pos_x> <4:pos_y>
 	NET_EVENT_PLAYER_SPAWN,
-	// [S] <1:new client id>
+	// [S] <1:client id>
 	NET_EVENT_PLAYER_DIED,
-	// [S] <1:new client id> <4:pos_x> <4:pos_y>
+	// [S] <1:client id> <4:pos_x> <4:pos_y>
 	// [C] <4:pos_x> <4:pos_y>
-	NET_EVENT_PLAYER_MOVED
+	NET_EVENT_PLAYER_MOVED,
+	// [S] <1:client id>
+	// [C] none
+	NET_EVENT_PLAYER_JUMP
 };
 
 

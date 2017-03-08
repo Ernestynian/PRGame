@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "../../Common/networkInterface.h"
 #include "../../Common/byteConverter.h"
@@ -16,13 +17,14 @@
 #include "players.h"
 
 int srv_fd = 0;
-clock_t lastSentPacketTime;
+struct timeval lastSentPacketTime;
 
 char            inBuffer[MAX_CLIENT_PACKET_SIZE];
 char            outBuffer[MAX_SERVER_PACKET_SIZE];
 int             outBufferPosition;
 unsigned char   outBufferTick;
 pthread_mutex_t outBufferMutex = PTHREAD_MUTEX_INITIALIZER;
+double          msTimeToSendPacket = 1000.0 / PACKETS_PER_SECOND;
 
 
 int srv_start() {
@@ -115,6 +117,7 @@ void srv_addNewEventTo(char* buffer, int* pos, char eventType, const char* forma
 void srv_sendCurrentState(int newClientID, struct sockaddr_in client_address, socklen_t addrlen) {
 	int len = 1;
 	char buffer[MAX_SERVER_PACKET_SIZE];
+	buffer[0] = 0;
 	
 	pthread_mutex_lock(&clientListMutex);
 	for (int i = 0; i < MAX_CLIENTS; ++i) {
@@ -149,7 +152,6 @@ int srv_sendEventsToAll(unsigned char tick) {
 		outBuffer[0] = tick;
 		//printf("Sent %d bytes to everyone\n", outBufferPosition);
 
-		//send(srv_fd, srv_buf, buflen, 0);
 		pthread_mutex_lock(&clientListMutex);
 		for (int i = 0; i < MAX_CLIENTS; ++i) {
 			sendto(srv_fd, outBuffer, outBufferPosition, 0, 
@@ -189,16 +191,21 @@ int srv_transferPackets() {
 			} else
 				printf("EVENT_CLIENT_JOIN not accepted\n");
 		} else {
-			client_transferPacket(client_address, inBuffer);
+			client_transferPacket(client_address, inBuffer, recvlen);
 		}
 		
 		return 1;
 	}
 	
-	clock_t diff = (clock() - lastSentPacketTime) * 1000 / CLOCKS_PER_SEC;
-	if (diff > 1000 / 60) {
+	
+	struct timeval current;
+	gettimeofday(&current, NULL);
+	double 
+	diff =  (current.tv_sec - lastSentPacketTime.tv_sec) * 1000.0;
+	diff += (current.tv_usec - lastSentPacketTime.tv_usec) / 1000.0;
+	if (diff > msTimeToSendPacket) {
 		if (srv_sendEventsToAll(outBufferTick)) {
-			lastSentPacketTime = clock();
+			gettimeofday(&lastSentPacketTime, NULL);
 			outBufferTick++;
 			if (outBufferTick == 0)
 				outBufferTick++;

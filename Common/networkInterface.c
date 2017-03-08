@@ -3,7 +3,7 @@
 #include "networkInterface.h"
 
 
-NetworkEvent* createEvent(char type, const char* data, int dataLength) {
+NetworkEvent* createEvent(char type, const char* data, int dataLength) {	
 	NetworkEvent* event = (NetworkEvent*)malloc(sizeof(NetworkEvent));
 	
 	event->length = 2 + dataLength;
@@ -12,7 +12,8 @@ NetworkEvent* createEvent(char type, const char* data, int dataLength) {
 	
 	event->data[0] = type;
 	event->data[1] = dataLength;
-	memcpy(event->data + 2, data, dataLength);
+	if (data != NULL && dataLength > 0)
+		memcpy(event->data + 2, data, dataLength);
 	
 	return event;
 };
@@ -24,8 +25,15 @@ void releaseEvent(NetworkEvent* event) {
 }
 
 int isPacketNewer(unsigned char currentTick, unsigned char* previousTick) {
+	// Always accept packets with tick 0
 	if (currentTick == 0)
 		return 1;
+	
+	// Always accept when network is not "initialized"
+	if (*previousTick == 0) {
+		*previousTick = currentTick;
+		return 1;
+	}
 	
 	unsigned char diff = currentTick - *previousTick;
 	*previousTick = currentTick;

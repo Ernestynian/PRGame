@@ -43,25 +43,23 @@ char* toBytes(int* bytesCount, const char* types, va_list valist) {
 	for (int i = 0; i < args; i++)
 		size += types[i] - '0';
 	
-	*bytesCount = 0;
 	buffer = malloc(size);
 	
 	for (int i = 0; i < args; i++) {
 		switch (types[i]) {
 			case '4':
 				convertInt(va_arg(valist, int32_t));
-				*bytesCount += 4;
 				break;
 			case '2':
 				convertShort(va_arg(valist, int32_t));
-				*bytesCount += 2;
 				break;
 			case '1':
 				convertByte(va_arg(valist, int32_t));
-				(*bytesCount)++;
 				break;
 		}
 	}
+	
+	*bytesCount = pos;
 	
 	return buffer;
 }
@@ -79,7 +77,7 @@ char* toBytesV(int* bytesCount, const char* types, ...) {
 }
 
 
-const char* reader_bytes;
+const uint8_t* reader_bytes;
 int reader_position;
 
 void initBinaryReader(const char* bytes) {

@@ -2,7 +2,6 @@
 #include <pthread.h>
 
 #include "../../Common/networkInterface.h"
-#include "../../Common/byteConverter.h"
 
 #include "players.h"
 
@@ -25,11 +24,7 @@ void player_reset(int id) {
 }
 
 
-void player_moved(int id, char* data) {
-	int x = binaryRead4B();
-	int y = binaryRead4B();
-	printf(" %d %d", x, y);
-	
+void player_moved(char id, int x, int y) {
 	// Check collisions
 	
 	pthread_mutex_lock(&players[id].mutex);

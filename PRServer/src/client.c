@@ -58,6 +58,13 @@ double getMsDifference(struct timeval t) {
 }
 
 
+int hasMoreEvents(char* currentEvent, client_publicData* data) {
+	int currentPosition = currentEvent - data->buf;
+	int lastPosition    = data->bufLen - (currentEvent[1] + 1 + 1);
+	return currentPosition < lastPosition;
+}
+
+
 void* client_process(void* dataPointer) {
 	client_publicData* data = dataPointer;
 	
@@ -75,36 +82,37 @@ void* client_process(void* dataPointer) {
 	for (;;) {
 		pthread_mutex_lock(&data->mutex);
 		if (data->bufHasNewData) {
-			if (data->buf[1] == NET_EVENT_CLIENT_EXIT) {
-				printf("EVENT_CLIENT_EXIT %d\n", data->id);
-				return client_stop(data);
-			}
-			
 			private.currentTick = data->buf[0];
-			
-			if (isPacketNewer(private.currentTick, &private.previousTick)) {
-				//printf("[%3hhu] ", data->buf[0]);
-				if (data->buf[1] > 0) {
-					printf("received message: ");
-					
-					initBinaryReader(data->buf + 3);
-					
-					switch(data->buf[1]) {
-						case NET_EVENT_PLAYER_MOVED:
-							player_moved(data->id, data->buf + 3);
-							break;
-						default:
-							printf("\"%s\"", data->buf + 3);
-							break;
-					}						
 
-					printf(" [%d %d]\n", data->buf[1], data->buf[2]);
-				} //else printf("received ping message: %d\n", data->buf[1]);
+			if (isPacketNewer(private.currentTick, &private.previousTick)) {
+				char* currentEvent = data->buf + 1;
 				
-				private.currentTick = data->buf[0];
+				do {
+					initBinaryReader(currentEvent + 2);
+
+					switch(*currentEvent) {
+						case NET_EVENT_CLIENT_EXIT:
+							printf("EVENT_CLIENT_EXIT %d\n", data->id);
+							return client_stop(data);
+						case NET_EVENT_PLAYER_DIED: {
+
+							break;
+						}
+						case NET_EVENT_PLAYER_MOVED: {
+							int x = binaryRead4B();
+							int y = binaryRead4B();
+							player_moved(data->id, x, y);
+
+							srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "144", data->id, x, y);
+							break;
+						}
+						// TODO: transfer jump status
+					}
+				} while (hasMoreEvents(currentEvent, data));
+				
+				gettimeofday(&private.lastPacketTime, NULL);
 			}
 			
-			gettimeofday(&private.lastPacketTime, NULL);
 			data->bufHasNewData = 0;
 		}
 		pthread_mutex_unlock(&data->mutex);
@@ -119,7 +127,7 @@ void* client_process(void* dataPointer) {
 			timerDiff = getMsDifference(private.spawnTimerStart);
 			if (timerDiff > MS_TO_SPAWN) {
 				private.spawningPlayer = 0;
-				// TODO: randomize and not collide with map
+				// TODO: randomize and check collision with the map
 				int x = 20 + 30 * data->id;
 				int y = 40;
 				player_spawn(data->id, x, y);
@@ -170,7 +178,7 @@ uint32_t client_create(struct sockaddr_in client_address) {
 }
 
 
-void client_transferPacket(struct sockaddr_in client_address, char* data) {
+void client_transferPacket(struct sockaddr_in client_address, char* data, int dataLen) {
 	pthread_mutex_lock(&clientListMutex);
 	for (int i = 0;i < MAX_CLIENTS; ++i) {
 		if (clients[i].cd == NULL)
@@ -181,6 +189,7 @@ void client_transferPacket(struct sockaddr_in client_address, char* data) {
 			pthread_mutex_lock(&(clients[i].cd->mutex));
 			// TODO: change const length into dynamic
 			memcpy(clients[i].cd->buf, data, MAX_CLIENT_PACKET_SIZE);
+			clients[i].cd->bufLen = dataLen;
 			clients[i].cd->bufHasNewData = 1;
 			pthread_mutex_unlock(&(clients[i].cd->mutex));
 		}
