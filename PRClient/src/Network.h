@@ -23,6 +23,7 @@ public:
 	bool recieviedAcceptMessage();
 	
 	void addNewEvent(EventTypes eventType, const char* format, ...);
+	void addNewEvent(EventTypes eventType);
 	bool sendPacket(unsigned char frameTime);
 private:
 	bool init();

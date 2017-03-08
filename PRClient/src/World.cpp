@@ -1,13 +1,11 @@
-#include <string>
 #include <stdexcept>
 
 #include <SDL2/SDL.h>
 
+#include "../../Common/byteConverter.h"
+
 #include "Texture.h"
 #include "World.h"
-
-#include "../../Common/networkInterface.h"
-#include "../../Common/byteConverter.h"
 
 
 World::World(Renderer* renderer, unsigned int selfID) : gravity(0.0054) {
@@ -47,9 +45,7 @@ void World::update(float delta) {
 	if (playersById[selfID] != nullptr) {
 		if (playersById[selfID]->isAlive()) {
 			if (selfDirection != DIRECTION_NONE) {
-				if (playersById[selfID]->canMove()) {
-					playersById[selfID]->setSpeed(0.1 * delta * selfDirection, 0);
-				}
+				playersById[selfID]->setSpeed(0.1 * delta * selfDirection, 0);
 			}
 		}
 	}
@@ -101,16 +97,24 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			char id = binaryRead1B();
 			int x   = binaryRead4B();
 			int y   = binaryRead4B();
-			if (isIdCorrect(id))
-				playersById[id]->spawn(x, y);
+			if (isIdCorrect(id)) {
+				if (playersById[id] != nullptr)
+					playersById[id]->spawn(x, y);
+				else
+					printf("%d is nullptr!!!!\n", id);
+			}
 				
 			break;
 		}
 		case NET_EVENT_PLAYER_DIED: {
-			printf("NET_EVENT_PLAYER_SPAWN\n");
+			printf("NET_EVENT_PLAYER_DIED\n");
 			char id = binaryRead1B();
-			if (isIdCorrect(id))
-				playersById[id]->kill();
+			if (isIdCorrect(id)) {
+				if (playersById[id] != nullptr)
+					playersById[id]->kill();
+				else
+					printf("%d is nullptr!!!!\n", id);
+			}
 			
 			break;
 		}
@@ -118,8 +122,10 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			char id = binaryRead1B();
 			int x   = binaryRead4B();
 			int y   = binaryRead4B();
-			if (isIdCorrect(id))
-				playersById[id]->moveToPosition(x, y);
+			if (isIdCorrect(id)) {
+				if (id != selfID)
+					playersById[id]->teleportToPosition(x, y);
+			}
 			
 			break;
 		}
@@ -140,6 +146,32 @@ void World::selfStopMoving(int direction) {
 	}
 }
 
+
+/**
+ * Try to perform jump of the controlled player
+ * @return true when acually jumped
+ */
+bool World::selfJump() {
+	return playersById[selfID]->tryToJump(-5);		
+}
+
+
+bool World::selfHasMoved() {
+	if (playersById[selfID] == nullptr)
+		return false;
+	
+	return playersById[selfID]->hasMoved();
+}
+
+
+int World::getSelfPosX() {
+	return playersById[selfID]->getPosX();
+}
+
+
+int World::getSelfPosY() {
+	return playersById[selfID]->getPosY();
+}
 
 
 bool World::isIdCorrect(char id) {

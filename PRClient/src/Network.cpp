@@ -131,6 +131,18 @@ void Network::addNewEvent(EventTypes eventType, const char* format, ...) {
 }
 
 
+void Network::addNewEvent(EventTypes eventType) {
+	NetworkEvent* event = createEvent(eventType, 0, 0);
+	
+	if (packetOut->len + event->length < packetOut->maxlen) {
+		memcpy(packetOut->data + packetOut->len, event->data, event->length);
+		packetOut->len += event->length;
+	}
+	
+	releaseEvent(event);
+}
+
+
 void Network::sendEvent(EventTypes eventType, const char* data, int length) {
 	NetworkEvent* event = createEvent(eventType, data, length);
 	
@@ -178,10 +190,12 @@ bool Network::sendPacket(unsigned char frameTime) {
 bool Network::receivePacket() {
 	int status = SDLNet_UDP_Recv(UDPSocket, packetIn);
 	
-	if (isPacketNewer(packetIn->data[0], &previousServerTick))
-		currentEvent = packetIn->data + 1;
-	else
-		status = 0;
+	if (status > 0) {
+		if (isPacketNewer(packetIn->data[0], &previousServerTick))
+			currentEvent = packetIn->data + 1;
+		else
+			status = 0;
+	}
 	
 	return status > 0;
 }
@@ -189,8 +203,7 @@ bool Network::receivePacket() {
 
 bool Network::isThereMoreEvents() {
 	int currentPosition = currentEvent - packetIn->data;
-	// + 1 is a tick byte and another + 1 is a length to index conversion
-	// FIXME: isn't the second +1 a +2 in reality?
+	// + 1 is a tick byte and another + 1 a "next" event type
 	int lastPosition    = packetIn->len - (getCurrentEventDataLength() + 1 + 1);
 	return currentPosition < lastPosition;
 }

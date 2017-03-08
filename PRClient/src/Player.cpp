@@ -41,14 +41,47 @@ void Player::kill() {
 }
 
 
-void Player::moveToPosition(int x, int y) {
+void Player::teleportToPosition(int x, int y) {
 	this->x = x;
 	this->y = y;
 }
 
 
+void Player::applyGravity(Map* map, float g) {
+	if (isAlive()) {
+		SDL_Rect boundaries = { (int)x, (int)y, w, h };
+		if (map->canFall(boundaries)) {
+			y_speed += g;
+			
+			if (y_speed > 0.0)
+				changeStateTo(PLAYER_FALLING);
+		}			
+	}
+}
+
+
+void Player::setSpeed(float x, float y) {
+	if (canMove()) {
+		x_speed = x;
+		y_speed = y;
+		changeStateTo(PLAYER_MOVING);
+	}
+}
+
+
+bool Player::tryToJump(float speed) {
+	if (canMove()) {
+		y_speed = speed;
+		changeStateTo(PLAYER_JUMPING);
+		return true;
+	}
+	
+	return false;
+}
+
+
 void Player::move(Map* map) {
-	// TODO: check collisions with world
+	// TODO: collision when going up
 	SDL_Rect newBoundaries = { (int)(x + x_speed), (int)(y + y_speed), w, h };
 	if (!map->collides(&newBoundaries)) {
 		x += x_speed;
@@ -61,19 +94,8 @@ void Player::move(Map* map) {
 }
 
 
-void Player::setSpeed(float x, float y) {
-	x_speed = x;
-	y_speed = y;
-}
-
-
-void Player::applyGravity(Map* map, float g) {
-	SDL_Rect boundaries = { (int)x, (int)y, w, h };
-	if (map->canFall(boundaries))
-		changeStateTo(PLAYER_FALLING);
-	
-	if (state == PLAYER_FALLING)
-		this->y_speed += g;
+bool Player::hasMoved() {
+	return state == PLAYER_MOVING || state == PLAYER_FALLING || state == PLAYER_JUMPING;
 }
 
 
@@ -91,6 +113,9 @@ bool Player::isAlive() {
 
 
 bool Player::canMove() {
+	if (!isAlive())
+		return false;
+	
 	switch (state) {
 	case PLAYER_STILL:
 	case PLAYER_MOVING:
@@ -101,10 +126,21 @@ bool Player::canMove() {
 }
 
 
+int Player::getPosX() {
+	return static_cast<int>(x);
+}
+
+
+int Player::getPosY() {
+	return static_cast<int>(y);
+}
+
+
 void Player::changeStateTo(PlayerState newState) {
 	if (newState == PLAYER_STILL) {
 		x_speed = 0;
 		y_speed = 0;
 	}
+	
 	state = newState;
 }

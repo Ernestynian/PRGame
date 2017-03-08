@@ -51,17 +51,22 @@ int Game::run() {
 		
 		checkPackets();
 		
-		world->update(msPerFrame); // TODO: make it dynamic
+		world->update(msPerFrame); // TODO: make it dynamic (delta)
+		
+		if (world->selfHasMoved()) {
+			network->addNewEvent(NET_EVENT_PLAYER_MOVED, "44", 
+					world->getSelfPosX(), world->getSelfPosY());
+		}
 		
 		network->sendPacket(frame);
 		
 		world->draw();
 		
-		int delta = startTime - SDL_GetTicks();
+		int delta = SDL_GetTicks() - startTime;
 		
 		// Upper bound of FPS
 		if (msPerFrame > delta)
-			SDL_Delay(msPerFrame - delta);
+			SDL_Delay((int)msPerFrame - delta);
 		
 		frame++;
 		if (frame == 0)
@@ -112,26 +117,32 @@ void Game::processEvents() {
 		if (e.type == SDL_QUIT)
 			running = false;
 		else if (e.type == SDL_KEYDOWN) {
-			if (e.key.keysym.sym == SDLK_RIGHT
-			 || e.key.keysym.sym == SDLK_d) {
-				world->selfStartMoving(DIRECTION_RIGHT);
-				continue;
-			}
-			if (e.key.keysym.sym == SDLK_LEFT
-			 || e.key.keysym.sym == SDLK_a)
-				world->selfStartMoving(DIRECTION_LEFT);
-			
+			switch (e.key.keysym.sym) {
+				case SDLK_RIGHT:
+				case SDLK_d:
+					world->selfStartMoving(DIRECTION_RIGHT);
+					break;
+				case SDLK_LEFT:
+				case SDLK_a:
+					world->selfStartMoving(DIRECTION_LEFT);
+					break;
+				case SDLK_SPACE:
+				case SDLK_UP:
+					if (world->selfJump())
+						network->addNewEvent(NET_EVENT_PLAYER_JUMP);
+					break;
+			}		
 		} else if (e.type == SDL_KEYUP) {
-			if (e.key.keysym.sym == SDLK_RIGHT
-			 || e.key.keysym.sym == SDLK_d) {
-				world->selfStopMoving(DIRECTION_RIGHT);
-				continue;
-			}
-
-			if (e.key.keysym.sym == SDLK_LEFT
-			 || e.key.keysym.sym == SDLK_a)
-				world->selfStopMoving(DIRECTION_LEFT);
-			
+			switch (e.key.keysym.sym) {
+				case SDLK_RIGHT:
+				case SDLK_d:
+					world->selfStopMoving(DIRECTION_RIGHT);
+					break;
+				case SDLK_LEFT:
+				case SDLK_a:
+					world->selfStopMoving(DIRECTION_LEFT);
+					break;
+			}			
 		}
 	}
 }

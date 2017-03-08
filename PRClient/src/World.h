@@ -30,6 +30,10 @@ public:
 	
 	void selfStartMoving(int direction);
 	void selfStopMoving(int direction);
+	bool selfJump();
+	bool selfHasMoved();
+	int  getSelfPosX();
+	int  getSelfPosY();
 	
 private:
 	bool isIdCorrect(char id);
@@ -41,7 +45,7 @@ private:
 	
 	Texture* playerTexture;
 	std::vector<Player*> players; // Players connected to server 
-	Player** playersById;        // Players "sorted" by their server id
+	Player** playersById;         // Players "sorted" by their server id
 	
 	int selfID;
 	PlayerDirections selfDirection;

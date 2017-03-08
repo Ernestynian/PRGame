@@ -20,17 +20,23 @@ public:
 	
 	void spawn(int x, int y);
 	void kill();
-	void moveToPosition(int x, int y);
-	
-	void move(Map* map);
-	void setSpeed(float x, float y);
+	void teleportToPosition(int x, int y);
 	
 	void applyGravity(Map* map, float g);
+	void setSpeed(float x, float y);
+	
+	bool tryToJump(float speed);
+	
+	void move(Map* map);
+	bool hasMoved();
 	
 	void draw();
 	
 	bool isAlive();
 	bool canMove();
+	
+	int getPosX();
+	int getPosY();
 	
 private:
 	void changeStateTo(PlayerState newState);
