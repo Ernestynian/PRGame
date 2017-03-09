@@ -18,27 +18,38 @@ void player_reset(int id) {
 	pthread_mutex_lock(&players[id].mutex);
 	players[id].pos.x = 0;
 	players[id].pos.y = 0;
+	players[id].speed.x = 0;
+	players[id].speed.y = 0;
 	players[id].alive = 0;
 	players[id].moved = 0;
 	pthread_mutex_unlock(&players[id].mutex);
 }
 
 
-void player_moved(char id, int x, int y) {
+void player_moved(char id, float x, float y, float vx, float vy) {
 	// Check collisions
 	
 	pthread_mutex_lock(&players[id].mutex);
 	players[id].pos.x = x;
 	players[id].pos.y = y;
+	players[id].speed.x = x;
+	players[id].speed.y = y;
 	players[id].moved = 1;
 	pthread_mutex_unlock(&players[id].mutex);
 }
 
 
-void player_spawn(int id, int x, int y) {
+void player_spawn(int id, float x, float y) {
 	pthread_mutex_lock(&players[id].mutex);
 	players[id].pos.x = x;
 	players[id].pos.y = y;
 	players[id].alive = 1;
 	pthread_mutex_unlock(&players[id].mutex);
+}
+
+
+void player_kill(int id) {
+	pthread_mutex_lock(&players[id].mutex);
+	players[id].alive = 0;
+	pthread_mutex_unlock(&players[id].mutex);	
 }

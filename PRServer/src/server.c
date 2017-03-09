@@ -128,7 +128,7 @@ void srv_sendCurrentState(int newClientID, struct sockaddr_in client_address, so
 			pthread_mutex_lock(&players[i].mutex);
 			if (players[i].alive) {
 				srv_addNewEventTo(buffer, &len, NET_EVENT_PLAYER_SPAWN, 
-					"144", (char)clients[i].cd->id, players[i].pos.x, players[i].pos.y);
+					"1ff", (char)clients[i].cd->id, players[i].pos.x, players[i].pos.y);
 			}
 			pthread_mutex_unlock(&players[i].mutex);
 		}

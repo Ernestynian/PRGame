@@ -26,6 +26,7 @@ char*   toBytesV(int* bytesCount, const char* types, ...);
  * @param Array of bytes to be read from
  */
 void    initBinaryReader(const char* bytes);
+float   binaryReadFloat();
 int32_t binaryRead4B();
 int16_t binaryRead2B();
 int8_t  binaryRead1B();

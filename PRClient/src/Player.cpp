@@ -5,7 +5,7 @@
 
 
 Player::Player(Texture* texture) : tileW(320), tileH(480), 
-        anim_cycle_time(0.4), anim_frame_count(4) {
+        animCycleTime(0.4), anim_frame_count(4) {
 	this->texture = texture;
 	x = 0;
 	y = 0;
@@ -103,21 +103,21 @@ bool Player::hasMoved() {
 void Player::calculateAnimation() {
     if(x_speed == 0)
     {
-        delta_anim_time = 0;
+        deltaAnimTime = 0;
         flip = SDL_FLIP_NONE;
     }
     else
     {
-        delta_anim_time += fabs(x_speed*0.01);
-        if(delta_anim_time > anim_cycle_time)
-            delta_anim_time = delta_anim_time - anim_cycle_time;
+        deltaAnimTime += fabs(x_speed*0.01);
+        if(deltaAnimTime > animCycleTime)
+            deltaAnimTime = deltaAnimTime - animCycleTime;
         if(x_speed >= 0)
             flip = SDL_FLIP_NONE;
         else
             flip = SDL_FLIP_HORIZONTAL;
     }
     
-    anim_frame = static_cast<int>(((float)anim_frame_count/anim_cycle_time)*delta_anim_time);
+    anim_frame = static_cast<int>(((float)anim_frame_count / animCycleTime) * deltaAnimTime);
 }
     
     
@@ -150,13 +150,23 @@ bool Player::canMove() {
 }
 
 
-int Player::getPosX() {
-	return static_cast<int>(x);
+float Player::getPosX() {
+	return x;
 }
 
 
-int Player::getPosY() {
-	return static_cast<int>(y);
+float Player::getPosY() {
+	return y;
+}
+
+
+float Player::getSpeedX() {
+	return x_speed;
+}
+
+
+float Player::getSpeedY() {
+	return y_speed;
 }
 
 

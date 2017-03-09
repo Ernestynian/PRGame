@@ -36,8 +36,10 @@ public:
 	bool isAlive();
 	bool canMove();
 	
-	int getPosX();
-	int getPosY();
+	float getPosX();
+	float getPosY();
+	float getSpeedX();
+	float getSpeedY();
 	
 private:
 	void changeStateTo(PlayerState newState);
@@ -53,8 +55,8 @@ private:
 	float x_speed;
 	float y_speed;
         
-        float delta_anim_time;
-        double anim_cycle_time;//const
+        float deltaAnimTime;
+        double animCycleTime;//const
         int anim_frame_count;//const
         SDL_RendererFlip flip;
         int anim_frame;

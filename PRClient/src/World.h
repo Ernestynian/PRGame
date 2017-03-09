@@ -32,8 +32,10 @@ public:
 	void selfStopMoving(int direction);
 	bool selfJump();
 	bool selfHasMoved();
-	int  getSelfPosX();
-	int  getSelfPosY();
+	float getSelfPosX();
+	float getSelfPosY();
+	float getSelfSpeedX();
+	float getSelfSpeedY();
 	
 private:
 	bool isIdCorrect(char id);

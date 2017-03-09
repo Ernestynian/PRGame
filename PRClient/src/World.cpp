@@ -98,8 +98,8 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 		case NET_EVENT_PLAYER_SPAWN: {
 			printf("NET_EVENT_PLAYER_SPAWN\n");
 			char id = binaryRead1B();
-			int x   = binaryRead4B();
-			int y   = binaryRead4B();
+			float x = binaryReadFloat();
+			float y = binaryReadFloat();
 			if (isIdCorrect(id)) {
 				if (playersById[id] != nullptr)
 					playersById[id]->spawn(x, y);
@@ -122,12 +122,25 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			break;
 		}
 		case NET_EVENT_PLAYER_MOVED: {
+			char id  = binaryRead1B();
+			float x  = binaryReadFloat();
+			float y  = binaryReadFloat();
+			float vx = binaryReadFloat();
+			float vy = binaryReadFloat();
+			if (isIdCorrect(id)) {
+				if (id != selfID) {
+					playersById[id]->teleportToPosition(x, y);
+					playersById[id]->setSpeed(vx, vy);
+				}
+			}
+			
+			break;
+		}
+		case NET_EVENT_PLAYER_JUMP: {
 			char id = binaryRead1B();
-			int x   = binaryRead4B();
-			int y   = binaryRead4B();
 			if (isIdCorrect(id)) {
 				if (id != selfID)
-					playersById[id]->teleportToPosition(x, y);
+					playersById[id]->tryToJump(-5);
 			}
 			
 			break;
@@ -135,6 +148,10 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 	}
 }
 
+
+///////////////////////
+// CONTROLLER PLAYER //
+///////////////////////
 
 void World::selfStartMoving(int direction) {
 	selfDirection = (PlayerDirections)direction;
@@ -167,13 +184,23 @@ bool World::selfHasMoved() {
 }
 
 
-int World::getSelfPosX() {
+float World::getSelfPosX() {
 	return playersById[selfID]->getPosX();
 }
 
 
-int World::getSelfPosY() {
+float World::getSelfPosY() {
 	return playersById[selfID]->getPosY();
+}
+
+
+float World::getSelfSpeedX() {
+	return playersById[selfID]->getSpeedX();
+}
+
+
+float World::getSelfSpeedY() {
+	return playersById[selfID]->getSpeedY();
 }
 
 

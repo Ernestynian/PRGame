@@ -54,8 +54,9 @@ int Game::run() {
 		world->update(msPerFrame); // TODO: make it dynamic (delta)
 		
 		if (world->selfHasMoved()) {
-			network->addNewEvent(NET_EVENT_PLAYER_MOVED, "44", 
-					world->getSelfPosX(), world->getSelfPosY());
+			network->addNewEvent(NET_EVENT_PLAYER_MOVED, "ffff", 
+					world->getSelfPosX(),   world->getSelfPosY(),
+					world->getSelfSpeedX(), world->getSelfSpeedY());
 		}
 		
 		network->sendPacket(frame);

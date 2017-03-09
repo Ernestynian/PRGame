@@ -100,19 +100,21 @@ void* client_process(void* dataPointer) {
 							printf("EVENT_CLIENT_EXIT %d\n", data->id);
 							return client_stop(data);
 						case NET_EVENT_PLAYER_DIED: {
-
+							player_kill(data->id);
 							break;
 						}
 						case NET_EVENT_PLAYER_MOVED: {
-							int x = binaryRead4B();
-							int y = binaryRead4B();
-							player_moved(data->id, x, y);
+							float  x = binaryReadFloat();
+							float  y = binaryReadFloat();
+							float vx = binaryReadFloat();
+							float vy = binaryReadFloat();
+							player_moved(data->id, x, y, vx, vy);
 
-							srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "144", data->id, x, y);
+							srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "1ffff", data->id, x, y, vx, vy);
 							break;
 						}
 						case NET_EVENT_PLAYER_JUMP: {
-
+							srv_addNewEvent(NET_EVENT_PLAYER_JUMP, "1", data->id);
 							break;
 						}
 					}
@@ -136,10 +138,10 @@ void* client_process(void* dataPointer) {
 			if (timerDiff > MS_TO_SPAWN) {
 				private.spawningPlayer = 0;
 				// TODO: randomize and check collision with the map
-				int x = 20 + 30 * data->id;
-				int y = 40;
+				float x = 20 + 30 * data->id;
+				float y = 40;
 				player_spawn(data->id, x, y);
-				srv_addNewEvent(NET_EVENT_PLAYER_SPAWN, "144", data->id, x, y);
+				srv_addNewEvent(NET_EVENT_PLAYER_SPAWN, "1ff", data->id, x, y);
 			}
 		}
 		

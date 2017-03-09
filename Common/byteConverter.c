@@ -5,29 +5,33 @@
 
 #include "byteConverter.h"
 
-char* buffer;
-int   pos;
 
-void convertInt(int a) {
-	buffer[pos + 0] =  a        & 0xFF;
-	buffer[pos + 1] = (a >> 8)  & 0xFF;
-	buffer[pos + 2] = (a >> 16) & 0xFF;
-	buffer[pos + 3] = (a >> 24) & 0xFF;
+void convertFloat(char* buffer, int* pos, float a) {
+	memcpy(buffer + *pos, (char*)(&a), 4);
 	
-	pos += sizeof(a);
+	*pos += sizeof(a);
 }
 
-void convertShort(short a) {
-	buffer[pos + 0] =  a        & 0xFF;
-	buffer[pos + 1] = (a >> 8)  & 0xFF;
+void convertInt(char* buffer, int* pos, int a) {
+	buffer[*pos + 0] =  a        & 0xFF;
+	buffer[*pos + 1] = (a >> 8)  & 0xFF;
+	buffer[*pos + 2] = (a >> 16) & 0xFF;
+	buffer[*pos + 3] = (a >> 24) & 0xFF;
 	
-	pos += sizeof(a);
+	*pos += sizeof(a);
 }
 
-void convertByte(char a) {
-	buffer[pos] =  a;
+void convertShort(char* buffer, int* pos, short a) {
+	buffer[*pos + 0] =  a        & 0xFF;
+	buffer[*pos + 1] = (a >> 8)  & 0xFF;
 	
-	pos += sizeof(a);
+	*pos += sizeof(a);
+}
+
+void convertByte(char* buffer, int* pos, char a) {
+	buffer[*pos] = a;
+	
+	*pos += sizeof(a);
 }
 
 ///////////////
@@ -35,7 +39,7 @@ void convertByte(char a) {
 ///////////////
 
 char* toBytes(int* bytesCount, const char* types, va_list valist) {
-	pos = 0;
+	int pos = 0;
 	
 	int args = strlen(types);
 	
@@ -43,18 +47,21 @@ char* toBytes(int* bytesCount, const char* types, va_list valist) {
 	for (int i = 0; i < args; i++)
 		size += types[i] - '0';
 	
-	buffer = malloc(size);
+	char* buffer = malloc(size);
 	
 	for (int i = 0; i < args; i++) {
 		switch (types[i]) {
+			case 'f':
+				convertFloat(buffer, &pos, (float)va_arg(valist, double));
+				break;
 			case '4':
-				convertInt(va_arg(valist, int32_t));
+				convertInt(buffer, &pos, va_arg(valist, int32_t));
 				break;
 			case '2':
-				convertShort(va_arg(valist, int32_t));
+				convertShort(buffer, &pos, va_arg(valist, int32_t));
 				break;
 			case '1':
-				convertByte(va_arg(valist, int32_t));
+				convertByte(buffer, &pos, va_arg(valist, int32_t));
 				break;
 		}
 	}
@@ -86,9 +93,18 @@ void initBinaryReader(const char* bytes) {
 }
 
 
-int32_t binaryRead4B() {
-	int32_t var;
+float binaryReadFloat() {
+	float var;
 	
+	memcpy((uint8_t*)(&var), reader_bytes + reader_position, 4);
+	
+	reader_position += sizeof(float);
+	return var;
+}
+
+
+int32_t binaryRead4B() {
+	int32_t
 	var = reader_bytes[reader_position] + 
 		 (reader_bytes[reader_position + 1] << 8)  +
 		 (reader_bytes[reader_position + 2] << 16) +
@@ -98,9 +114,9 @@ int32_t binaryRead4B() {
 	return var;
 }
 
+
 int16_t binaryRead2B() {
-	int16_t var;
-	
+	int16_t	
 	var = reader_bytes[reader_position] +
 		 (reader_bytes[reader_position + 1] << 8);
 
