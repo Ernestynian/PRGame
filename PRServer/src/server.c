@@ -24,7 +24,7 @@ char            outBuffer[MAX_SERVER_PACKET_SIZE];
 int             outBufferPosition;
 unsigned char   outBufferTick;
 pthread_mutex_t outBufferMutex = PTHREAD_MUTEX_INITIALIZER;
-double          msTimeToSendPacket = 1000.0 / PACKETS_PER_SECOND;
+double          msTimeToSendPacket = 1000.0 / FRAMERATE;
 
 
 int srv_start() {

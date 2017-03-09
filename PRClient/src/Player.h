@@ -27,10 +27,10 @@ public:
 	
 	bool tryToJump(float speed);
 	
-	void move(Map* map);
+	void move(Map* map, float delta);
 	bool hasMoved();
 	
-        void calculateAnimation();
+	void calculateAnimation(float delta);
 	void draw();
 	
 	bool isAlive();

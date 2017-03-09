@@ -197,8 +197,7 @@ void client_transferPacket(struct sockaddr_in client_address, char* data, int da
 		if (clients[i].address.sin_addr.s_addr == client_address.sin_addr.s_addr
 		 && clients[i].address.sin_port        == client_address.sin_port) {
 			pthread_mutex_lock(&(clients[i].cd->mutex));
-			// TODO: change const length into dynamic
-			memcpy(clients[i].cd->buf, data, MAX_CLIENT_PACKET_SIZE);
+			memcpy(clients[i].cd->buf, data, dataLen);
 			clients[i].cd->bufLen = dataLen;
 			clients[i].cd->bufHasNewData = 1;
 			pthread_mutex_unlock(&(clients[i].cd->mutex));

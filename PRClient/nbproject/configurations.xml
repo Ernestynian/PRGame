@@ -23,7 +23,8 @@
                    displayName="Resource Files"
                    projectFiles="true">
       <itemPath>res/background.png</itemPath>
-      <itemPath>res/player_sprites.png</itemPath>
+      <itemPath>res/player_body_sprites.png</itemPath>
+      <itemPath>res/player_hands_sprites.png</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -87,7 +88,9 @@
       </item>
       <item path="res/background.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/player_sprites.png" ex="false" tool="3" flavor2="0">
+      <item path="res/player_body_sprites.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/player_hands_sprites.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -164,7 +167,9 @@
       </item>
       <item path="res/background.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/player_sprites.png" ex="false" tool="3" flavor2="0">
+      <item path="res/player_body_sprites.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/player_hands_sprites.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>

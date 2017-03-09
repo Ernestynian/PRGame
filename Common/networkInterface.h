@@ -12,13 +12,18 @@
 #define NETWORK_INTERFACE_H
 
 #define PORT 1337
-#define PACKETS_PER_SECOND 60
 #define MAX_CLIENT_PACKET_SIZE 256
 #define MAX_SERVER_PACKET_SIZE 2048
 #define MAX_CLIENTS 32
 
 #define MS_TO_TIMEOUT 1000
 #define MS_TO_SPAWN   3000
+
+#define MAX_MOVEMENT_SPEED 0.2
+#define GRAVITY_CONSTANT 0.0006
+#define JUMP_ACCELERATION -0.35
+
+#define FRAMERATE 60
 
 #ifdef __cplusplus
 extern "C" {

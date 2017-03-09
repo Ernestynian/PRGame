@@ -8,7 +8,7 @@
 #include "World.h"
 
 
-World::World(Renderer* renderer, unsigned int selfID) : gravity(0.0054) {
+World::World(Renderer* renderer, unsigned int selfID) : gravity(GRAVITY_CONSTANT) {
 	this->renderer = renderer;
 	this->selfID   = selfID;
 	
@@ -40,21 +40,17 @@ World::~World() {
 
 
 void World::update(float delta) {
-	for (auto player : players)
-		player->applyGravity(map, gravity * delta);
-	
-	if (playersById[selfID] != nullptr) {
-		if (playersById[selfID]->isAlive()) {
-			if (selfDirection != DIRECTION_NONE) {
-				playersById[selfID]->setSpeed(0.1 * delta * selfDirection, 0);
-			}
+	if (playersById[selfID] != nullptr
+	 && playersById[selfID]->isAlive()) {
+		if (selfDirection != DIRECTION_NONE) {
+			playersById[selfID]->setSpeed(MAX_MOVEMENT_SPEED * selfDirection, 0);
 		}
 	}
 	
-	for (auto player : players)
-    {
-		player->move(map);
-        player->calculateAnimation();
+	for (auto player : players) {
+		player->applyGravity(map, gravity * delta);
+		player->move(map, delta);
+        player->calculateAnimation(delta);
     }
 }
 
@@ -141,7 +137,7 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			char id = binaryRead1B();
 			if (isIdCorrect(id)) {
 				if (id != selfID)
-					playersById[id]->tryToJump(-5);
+					playersById[id]->tryToJump(JUMP_ACCELERATION);
 			}
 			
 			break;
@@ -173,7 +169,7 @@ void World::selfStopMoving(int direction) {
  * @return true when acually jumped
  */
 bool World::selfJump() {
-	return playersById[selfID]->tryToJump(-5);		
+	return playersById[selfID]->tryToJump(JUMP_ACCELERATION);		
 }
 
 

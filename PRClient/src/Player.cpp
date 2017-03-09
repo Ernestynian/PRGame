@@ -82,12 +82,16 @@ bool Player::tryToJump(float speed) {
 }
 
 
-void Player::move(Map* map) {
+void Player::move(Map* map, float delta) {
+	if (state == PLAYER_STILL && x_speed == 0.0 && y_speed == 0.0)
+		return;
+	
 	// TODO: collision when going up
-	SDL_Rect newBoundaries = { (int)(x + x_speed), (int)(y + y_speed), w, h };
+	SDL_Rect newBoundaries = { (int)(x + x_speed*delta), (int)(y + y_speed*delta), w, h };
 	if (!map->collides(&newBoundaries)) {
-		x += x_speed;
-		y += y_speed;
+		printf("y: %f\n", y_speed);
+		x += x_speed * delta;
+		y += y_speed * delta;
 	} else if (state == PLAYER_MOVING || state == PLAYER_FALLING) {
 		x = newBoundaries.x;
 		y = newBoundaries.y;
@@ -101,7 +105,7 @@ bool Player::hasMoved() {
 }
 
 
-void Player::calculateAnimation() {
+void Player::calculateAnimation(float delta) {
     if(x_speed == 0)
     {
         deltaAnimTime = 0;
@@ -109,7 +113,7 @@ void Player::calculateAnimation() {
     }
     else
     {
-        deltaAnimTime += fabs(x_speed*0.01);
+        deltaAnimTime += fabs(x_speed * 0.005 * delta);
         if(deltaAnimTime > animCycleTime)
             deltaAnimTime = deltaAnimTime - animCycleTime;
         if(x_speed >= 0)

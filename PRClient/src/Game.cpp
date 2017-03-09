@@ -8,10 +8,8 @@
 #include "../../Common/networkInterface.h"
 #include "../../Common/byteConverter.h"
 
-#define DESIRED_FRAMERATE 60
 
-
-Game::Game(int argc, const char* argv[]) : msPerFrame(1000.0 / DESIRED_FRAMERATE), 
+Game::Game(int argc, const char* argv[]) : msPerFrame(1000.0 / FRAMERATE), 
 										   networkTickrate(30) {	
 	window  = new Window();
 	world   = nullptr;
