@@ -4,9 +4,10 @@
 #include "Player.h"
 
 
-Player::Player(Texture* texture) : tileW(320), tileH(480), 
+Player::Player(Texture* bodyTexture, Texture* handsTexture) : tileW(320), tileH(480), 
         animCycleTime(0.4), anim_frame_count(4) {
-	this->texture = texture;
+	this->bodyTexture = bodyTexture;
+    this->handsTexture = handsTexture;
 	x = 0;
 	y = 0;
 	w = tileW / 10;
@@ -117,17 +118,18 @@ void Player::calculateAnimation() {
             flip = SDL_FLIP_HORIZONTAL;
     }
     
-    anim_frame = static_cast<int>(((float)anim_frame_count / animCycleTime) * deltaAnimTime);
+    body_anim_frame = static_cast<int>(((float)anim_frame_count / animCycleTime) * deltaAnimTime);
+    hands_anim_frame = static_cast<int>(((float)anim_frame_count / animCycleTime) * deltaAnimTime);//temp
 }
     
     
 void Player::draw() {
 	SDL_Rect renderQuad = { (int)x, (int)y, w, h };
-	SDL_Rect bodySourceQuad = { 0 + anim_frame * tileW, 0, tileW, tileH };//temp
-	SDL_Rect handsSourceQuad = { 0 + anim_frame * tileW, tileH, tileW, tileH };//temp
+	SDL_Rect bodySourceQuad = { 0 + body_anim_frame * tileW, 0, tileW, tileH };
+	SDL_Rect handsSourceQuad = { 0 + hands_anim_frame * tileW, 0, tileW, tileH };
         
-	texture->draw(&bodySourceQuad, &renderQuad, 0, NULL, flip);
-    texture->draw(&handsSourceQuad, &renderQuad, 0, NULL, flip);//
+	bodyTexture->draw(&bodySourceQuad, &renderQuad, 0, NULL, flip);
+    handsTexture->draw(&handsSourceQuad, &renderQuad, 0, NULL, flip);//
 }
 
 

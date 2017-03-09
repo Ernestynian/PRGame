@@ -18,7 +18,8 @@ World::World(Renderer* renderer, unsigned int selfID) : gravity(0.0054) {
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 		playersById[i] = nullptr;
 	
-	playerTexture = new Texture(renderer, "res/player_sprites.png");
+	playerBodyTexture = new Texture(renderer, "res/player_body_sprites.png");
+    playerHandsTexture = new Texture(renderer, "res/player_hands_sprites.png");
 	
 	selfDirection = DIRECTION_NONE;
 	
@@ -76,7 +77,7 @@ void World::addPlayer(int id) {
 	if (playersById[id] != nullptr)
 		removePlayer(id);
 	
-	players.push_back(new Player(playerTexture));
+	players.push_back(new Player(playerBodyTexture, playerHandsTexture));
 	playersById[id] = players.back();
 }
 

@@ -45,7 +45,8 @@ private:
 	
 	Renderer* renderer;
 	
-	Texture* playerTexture;
+	Texture* playerBodyTexture;
+	Texture* playerHandsTexture;
 	std::vector<Player*> players; // Players connected to server 
 	Player** playersById;         // Players "sorted" by their server id
 	

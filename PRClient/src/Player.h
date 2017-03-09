@@ -15,7 +15,7 @@ enum PlayerState {
 
 class Player {
 public:
-	Player(Texture* texture);
+	Player(Texture* bodyTexture, Texture* handsTexture);
 	virtual ~Player();
 	
 	void spawn(int x, int y);
@@ -59,11 +59,13 @@ private:
         double animCycleTime;//const
         int anim_frame_count;//const
         SDL_RendererFlip flip;
-        int anim_frame;
+        int body_anim_frame;
+        int hands_anim_frame;
 	
 	bool alive;
 	
-	Texture* texture;
+	Texture* bodyTexture;
+        Texture* handsTexture;
 };
 
 #endif /* PLAYER_H */
