@@ -10,7 +10,8 @@ public:
 	virtual ~Map();
 	
 	bool canFall(SDL_Rect object);
-	bool collides(SDL_Rect* object);
+	bool hcollides(int* x, int w);
+	bool vcollides(int* y, int h);
 	
 	void draw();
 private:

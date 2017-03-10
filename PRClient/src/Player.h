@@ -57,10 +57,10 @@ private:
         
         float deltaAnimTime;
         double animCycleTime;//const
-        int anim_frame_count;//const
+        int animFrameCount;//const
         SDL_RendererFlip flip;
-        int body_anim_frame;
-        int hands_anim_frame;
+        int bodyAnimFrame;
+        int handsAnimFrame;
 	
 	bool alive;
 	

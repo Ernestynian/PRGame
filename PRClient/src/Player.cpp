@@ -4,8 +4,9 @@
 #include "Player.h"
 
 
-Player::Player(Texture* bodyTexture, Texture* handsTexture) : tileW(320), tileH(480), 
-        animCycleTime(0.4), anim_frame_count(4) {
+Player::Player(Texture* bodyTexture, Texture* handsTexture) 
+: tileW(320), tileH(480), animCycleTime(0.4), animFrameCount(4) {
+	
 	this->bodyTexture = bodyTexture;
     this->handsTexture = handsTexture;
 	x = 0;
@@ -83,25 +84,54 @@ bool Player::tryToJump(float speed) {
 
 
 void Player::move(Map* map, float delta) {
-	if (state == PLAYER_STILL && x_speed == 0.0 && y_speed == 0.0)
+	if (state == PLAYER_STILL 
+	 && x_speed == 0.0 && y_speed == 0.0)
 		return;
 	
-	// TODO: collision when going up
-	SDL_Rect newBoundaries = { (int)(x + x_speed*delta), (int)(y + y_speed*delta), w, h };
-	if (!map->collides(&newBoundaries)) {
-		printf("y: %f\n", y_speed);
-		x += x_speed * delta;
-		y += y_speed * delta;
-	} else if (state == PLAYER_MOVING || state == PLAYER_FALLING) {
-		x = newBoundaries.x;
-		y = newBoundaries.y;
+	int x = (int)(this->x + x_speed*delta);
+	int y = (int)(this->y + y_speed*delta);
+	
+	if (!map->hcollides(&x, w)) {
+		this->x += x_speed * delta;
+	} else if (state == PLAYER_MOVING) {
+		this->x = x;
 		changeStateTo(PLAYER_STILL);
 	}
+	
+	if (!map->vcollides(&y, h)) {
+		this->y += y_speed * delta;
+	} else if (state == PLAYER_FALLING) {
+		this->y = y;
+		changeStateTo(PLAYER_STILL);
+	}
+	
+	/*switch(state) {
+	case PLAYER_STILL:
+		printf("PLAYER_STILL\n");
+		break;
+	case PLAYER_FALLING:
+		printf("PLAYER_FALLING\n");
+		break;
+	case PLAYER_MOVING:
+		printf("PLAYER_MOVING\n");
+		break;
+	case PLAYER_JUMPING:
+		printf("PLAYER_JUMPING\n");
+		break;
+	case PLAYER_DYING:
+		printf("PLAYER_DYING\n");
+		break;
+	case PLAYER_CROUCHING:
+		printf("PLAYER_CROUCHING\n");
+		break;
+	}*/
 }
 
 
 bool Player::hasMoved() {
-	return state == PLAYER_MOVING || state == PLAYER_FALLING || state == PLAYER_JUMPING;
+	return state == PLAYER_MOVING 
+		|| state == PLAYER_FALLING
+		|| state == PLAYER_JUMPING;
 }
 
 
@@ -122,15 +152,15 @@ void Player::calculateAnimation(float delta) {
             flip = SDL_FLIP_HORIZONTAL;
     }
     
-    body_anim_frame = static_cast<int>(((float)anim_frame_count / animCycleTime) * deltaAnimTime);
-    hands_anim_frame = static_cast<int>(((float)anim_frame_count / animCycleTime) * deltaAnimTime);//temp
+    bodyAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime);
+    handsAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime);//temp
 }
     
     
 void Player::draw() {
 	SDL_Rect renderQuad = { (int)x, (int)y, w, h };
-	SDL_Rect bodySourceQuad = { 0 + body_anim_frame * tileW, 0, tileW, tileH };
-	SDL_Rect handsSourceQuad = { 0 + hands_anim_frame * tileW, 0, tileW, tileH };
+	SDL_Rect bodySourceQuad = { 0 + bodyAnimFrame * tileW, 0, tileW, tileH };
+	SDL_Rect handsSourceQuad = { 0 + handsAnimFrame * tileW, 0, tileW, tileH };
         
 	bodyTexture->draw(&bodySourceQuad, &renderQuad, 0, NULL, flip);
     handsTexture->draw(&handsSourceQuad, &renderQuad, 0, NULL, flip);//
