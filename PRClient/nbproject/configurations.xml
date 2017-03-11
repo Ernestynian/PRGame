@@ -9,6 +9,7 @@
         <itemPath>../Common/networkInterface.h</itemPath>
       </logicalFolder>
       <itemPath>src/Game.h</itemPath>
+      <itemPath>src/Icon.h</itemPath>
       <itemPath>src/Map.h</itemPath>
       <itemPath>src/Network.h</itemPath>
       <itemPath>src/Player.h</itemPath>
@@ -22,6 +23,27 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
+      <logicalFolder name="icons" displayName="icons" projectFiles="true">
+        <itemPath>res/icons/CD-Laufwerk.ico</itemPath>
+        <itemPath>res/icons/Diskette.ico</itemPath>
+        <itemPath>res/icons/Folder Closed.png</itemPath>
+        <itemPath>res/icons/Folder Opened.png</itemPath>
+        <itemPath>res/icons/Hard Drive.ico</itemPath>
+        <itemPath>res/icons/Media Player Classic.png</itemPath>
+        <itemPath>res/icons/Mozilla Firefox.png</itemPath>
+        <itemPath>res/icons/Mozilla Thunderbird.png</itemPath>
+        <itemPath>res/icons/My Computer.png</itemPath>
+        <itemPath>res/icons/My Documents.png</itemPath>
+        <itemPath>res/icons/My Music.png</itemPath>
+        <itemPath>res/icons/My Pictures.png</itemPath>
+        <itemPath>res/icons/My Videos.png</itemPath>
+        <itemPath>res/icons/Nero StartSmart.png</itemPath>
+        <itemPath>res/icons/Recycle Bin empty.png</itemPath>
+        <itemPath>res/icons/Recycle Bin.png</itemPath>
+        <itemPath>res/icons/Tablet PC.png</itemPath>
+        <itemPath>res/icons/Winamp.png</itemPath>
+        <itemPath>res/icons/Windows Media Player 10.png</itemPath>
+      </logicalFolder>
       <itemPath>res/background.png</itemPath>
       <itemPath>res/player_body_sprites.png</itemPath>
       <itemPath>res/player_hands_sprites.png</itemPath>
@@ -34,6 +56,7 @@
         <itemPath>../Common/networkInterface.c</itemPath>
       </logicalFolder>
       <itemPath>src/Game.cpp</itemPath>
+      <itemPath>src/Icon.cpp</itemPath>
       <itemPath>src/Map.cpp</itemPath>
       <itemPath>src/Network.cpp</itemPath>
       <itemPath>src/Player.cpp</itemPath>
@@ -88,6 +111,47 @@
       </item>
       <item path="res/background.png" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="res/icons/CD-Laufwerk.ico" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Diskette.ico" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Folder Closed.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Folder Opened.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Hard Drive.ico" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Media Player Classic.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Mozilla Firefox.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Mozilla Thunderbird.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Computer.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Documents.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Music.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Pictures.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Videos.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Nero StartSmart.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Recycle Bin empty.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Recycle Bin.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Tablet PC.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Winamp.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Windows Media Player 10.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="res/player_body_sprites.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/player_hands_sprites.png" ex="false" tool="3" flavor2="0">
@@ -95,6 +159,10 @@
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Game.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Icon.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Icon.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/Map.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -167,6 +235,47 @@
       </item>
       <item path="res/background.png" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="res/icons/CD-Laufwerk.ico" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Diskette.ico" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Folder Closed.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Folder Opened.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Hard Drive.ico" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Media Player Classic.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Mozilla Firefox.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Mozilla Thunderbird.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Computer.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Documents.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Music.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Pictures.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/My Videos.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Nero StartSmart.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Recycle Bin empty.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Recycle Bin.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Tablet PC.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Winamp.png" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="res/icons/Windows Media Player 10.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="res/player_body_sprites.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/player_hands_sprites.png" ex="false" tool="3" flavor2="0">
@@ -174,6 +283,10 @@
       <item path="src/Game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Game.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Icon.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Icon.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/Map.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -9,6 +9,8 @@ Player::Player(Texture* bodyTexture, Texture* handsTexture)
 	
 	this->bodyTexture = bodyTexture;
     this->handsTexture = handsTexture;
+	
+	// TODO: more precise collision box
 	x = 0;
 	y = 0;
 	w = tileW / 10;
@@ -58,7 +60,7 @@ void Player::applyGravity(Map* map, float g) {
 			
 			if (y_speed > 0.0)
 				changeStateTo(PLAYER_FALLING);
-		}			
+		}
 	}
 }
 
@@ -91,11 +93,38 @@ void Player::move(Map* map, float delta) {
 	int x = (int)(this->x + x_speed*delta);
 	int y = (int)(this->y + y_speed*delta);
 	
+	if (state != PLAYER_STILL) {
+		if (map->collides(x, y, w, h)) {
+			for (int i = this->x; i < x; ++i)
+				if (!map->collides(i, this->y, w, h))
+					this->x = i;
+			
+			for (int i = this->y; i < y; ++i)
+				if (!map->collides(this->x, i, w, h))
+					this->y = i;
+
+			x_speed = 0;
+			y_speed = 0;
+			
+			SDL_Rect boundaries = { (int)this->x, (int)this->y, w, h };
+			if (map->canFall(boundaries))
+				changeStateTo(PLAYER_FALLING);
+			else
+				changeStateTo(PLAYER_STILL);
+
+			return;
+		}
+	}
+	
 	if (!map->hcollides(&x, w)) {
 		this->x += x_speed * delta;
-	} else if (state == PLAYER_MOVING) {
-		this->x = x;
-		changeStateTo(PLAYER_STILL);
+	} else {
+		x_speed = 0;
+		y_speed = 0;
+		if (state == PLAYER_MOVING) {
+			this->x = x;
+			changeStateTo(PLAYER_STILL);
+		}
 	}
 	
 	if (!map->vcollides(&y, h)) {
@@ -143,7 +172,7 @@ void Player::calculateAnimation(float delta) {
     }
     else
     {
-        deltaAnimTime += fabs(x_speed * 0.005 * delta);
+        deltaAnimTime += fabs(x_speed * 0.01 * delta);
         if(deltaAnimTime > animCycleTime)
             deltaAnimTime = deltaAnimTime - animCycleTime;
         if(x_speed >= 0)

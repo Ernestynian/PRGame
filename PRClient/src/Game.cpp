@@ -9,8 +9,8 @@
 #include "../../Common/byteConverter.h"
 
 
-Game::Game(int argc, const char* argv[]) : msPerFrame(1000.0 / FRAMERATE), 
-										   networkTickrate(30) {	
+Game::Game(int argc, const char* argv[])
+: msPerFrame(1000.0 / FRAMERATE), networkTickrate(30) {	
 	window  = new Window();
 	world   = nullptr;
 	network = nullptr;

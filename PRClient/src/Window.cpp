@@ -7,7 +7,7 @@
 
 Window::Window() {
 	window = nullptr;
-		
+	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		return;
 	

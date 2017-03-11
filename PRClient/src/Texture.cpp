@@ -5,7 +5,7 @@
 
 #include "Texture.h"
 
-
+// TODO: remove "res/" from filename
 Texture::Texture(Renderer* renderer, const char* filename) {
 	this->renderer = renderer;
 	

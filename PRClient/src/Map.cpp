@@ -11,17 +11,31 @@ Map::Map(Renderer* renderer) {
 	playerSpace.y = 0;
 	playerSpace.w = renderer->width;
 	playerSpace.h = renderer->height - 30;
+
+	t = new Texture(renderer, "res/icons/My Computer.png");
+	Icon* i = new Icon(t, 140, 480, 32);
+	icons.push_back(i);
+	i = new Icon(t, 340, 400, 32);
+	icons.push_back(i);
 }
 
 
 Map::~Map() {
 	delete background;
+	for (auto icon : icons)
+		delete icon;
+	icons.clear();
 }
 
 
 bool Map::canFall(SDL_Rect object) {
 	if (object.y + object.h + 1 > playerSpace.x + playerSpace.h)
 		return false;
+	
+	for (auto icon : icons) {
+		if (icon->downCollision(object.x, object.y, object.w, object.h))
+			return false;
+	}
 	
 	return true;
 }
@@ -66,6 +80,20 @@ bool Map::vcollides(int* y, int h) {
 }
 
 
+bool Map::collides(int x, int y, int w, int h) {
+	for (auto icon : icons) {
+		if (icon->collides(x, y, w, h))
+			return true;
+	}
+	
+	return false;
+}
+
+
 void Map::draw() {
 	background->draw();
+	
+	// TODO: move to different function that will be executed after the players
+	for (auto icon : icons)
+		icon->draw();
 }
