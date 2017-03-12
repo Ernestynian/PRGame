@@ -14,7 +14,9 @@
 
 #include "server.h"
 #include "client.h"
+#include "map.h"
 #include "players.h"
+
 
 int srv_fd = 0;
 struct timeval lastSentPacketTime;
@@ -28,6 +30,8 @@ double          msTimeToSendPacket = 1000.0 / FRAMERATE;
 
 
 int srv_start() {
+	map_initiate();
+	
 	srv_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (srv_fd < 0) {
 		printf("ERROR: Cannot create socket");
@@ -114,7 +118,7 @@ void srv_addNewEventTo(char* buffer, int* pos, char eventType, const char* forma
 }
 
 
-void srv_sendCurrentState(int newClientID, struct sockaddr_in client_address, socklen_t addrlen) {
+void srv_sendCurrentState(char newClientID, struct sockaddr_in client_address, socklen_t addrlen) {
 	int len = 1;
 	char buffer[MAX_SERVER_PACKET_SIZE];
 	buffer[0] = 0;
@@ -136,6 +140,27 @@ void srv_sendCurrentState(int newClientID, struct sockaddr_in client_address, so
 	pthread_mutex_unlock(&clientListMutex);
 	
 	sendto(srv_fd, buffer, len, 0, (struct sockaddr *)&client_address, addrlen);
+}
+
+
+void srv_sendClientAcceptAndData(char newClientId, struct sockaddr_in client_address, socklen_t addrlen) {
+	int mapDataLength;
+	int mapIconsCount;
+	char* mapData = map_getInitData(&mapDataLength, &mapIconsCount);
+	
+	char* packetData = (char*)malloc(5 + mapDataLength);
+	packetData[0] = 0;
+	packetData[1] = NET_EVENT_CLIENT_ACCEPTED;
+	packetData[2] = 1 + mapDataLength;
+	packetData[3] = newClientId;
+	packetData[4] = mapIconsCount;
+	memcpy(packetData + 5, mapData, mapDataLength);
+	
+	free(mapData);
+	
+	sendto(srv_fd, packetData, mapDataLength + 5, 0, (struct sockaddr *)&client_address, addrlen);
+	
+	free(packetData);	
 }
 
 
@@ -181,7 +206,7 @@ int srv_transferPackets() {
 		if (inBuffer[1] == NET_EVENT_CLIENT_JOIN) {
 			int newClientID = client_create(client_address);
 			if (newClientID != CLIENT_NOT_CREATED) {
-				srv_send(NET_EVENT_CLIENT_ACCEPTED, client_address, addrlen, "1", (char)newClientID);
+				srv_sendClientAcceptAndData(newClientID, client_address, addrlen);
 				player_reset(newClientID);
 				srv_sendCurrentState(newClientID, client_address, addrlen);
 				

@@ -93,7 +93,8 @@ void Player::move(Map* map, float delta) {
 	int x = (int)(this->x + x_speed*delta);
 	int y = (int)(this->y + y_speed*delta);
 	
-	if (state != PLAYER_STILL) {
+	// TODO: don't lose all energy on collision
+	if (state != PLAYER_STILL) {		
 		if (map->collides(x, y, w, h)) {
 			for (int i = this->x; i < x; ++i)
 				if (!map->collides(i, this->y, w, h))

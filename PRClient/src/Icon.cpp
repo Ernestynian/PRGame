@@ -45,7 +45,7 @@ bool Icon::downCollision(int x, int y, int w, int h) {
 	if (x + w > collisionBox.x
 	 && x     < collisionBox.x + collisionBox.w
 	 && y + h > collisionBox.y - 1
-	 && y     < collisionBox.y + collisionBox.h + 1)
+	 && y     < collisionBox.y + collisionBox.h)
 		return true;
 	
 	return false;

@@ -7,9 +7,15 @@
 #include "Sprite.h"
 #include "Icon.h"
 
+struct IconData {
+	int x;
+	int y;
+	int textureId;
+};
+
 class Map {
 public:
-	Map(Renderer* renderer);
+	Map(Renderer* renderer, std::vector<IconData*> newIcons);
 	virtual ~Map();
 	
 	bool canFall(SDL_Rect object);

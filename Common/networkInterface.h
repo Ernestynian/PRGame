@@ -40,7 +40,7 @@ enum EventTypes {
 	NET_EVENT_CLIENT_JOIN,
 	// [S] <1:new client id>
 	NET_EVENT_CLIENT_ACCEPTED,
-	// [S] <1:client id>
+	// [S] <1:client id> <1:icons amount> <2:icon x> <2:icon y> <1:icon tex id> (...)
 	// [C] none
 	NET_EVENT_CLIENT_EXIT,
 	

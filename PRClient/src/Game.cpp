@@ -36,11 +36,12 @@ int Game::run() {
 	
 	network = new Network();
 	
-	int id = makeConnection();
+	std::pair<int, std::vector<IconData*>> worldData = makeConnection();
 	
 	// network creates the world
-	if (id >= 0)
-		world = new World(window->getRenderer(), id);
+	if (worldData.first >= 0)
+		world = new World(window->getRenderer(), worldData.first, 
+												 worldData.second);
 	
 	while (running) {
 		int startTime = SDL_GetTicks();
@@ -80,7 +81,10 @@ int Game::run() {
  * Make sure the server is running and has a slot for us
  * @return player id
  */
-int Game::makeConnection() {
+std::pair<int, std::vector<IconData*>> Game::makeConnection() {
+	std::pair<int, std::vector<IconData*>> data;
+	data.first = -1;
+	
 	int timeoutStart = SDL_GetTicks();
 	while(running) {
 		processEvents();
@@ -92,8 +96,19 @@ int Game::makeConnection() {
 			if (network->getCurrentEventDataLength() > 0) {
 				initBinaryReader((char*)network->getCurrentEventData());
 				char id = binaryRead1B();
-				if (id >= 0 && id <= MAX_CLIENTS)
-					return id;
+				if (id >= 0 && id <= MAX_CLIENTS) {
+					data.first = id;
+					char iconsAmount = binaryRead1B();
+					for (int i = 0; i < iconsAmount; ++i) {
+						IconData* icon = new IconData();
+						icon->x = binaryRead2B();
+						icon->y = binaryRead2B();
+						icon->textureId = binaryRead1B();
+						data.second.push_back(icon);
+					}
+					
+					return data;
+				}
 			}
 			window->showError("Network error.", "Failed to make a connection with server.");
 			break;
@@ -106,7 +121,7 @@ int Game::makeConnection() {
 	}
 	
 	running = false;
-	return -1;
+	return data;
 }
 
 

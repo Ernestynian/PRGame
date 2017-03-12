@@ -5,19 +5,22 @@
 #include <pthread.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <sys/time.h>
+#include "timer.h"
 
 #include "../../Common/networkInterface.h"
 #include "../../Common/byteConverter.h"
 
 #include "server.h"
 #include "client.h"
+#include "map.h"
 #include "players.h"
 
 
 typedef struct {
 	unsigned char currentTick;
 	unsigned char previousTick;
+	
+	MapData* map;
 	
 	struct timeval lastPacketTime;
 	int spawningPlayer;
@@ -28,21 +31,22 @@ typedef struct {
 client clients[MAX_CLIENTS];
 pthread_mutex_t clientListMutex = PTHREAD_MUTEX_INITIALIZER;
 
-unsigned int currentClients = 0;
-pthread_mutex_t clientsMutex = PTHREAD_MUTEX_INITIALIZER;
+//unsigned int currentClients = 0;
+//pthread_mutex_t clientsMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
-void* client_stop(client_publicData* data) {
+void* client_stop(client_publicData* data, client_privateData* priv) {
 	srv_addNewEvent(NET_EVENT_CLIENT_EXIT, "1", data->id);
 	
-	pthread_mutex_lock(&clientsMutex);
-	currentClients--;
-	pthread_mutex_unlock(&clientsMutex);
+	//pthread_mutex_lock(&clientsMutex);
+	//currentClients--;
+	//pthread_mutex_unlock(&clientsMutex);
 	
 	pthread_mutex_lock(&clientListMutex);
 	clients[data->id].cd = NULL;
 	pthread_mutex_unlock(&clientListMutex);	
 	
+	map_free(priv->map);
 	free(data);
 	pthread_exit(NULL);
 	// This won't be called in reality but let the compiler think it will be
@@ -50,15 +54,7 @@ void* client_stop(client_publicData* data) {
 }
 
 
-double getMsDifference(struct timeval t) {
-	struct timeval current;
-	gettimeofday(&current, NULL);
-	double diff = (current.tv_sec  - t.tv_sec) * 1000.0;
-	return diff + (current.tv_usec - t.tv_usec) / 1000.0;
-}
-
-
-int getNextEvent(char** currentEvent, client_publicData* data) {
+int client_getNextEvent(char** currentEvent, client_publicData* data) {
 	int currentPosition = *currentEvent - data->buf;
 	int lastPosition    = data->bufLen - ((*currentEvent)[1] + 1 + 1);
 	if (currentPosition < lastPosition) {
@@ -73,9 +69,9 @@ int getNextEvent(char** currentEvent, client_publicData* data) {
 void* client_process(void* dataPointer) {
 	client_publicData* data = dataPointer;
 	
-	pthread_mutex_lock(&clientsMutex);
-	currentClients++;
-	pthread_mutex_unlock(&clientsMutex);
+	//pthread_mutex_lock(&clientsMutex);
+	//currentClients++;
+	//pthread_mutex_unlock(&clientsMutex);
 	
 	client_privateData private;
 	private.previousTick = 0;
@@ -83,6 +79,7 @@ void* client_process(void* dataPointer) {
 	// Spawn player at the start (right after he joins)
 	private.spawningPlayer = 1;
 	private.spawnTimerStart = private.lastPacketTime;
+	private.map = map_clone();
 	
 	for (;;) {
 		pthread_mutex_lock(&data->mutex);
@@ -98,7 +95,7 @@ void* client_process(void* dataPointer) {
 					switch(*currentEvent) {
 						case NET_EVENT_CLIENT_EXIT:
 							printf("EVENT_CLIENT_EXIT %d\n", data->id);
-							return client_stop(data);
+							return client_stop(data, &private);
 						case NET_EVENT_PLAYER_DIED: {
 							player_kill(data->id);
 							break;
@@ -118,7 +115,7 @@ void* client_process(void* dataPointer) {
 							break;
 						}
 					}
-				} while (getNextEvent(&currentEvent, data));
+				} while (client_getNextEvent(&currentEvent, data));
 				
 				gettimeofday(&private.lastPacketTime, NULL);
 			}
@@ -130,7 +127,7 @@ void* client_process(void* dataPointer) {
 		double timerDiff = getMsDifference(private.lastPacketTime);
 		if (timerDiff > MS_TO_TIMEOUT) {
 			printf("TIMEOUTED %d\n", data->id);
-			return client_stop(data);
+			return client_stop(data, &private);
 		}
 		
 		if (private.spawningPlayer) {
@@ -148,9 +145,13 @@ void* client_process(void* dataPointer) {
 		usleep(1);
 	}
 	
-	return client_stop(data);
+	return client_stop(data, &private);
 }
 
+
+//////////////////////
+// PUBLIC FUNCTIONS //
+//////////////////////
 
 uint32_t client_create(struct sockaddr_in client_address) {
 	unsigned int id = MAX_CLIENTS;

@@ -8,11 +8,12 @@
 #include "World.h"
 
 
-World::World(Renderer* renderer, unsigned int selfID) : gravity(GRAVITY_CONSTANT) {
+World::World(Renderer* renderer, unsigned int selfID, std::vector<IconData*> mapIcons)
+	: gravity(GRAVITY_CONSTANT) {
 	this->renderer = renderer;
 	this->selfID   = selfID;
 	
-	map = new Map(renderer);
+	map = new Map(renderer, mapIcons);
 	
 	playersById = new Player*[MAX_CLIENTS];
 	for (int i = 0; i < MAX_CLIENTS; ++i)

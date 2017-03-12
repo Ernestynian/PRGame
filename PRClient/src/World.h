@@ -17,7 +17,7 @@ enum PlayerDirections {
 
 class World {
 public:
-	World(Renderer* renderer, unsigned int selfID);
+	World(Renderer* renderer, unsigned int selfID, std::vector<IconData*> mapIcons);
 	~World();
 	
 	void update(float delta);

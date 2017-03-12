@@ -41,7 +41,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/map.o \
 	${OBJECTDIR}/src/players.o \
-	${OBJECTDIR}/src/server.o
+	${OBJECTDIR}/src/server.o \
+	${OBJECTDIR}/src/timer.o
 
 
 # C Compiler Flags
@@ -102,6 +103,11 @@ ${OBJECTDIR}/src/server.o: src/server.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/server.o src/server.c
+
+${OBJECTDIR}/src/timer.o: src/timer.c
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/timer.o src/timer.c
 
 # Subprojects
 .build-subprojects:

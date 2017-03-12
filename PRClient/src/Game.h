@@ -15,7 +15,7 @@ public:
 	int run();
 
 private:
-	int makeConnection();
+	std::pair<int, std::vector<IconData*>> makeConnection();
 	void processEvents();
 	void checkPackets();
 	

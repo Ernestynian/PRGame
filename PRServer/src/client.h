@@ -22,8 +22,8 @@ typedef struct {
 extern client clients[MAX_CLIENTS];
 extern pthread_mutex_t clientListMutex;
 
-extern unsigned int currentClients;
-extern pthread_mutex_t clientsMutex;
+//extern unsigned int currentClients;
+//extern pthread_mutex_t clientsMutex;
 
 uint32_t client_create(struct sockaddr_in client_address);
 void client_transferPacket(struct sockaddr_in client_address, char* data, int dataLen);

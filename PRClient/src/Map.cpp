@@ -3,7 +3,7 @@
 #include "Map.h"
 
 
-Map::Map(Renderer* renderer) {
+Map::Map(Renderer* renderer, std::vector<IconData*> newIcons) {
 	Texture* t = new Texture(renderer, "res/background.png");
 	background = new Sprite(t, 0, 0, renderer->width, renderer->height);
 	
@@ -12,11 +12,30 @@ Map::Map(Renderer* renderer) {
 	playerSpace.w = renderer->width;
 	playerSpace.h = renderer->height - 30;
 
-	t = new Texture(renderer, "res/icons/My Computer.png");
-	Icon* i = new Icon(t, 140, 480, 32);
-	icons.push_back(i);
-	i = new Icon(t, 340, 400, 32);
-	icons.push_back(i);
+	Texture* icTx[] = {
+		new Texture(renderer, "res/icons/My Computer.png"),
+		new Texture(renderer, "res/icons/My Documents.png"),
+		new Texture(renderer, "res/icons/My Music.png"),
+		new Texture(renderer, "res/icons/My Pictures.png"),
+		new Texture(renderer, "res/icons/My Videos.png"),
+		new Texture(renderer, "res/icons/Mozilla Firefox.png"),
+		new Texture(renderer, "res/icons/Mozilla Thunderbird.png"),
+		new Texture(renderer, "res/icons/Media Player Classic.png")
+		//new Texture(renderer, "res/icons/.png")
+	};
+	
+	int icTxLength = sizeof(icTx) / sizeof(icTx[0]);
+	
+	for (IconData* newIcon : newIcons) {
+		if (newIcon->textureId >= 0
+		 && newIcon->textureId < icTxLength) {
+			Icon* i = new Icon(icTx[newIcon->textureId], 
+							newIcon->x, newIcon->y, 32);
+			icons.push_back(i);
+		}
+		
+		delete newIcon;
+	}	
 }
 
 
