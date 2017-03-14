@@ -93,9 +93,8 @@ void Player::move(Map* map, float delta) {
 	int x = (int)(this->x + x_speed*delta);
 	int y = (int)(this->y + y_speed*delta);
 	
-	// TODO: don't lose all energy on collision
-	if (state != PLAYER_STILL) {		
-		if (map->collides(x, y, w, h)) {
+	if (state != PLAYER_STILL) {
+		if (map->collides(x, y, w, h, &x_speed)) {			
 			for (int i = this->x; i < x; ++i)
 				if (!map->collides(i, this->y, w, h))
 					this->x = i;
@@ -103,8 +102,7 @@ void Player::move(Map* map, float delta) {
 			for (int i = this->y; i < y; ++i)
 				if (!map->collides(this->x, i, w, h))
 					this->y = i;
-
-			x_speed = 0;
+			
 			y_speed = 0;
 			
 			SDL_Rect boundaries = { (int)this->x, (int)this->y, w, h };

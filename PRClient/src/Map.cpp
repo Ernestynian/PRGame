@@ -99,12 +99,21 @@ bool Map::vcollides(int* y, int h) {
 }
 
 
-bool Map::collides(int x, int y, int w, int h) {
-	for (auto icon : icons) {
-		if (icon->collides(x, y, w, h))
+bool Map::collides(int x, int y, int w, int h, float* newHorizontalSpeed) {
+	for (Icon* icon : icons) {
+		if (icon->collides(x, y, w, h)) {
+			if (newHorizontalSpeed != nullptr) {
+				float hx = (h + 32) * ((x + w * 0.5) - icon->getCenterX());
+				float wy = (w + 32) * ((y + h * 0.5) - icon->getCenterY());
+				if (wy > hx && wy > -hx)
+					*newHorizontalSpeed *= 0.6;
+				else
+					*newHorizontalSpeed = 0;
+			}
+			
 			return true;
+		}
 	}
-	
 	return false;
 }
 

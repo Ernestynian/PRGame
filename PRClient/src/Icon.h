@@ -14,6 +14,9 @@ public:
 	bool collides(int x, int y, int w, int h);
 	bool downCollision(int x, int y, int w, int h);
 	
+	float getCenterX();
+	float getCenterY();
+	
 private:
 	SDL_Rect collisionBox;
 };

@@ -50,3 +50,13 @@ bool Icon::downCollision(int x, int y, int w, int h) {
 	
 	return false;
 }
+
+
+float Icon::getCenterX() {
+	return collisionBox.x + collisionBox.w * 0.5;
+}
+
+
+float Icon::getCenterY() {
+	return collisionBox.y + collisionBox.h * 0.5;
+}
