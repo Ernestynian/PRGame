@@ -7,6 +7,14 @@
 #include "Sprite.h"
 #include "Icon.h"
 
+enum CollisionSide {
+	NotCollided = 0,
+	CollidedBottom = 1,
+	CollidedTop,
+	CollidedLeft,
+	CollidedRight
+};
+
 struct IconData {
 	int x;
 	int y;
@@ -21,7 +29,7 @@ public:
 	bool canFall(SDL_Rect object);
 	bool hcollides(int* x, int w);
 	bool vcollides(int* y, int h);
-	bool collides(int x, int y, int w, int h, float* newHorizontalSpeed = nullptr);
+	CollisionSide collides(int x, int y, int w, int h);
 	
 	void draw();
 private:
