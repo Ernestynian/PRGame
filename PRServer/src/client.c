@@ -114,6 +114,10 @@ void* client_process(void* dataPointer) {
 							srv_addNewEvent(NET_EVENT_PLAYER_JUMP, "1", data->id);
 							break;
 						}
+						case NET_EVENT_PLAYER_ATTACK: {
+							srv_addNewEvent(NET_EVENT_PLAYER_ATTACK, "1", data->id);
+							break;
+						}
 					}
 				} while (client_getNextEvent(&currentEvent, data));
 				
