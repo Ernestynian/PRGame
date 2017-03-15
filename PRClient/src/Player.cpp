@@ -106,7 +106,8 @@ void Player::move(Map* map, float delta) {
 	int y = (int)(this->y + y_speed*delta);
 	
 	if (state != PLAYER_STILL) {
-		if (map->collides(x, y, w, h, &x_speed)) {			
+		CollisionSide collisionSide = map->collides(x, y, w, h);
+		if (collisionSide != NotCollided) {			
 			for (int i = this->x; i < x; ++i)
 				if (!map->collides(i, this->y, w, h))
 					this->x = i;
@@ -115,6 +116,10 @@ void Player::move(Map* map, float delta) {
 				if (!map->collides(this->x, i, w, h))
 					this->y = i;
 			
+			if (collisionSide == CollidedBottom)
+				x_speed *= 0.6;
+			else
+				x_speed = 0;			
 			y_speed = 0;
 			
 			SDL_Rect boundaries = { (int)this->x, (int)this->y, w, h };
