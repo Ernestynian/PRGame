@@ -30,6 +30,7 @@ public:
 	
 	void selfStartMoving(int direction);
 	void selfStopMoving(int direction);
+    bool selfAttack();
 	bool selfJump();
 	bool selfHasMoved();
 	float getSelfPosX();

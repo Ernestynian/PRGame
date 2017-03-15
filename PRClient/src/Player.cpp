@@ -5,8 +5,8 @@
 
 
 Player::Player(Texture* bodyTexture, Texture* handsTexture) 
-: tileW(320), tileH(480), animCycleTime(0.4), animFrameCount(4) {
-	
+: tileW(320), tileH(480), animCycleTime(0.4), animFrameCount(4),
+attackAnimFrameCount(4), attackAnimTime(0.4), deltaAttackTime(0.0) {
 	this->bodyTexture = bodyTexture;
     this->handsTexture = handsTexture;
 	
@@ -82,6 +82,18 @@ bool Player::tryToJump(float speed) {
 	}
 	
 	return false;
+}
+
+bool Player::attack() {
+    //waits till the end of previous attack, and allows attacks only while moving
+    //TODO: jump attack
+    if(deltaAttackTime <= 0.01 && x_speed != 0)
+    {
+        deltaAttackTime = 0.99;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 
@@ -181,14 +193,31 @@ void Player::calculateAnimation(float delta) {
     }
     
     bodyAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime);
-    handsAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime);//temp
+    
+    if(deltaAttackTime>0.0)
+    {
+        if(handsAnimationID != ATTACKING)
+        {
+           handsAnimationID = ATTACKING; 
+        }
+        handsAnimFrame = 3-floor(deltaAttackTime* attackAnimFrameCount);
+        deltaAttackTime -= 0.005 * delta;//const to be tweaked
+    }
+    else
+    {
+        if(handsAnimationID != RUNNING)
+        {
+           handsAnimationID = RUNNING; 
+        }
+        handsAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime);//temp
+    }
 }
     
     
 void Player::draw() {
 	SDL_Rect renderQuad = { (int)x, (int)y, w, h };
 	SDL_Rect bodySourceQuad = { 0 + bodyAnimFrame * tileW, 0, tileW, tileH };
-	SDL_Rect handsSourceQuad = { 0 + handsAnimFrame * tileW, 0, tileW, tileH };
+	SDL_Rect handsSourceQuad = { 0 + handsAnimFrame * tileW, handsAnimationID * tileH, tileW, tileH };//to be tested
         
 	bodyTexture->draw(&bodySourceQuad, &renderQuad, 0, NULL, flip);
     handsTexture->draw(&handsSourceQuad, &renderQuad, 0, NULL, flip);//

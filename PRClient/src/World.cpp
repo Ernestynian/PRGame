@@ -143,6 +143,15 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			
 			break;
 		}
+        case NET_EVENT_PLAYER_ATTACK: {
+			char id = binaryRead1B();
+			if (isIdCorrect(id)) {
+				if (id != selfID)
+					playersById[id]->attack();
+			}
+			
+			break;
+		}
 	}
 }
 
@@ -173,6 +182,9 @@ bool World::selfJump() {
 	return playersById[selfID]->tryToJump(JUMP_ACCELERATION);		
 }
 
+bool World::selfAttack() {
+    return playersById[selfID]->attack();
+}
 
 bool World::selfHasMoved() {
 	if (playersById[selfID] == nullptr)

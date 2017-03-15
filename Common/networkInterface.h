@@ -53,7 +53,9 @@ enum EventTypes {
 	NET_EVENT_PLAYER_MOVED,
 	// [S] <1:client id>
 	// [C] none
-	NET_EVENT_PLAYER_JUMP
+	NET_EVENT_PLAYER_JUMP,
+    
+	NET_EVENT_PLAYER_ATTACK
 };
 
 

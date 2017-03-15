@@ -140,6 +140,10 @@ void Game::processEvents() {
 				case SDLK_a:
 					world->selfStartMoving(DIRECTION_LEFT);
 					break;
+                case SDLK_f:
+                    if(world->selfAttack())
+                        network->addNewEvent(NET_EVENT_PLAYER_ATTACK);
+                    break;
 				case SDLK_SPACE:
 				case SDLK_UP:
 					if (world->selfJump())
