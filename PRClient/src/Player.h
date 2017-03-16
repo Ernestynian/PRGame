@@ -15,7 +15,8 @@ enum PlayerState {
 
 enum HandsAnimation {
     RUNNING,
-    ATTACKING
+    RUNNING_AND_ATTACKING,
+    STILL_AND_ATTACKING
 };
 
 class Player {
