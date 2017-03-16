@@ -44,3 +44,15 @@ void Renderer::draw(SDL_Texture* texture, SDL_Rect* clipQuad, SDL_Rect* renderQu
 void Renderer::draw(SDL_Texture* texture, SDL_Rect* clipQuad, SDL_Rect* renderQuad, double angle, SDL_Point* center, SDL_RendererFlip flip) {
     SDL_RenderCopyEx( renderer, texture, clipQuad, renderQuad, angle, center, flip );
 }
+
+Texture* Renderer::createTexture(const char* filename) {
+    char* buffer = new char [32];
+    
+    //buffer = new
+    snprintf(buffer,31,"%s%s","res/",filename);
+    //const char *b = buffer;
+    printf("%s\n",buffer);
+    Texture* t = new Texture(this, buffer);
+    delete [] buffer;
+    return t;
+}

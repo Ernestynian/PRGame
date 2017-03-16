@@ -19,8 +19,10 @@ World::World(Renderer* renderer, unsigned int selfID, std::vector<IconData*> map
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 		playersById[i] = nullptr;
 	
-	playerBodyTexture = new Texture(renderer, "res/player_body_sprites.png");
-    playerHandsTexture = new Texture(renderer, "res/player_hands_sprites.png");
+	//playerBodyTexture = new Texture(renderer, "res/player_body_sprites.png");
+	playerBodyTexture = renderer->createTexture("player_body_sprites.png");
+    //playerHandsTexture = new Texture(renderer, "res/player_hands_sprites.png");
+    playerHandsTexture = renderer->createTexture("player_hands_sprites.png");
 	
 	selfDirection = DIRECTION_NONE;
 	

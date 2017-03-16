@@ -4,7 +4,8 @@
 
 
 Map::Map(Renderer* renderer, std::vector<IconData*> newIcons) {
-	Texture* t = new Texture(renderer, "res/background.png");
+	//Texture* t = new Texture(renderer, "res/background.png");
+    Texture* t = renderer->createTexture("background.png");
 	background = new Sprite(t, 0, 0, renderer->width, renderer->height);
 	
 	playerSpace.x = 0;

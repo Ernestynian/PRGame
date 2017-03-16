@@ -8,12 +8,12 @@
 // TODO: remove "res/" from filename
 Texture::Texture(Renderer* renderer, const char* filename) {
 	this->renderer = renderer;
-	
+	printf("%s\n",filename);//////////////////////////////////////////////////////
     int swidth, sheight, orig_format;
     unsigned char* data = stbi_load(filename, &swidth, &sheight, 
 									&orig_format, STBI_rgb_alpha);
     if(data == NULL) {
-		printf("Loading image failed: %s", stbi_failure_reason());
+		printf("Loading image failed: %s\n", stbi_failure_reason());
 		//fatal error, do something
     }
 

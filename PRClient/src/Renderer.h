@@ -3,6 +3,9 @@
 
 #include <list>
 
+#include "Texture.h"
+class Texture;
+
 class Renderer {
 public:	
 	Renderer(SDL_Window* window, int width, int height);
@@ -11,6 +14,7 @@ public:
 	void clear();
 	void render();
 	
+    Texture* createTexture(const char* filename);
 	SDL_Texture* createTextureFromSurface(SDL_Surface* surface);
 	
         void draw(SDL_Texture* texture, SDL_Rect* sourceQuad, SDL_Rect* renderQuad);
