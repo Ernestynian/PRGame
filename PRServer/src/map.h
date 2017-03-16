@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#define ICONS_AMOUNT 5
+#define ICONS_AMOUNT 15
 #define ICON_SIZE 32
 #define ICON_STYLES_AMOUNT 7
 

@@ -50,7 +50,7 @@ int srv_start() {
 	}
 	
 	unsigned char* ip = (unsigned char*)&srv_address.sin_addr.s_addr;
-	printf("Binded the server to %d.%d.%d.%d:%d\n", 
+	printf("Binded the server to %hhu.%hhu.%hhu.%hhu:%hhu\n", 
 			ip[0], ip[1], ip[2], ip[3], PORT);
 
 	int nonBlocking = 1;
@@ -151,7 +151,7 @@ void srv_sendClientAcceptAndData(char newClientId, struct sockaddr_in client_add
 	char* packetData = (char*)malloc(5 + mapDataLength);
 	packetData[0] = 0;
 	packetData[1] = NET_EVENT_CLIENT_ACCEPTED;
-	packetData[2] = 1 + mapDataLength;
+	packetData[2] = 2 + mapDataLength;
 	packetData[3] = newClientId;
 	packetData[4] = mapIconsCount;
 	memcpy(packetData + 5, mapData, mapDataLength);

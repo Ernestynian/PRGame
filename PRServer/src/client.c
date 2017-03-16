@@ -94,7 +94,7 @@ void* client_process(void* dataPointer) {
 
 					switch(*currentEvent) {
 						case NET_EVENT_CLIENT_EXIT:
-							printf("EVENT_CLIENT_EXIT %d\n", data->id);
+							printf("EVENT_CLIENT_EXIT %hhu\n", data->id);
 							return client_stop(data, &private);
 						case NET_EVENT_PLAYER_DIED: {
 							player_kill(data->id);
@@ -130,7 +130,7 @@ void* client_process(void* dataPointer) {
 		
 		double timerDiff = getMsDifference(private.lastPacketTime);
 		if (timerDiff > MS_TO_TIMEOUT) {
-			printf("TIMEOUTED %d\n", data->id);
+			printf("TIMEOUTED %hhu\n", data->id);
 			return client_stop(data, &private);
 		}
 		
