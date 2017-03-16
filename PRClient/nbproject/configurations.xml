@@ -24,11 +24,11 @@
                    displayName="Resource Files"
                    projectFiles="true">
       <logicalFolder name="icons" displayName="icons" projectFiles="true">
-        <itemPath>res/icons/CD-Laufwerk.ico</itemPath>
-        <itemPath>res/icons/Diskette.ico</itemPath>
+        <itemPath>res/icons/CD Drive.png</itemPath>
+        <itemPath>res/icons/Diskette.png</itemPath>
         <itemPath>res/icons/Folder Closed.png</itemPath>
         <itemPath>res/icons/Folder Opened.png</itemPath>
-        <itemPath>res/icons/Hard Drive.ico</itemPath>
+        <itemPath>res/icons/Hard Drive.png</itemPath>
         <itemPath>res/icons/Media Player Classic.png</itemPath>
         <itemPath>res/icons/Mozilla Firefox.png</itemPath>
         <itemPath>res/icons/Mozilla Thunderbird.png</itemPath>
@@ -111,15 +111,15 @@
       </item>
       <item path="res/background.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/icons/CD-Laufwerk.ico" ex="false" tool="3" flavor2="0">
+      <item path="res/icons/CD Drive.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/icons/Diskette.ico" ex="false" tool="3" flavor2="0">
+      <item path="res/icons/Diskette.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/icons/Folder Closed.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/icons/Folder Opened.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/icons/Hard Drive.ico" ex="false" tool="3" flavor2="0">
+      <item path="res/icons/Hard Drive.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/icons/Media Player Classic.png" ex="false" tool="3" flavor2="0">
       </item>
@@ -235,15 +235,15 @@
       </item>
       <item path="res/background.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/icons/CD-Laufwerk.ico" ex="false" tool="3" flavor2="0">
+      <item path="res/icons/CD Drive.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/icons/Diskette.ico" ex="false" tool="3" flavor2="0">
+      <item path="res/icons/Diskette.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/icons/Folder Closed.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/icons/Folder Opened.png" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="res/icons/Hard Drive.ico" ex="false" tool="3" flavor2="0">
+      <item path="res/icons/Hard Drive.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="res/icons/Media Player Classic.png" ex="false" tool="3" flavor2="0">
       </item>

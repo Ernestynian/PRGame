@@ -71,11 +71,10 @@ void map_initiate() {
 			map.icons[i].x = getRand(map.width / ICON_SIZE) * ICON_SIZE;
 			collides = 0;
 			for (int j = 0 ; j < i; ++j) {
-				// TODO: don't allow the same x only on the same y and y + 1 and y - 1
 				if (map.icons[i].x < map.icons[j].x + ICON_SIZE
-				 && map.icons[i].x + ICON_SIZE > map.icons[j].x
+				 && map.icons[i].x > map.icons[j].x - ICON_SIZE
 				 && map.icons[i].y < map.icons[j].y + ICON_SIZE * 3
-				 && map.icons[i].y + ICON_SIZE * 3 > map.icons[j].y) {
+				 && map.icons[i].y > map.icons[j].y - ICON_SIZE * 3) {
 					collides = 1;
 					break;
 				}					

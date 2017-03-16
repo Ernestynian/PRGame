@@ -32,6 +32,7 @@ public:
 	CollisionSide collides(int x, int y, int w, int h);
 	
 	void draw();
+	void drawObjects();
 private:
 	Sprite* background;
 	SDL_Rect playerSpace;

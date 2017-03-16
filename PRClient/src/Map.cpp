@@ -14,15 +14,26 @@ Map::Map(Renderer* renderer, std::vector<IconData*> newIcons) {
 	playerSpace.h = renderer->height - 30;
 
 	Texture* icTx[] = {
-		new Texture(renderer, "res/icons/My Computer.png"),
-		new Texture(renderer, "res/icons/My Documents.png"),
-		new Texture(renderer, "res/icons/My Music.png"),
-		new Texture(renderer, "res/icons/My Pictures.png"),
-		new Texture(renderer, "res/icons/My Videos.png"),
-		new Texture(renderer, "res/icons/Mozilla Firefox.png"),
-		new Texture(renderer, "res/icons/Mozilla Thunderbird.png"),
-		new Texture(renderer, "res/icons/Media Player Classic.png")
-		//new Texture(renderer, "res/icons/.png")
+		renderer->createTexture("icons/CD Drive.png"),
+		renderer->createTexture("icons/Diskette.png"),
+		renderer->createTexture("icons/Folder Closed.png"),
+		renderer->createTexture("icons/Folder Opened.png"),
+		renderer->createTexture("icons/Hard Drive.png"),
+		renderer->createTexture("icons/Media Player Classic.png"),
+		renderer->createTexture("icons/Mozilla Firefox.png"),
+		renderer->createTexture("icons/Mozilla Thunderbird.png"),
+		renderer->createTexture("icons/My Computer.png"),
+		renderer->createTexture("icons/My Documents.png"),
+		renderer->createTexture("icons/My Music.png"),
+		renderer->createTexture("icons/My Pictures.png"),
+		renderer->createTexture("icons/My Videos.png"),
+		renderer->createTexture("icons/Nero StartSmart.png"),
+		renderer->createTexture("icons/Recycle Bin empty.png"),
+		renderer->createTexture("icons/Recycle Bin.png"),
+		renderer->createTexture("icons/Tablet PC.png"),
+		renderer->createTexture("icons/Winamp.png"),
+		renderer->createTexture("icons/Windows Media Player 10.png"),
+		//renderer->createTexture("icons/.png")
 	};
 	
 	int icTxLength = sizeof(icTx) / sizeof(icTx[0]);

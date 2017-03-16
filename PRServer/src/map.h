@@ -3,7 +3,7 @@
 
 #define ICONS_AMOUNT 15
 #define ICON_SIZE 32
-#define ICON_STYLES_AMOUNT 7
+#define ICON_STYLES_AMOUNT 19
 
 typedef struct {
 	int x;
