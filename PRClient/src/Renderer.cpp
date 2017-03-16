@@ -47,11 +47,7 @@ void Renderer::draw(SDL_Texture* texture, SDL_Rect* clipQuad, SDL_Rect* renderQu
 
 Texture* Renderer::createTexture(const char* filename) {
     char* buffer = new char [32];
-    
-    //buffer = new
     snprintf(buffer,31,"%s%s","res/",filename);
-    //const char *b = buffer;
-    printf("%s\n",buffer);
     Texture* t = new Texture(this, buffer);
     delete [] buffer;
     return t;
