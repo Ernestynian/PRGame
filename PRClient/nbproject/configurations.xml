@@ -222,7 +222,7 @@
           <developmentMode>5</developmentMode>
         </asmTool>
         <linkerTool>
-          <commandLine>-lSDL2main -lSDL2 -lSDL2_net</commandLine>
+          <commandLine>-Wl,-Bstatic -lSDL2 -lSDL2main -lSDL2_net -Wl,-Bdynamic -lm -ldl -lpthread -lrt -static-libstdc++ -static-libgcc</commandLine>
         </linkerTool>
       </compileType>
       <item path="../Common/byteConverter.c" ex="false" tool="0" flavor2="0">
