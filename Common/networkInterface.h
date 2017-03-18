@@ -51,6 +51,8 @@ enum EventTypes {
 	// [S] <1:client id> <4:pos_x> <4:pos_y>
 	// [C] <4:pos_x> <4:pos_y>
 	NET_EVENT_PLAYER_MOVED,
+	// [S] <1:client id> <4:pos_x> <4:pos_y>
+	NET_EVENT_PLAYER_MOVE_DENIED,
 	// [S] <1:client id>
 	// [C] none
 	NET_EVENT_PLAYER_JUMP,

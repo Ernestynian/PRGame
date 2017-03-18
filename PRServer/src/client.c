@@ -105,9 +105,15 @@ void* client_process(void* dataPointer) {
 							float  y = binaryReadFloat();
 							float vx = binaryReadFloat();
 							float vy = binaryReadFloat();
-							player_moved(data->id, x, y, vx, vy);
-
-							srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "1ffff", data->id, x, y, vx, vy);
+							if (!map_collides(private.map, x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
+							 && player_moved(data->id, x, y, vx, vy))
+								srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "1ffff", data->id, x, y, vx, vy);
+							else {
+								float x;
+								float y;
+								player_getPos(data->id, &x, &y);
+								srv_addNewEvent(NET_EVENT_PLAYER_MOVE_DENIED, "1ff", data->id, x, y);
+							}
 							break;
 						}
 						case NET_EVENT_PLAYER_JUMP: {
@@ -138,9 +144,8 @@ void* client_process(void* dataPointer) {
 			timerDiff = getMsDifference(private.spawnTimerStart);
 			if (timerDiff > MS_TO_SPAWN) {
 				private.spawningPlayer = 0;
-				// TODO: randomize and check collision with the map
-				float x = 20 + 30 * data->id;
-				float y = 40;
+				float x, y;
+				map_getSpawnPosition(private.map, &x, &y, PLAYER_WIDTH, PLAYER_HEIGHT);
 				player_spawn(data->id, x, y);
 				srv_addNewEvent(NET_EVENT_PLAYER_SPAWN, "1ff", data->id, x, y);
 			}

@@ -49,6 +49,9 @@ void Player::kill() {
 void Player::teleportToPosition(int x, int y) {
 	this->x = x;
 	this->y = y;
+	this->x_speed = 0;
+	this->y_speed = 0;
+	this->state = PLAYER_STILL;
 }
 
 

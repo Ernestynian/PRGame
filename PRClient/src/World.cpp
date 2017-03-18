@@ -136,6 +136,17 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			
 			break;
 		}
+		case NET_EVENT_PLAYER_MOVE_DENIED: {
+			char id  = binaryRead1B();
+			float x  = binaryReadFloat();
+			float y  = binaryReadFloat();
+			if (isIdCorrect(id)) {
+				if (id == selfID)
+					playersById[id]->teleportToPosition(x, y);
+			}
+			
+			break;
+		}
 		case NET_EVENT_PLAYER_JUMP: {
 			char id = binaryRead1B();
 			if (isIdCorrect(id)) {

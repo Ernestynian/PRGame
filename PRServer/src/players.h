@@ -3,6 +3,9 @@
 
 #include "pthread.h"
 
+#define PLAYER_WIDTH 16
+#define PLAYER_HEIGHT 38
+
 typedef struct {
 	float x;
 	float y;
@@ -26,7 +29,14 @@ void players_init();
 
 void player_reset(int id);
 
-void player_moved(char id, float x, float y, float vx, float vy);
+/**
+ * 
+ * @param x - new position and optionally return previous position
+ * @param y - new position and optionally return previous position
+ * @return true if the move was accepted
+ */
+int player_moved(char id, float x, float y, float vx, float vy);
+void player_getPos(char id, float* x, float* y);
 
 void player_spawn(int id, float x, float y);
 void player_kill(int id);
