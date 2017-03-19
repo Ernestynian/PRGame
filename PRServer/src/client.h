@@ -8,9 +8,9 @@ typedef struct {
 	const unsigned char id;
 	
 	pthread_mutex_t mutex;
-	char buf[MAX_CLIENT_PACKET_SIZE];
-	int  bufLen;
-	char bufHasNewData;
+	char packetData[MAX_CLIENT_PACKET_SIZE];
+	int  packetLength;
+	char packetStatus;
 } client_publicData;
 
 
@@ -25,7 +25,7 @@ extern pthread_mutex_t clientListMutex;
 //extern unsigned int currentClients;
 //extern pthread_mutex_t clientsMutex;
 
-uint32_t client_create(struct sockaddr_in client_address);
+uint32_t client_create(struct sockaddr_in client_address, MapData* mapClone);
 void client_transferPacket(struct sockaddr_in client_address, char* data, int dataLen);
 
 #endif /* CLIENT_H */

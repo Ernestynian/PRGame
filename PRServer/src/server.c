@@ -13,8 +13,8 @@
 #include "../../Common/byteConverter.h"
 
 #include "server.h"
-#include "client.h"
 #include "map.h"
+#include "client.h"
 #include "players.h"
 
 
@@ -28,9 +28,10 @@ unsigned char   outBufferTick;
 pthread_mutex_t outBufferMutex = PTHREAD_MUTEX_INITIALIZER;
 double          msTimeToSendPacket = 1000.0 / FRAMERATE;
 
+MapData*        map;
 
 int srv_start() {
-	map_initiate();
+	map = map_create();
 	
 	srv_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (srv_fd < 0) {
@@ -70,6 +71,7 @@ int srv_start() {
 
 
 void srv_stop() {
+	map_free(map);
 	close(srv_fd);
 }
 
@@ -146,7 +148,7 @@ void srv_sendCurrentState(char newClientID, struct sockaddr_in client_address, s
 void srv_sendClientAcceptAndData(char newClientId, struct sockaddr_in client_address, socklen_t addrlen) {
 	int mapDataLength;
 	int mapIconsCount;
-	char* mapData = map_getInitData(&mapDataLength, &mapIconsCount);
+	char* mapData = map_getInitData(map, &mapDataLength, &mapIconsCount);
 	
 	char* packetData = (char*)malloc(5 + mapDataLength);
 	packetData[0] = 0;
@@ -204,7 +206,10 @@ int srv_transferPackets() {
 	
 	if (recvlen > 0) {
 		if (inBuffer[1] == NET_EVENT_CLIENT_JOIN) {
-			int newClientID = client_create(client_address);
+			MapData* mapClone = (MapData*)malloc(sizeof(MapData));
+			memcpy(mapClone, map, sizeof(MapData));
+			
+			int newClientID = client_create(client_address, mapClone);
 			if (newClientID != CLIENT_NOT_CREATED) {
 				srv_sendClientAcceptAndData(newClientID, client_address, addrlen);
 				player_reset(newClientID);

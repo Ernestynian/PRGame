@@ -6,8 +6,6 @@
 #include "map.h"
 
 #define RESERVED_HEIGHT 90
-MapData originalMap = { 800 - ICON_SIZE, 600 - RESERVED_HEIGHT };
-pthread_mutex_t mapMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 int getRand(int limit) {
@@ -22,10 +20,14 @@ int getRand(int limit) {
 }
 
 
-void map_initiate() {
+MapData* map_create() {
 	srand(time(NULL));
 	
-	int horizontalSpaces = originalMap.height / ICON_SIZE - 2;
+	MapData* map = malloc(sizeof(MapData));
+	map->width = 800 - ICON_SIZE;
+	map->height = 600 - RESERVED_HEIGHT;
+	
+	int horizontalSpaces = map->height / ICON_SIZE - 2;
 	
 	char* usedHeights = malloc(horizontalSpaces);
 	memset(usedHeights, 0, horizontalSpaces);
@@ -64,30 +66,36 @@ void map_initiate() {
 			currentHeightIcons = 1;
 		} else 
 			currentHeightIcons++;
-		originalMap.icons[i].y = currentHeight;
+		map->icons[i].y = currentHeight;
 		
 		int collides = 1;
 		while (collides) {
-			originalMap.icons[i].x = getRand(originalMap.width / ICON_SIZE) * ICON_SIZE;
+			map->icons[i].x = getRand(map->width / ICON_SIZE) * ICON_SIZE;
 			collides = 0;
 			for (int j = 0 ; j < i; ++j) {
-				if (originalMap.icons[i].x < originalMap.icons[j].x + ICON_SIZE
-				 && originalMap.icons[i].x > originalMap.icons[j].x - ICON_SIZE
-				 && originalMap.icons[i].y < originalMap.icons[j].y + ICON_SIZE * 3
-				 && originalMap.icons[i].y > originalMap.icons[j].y - ICON_SIZE * 3) {
+				if (map->icons[i].x < map->icons[j].x + ICON_SIZE
+				 && map->icons[i].x > map->icons[j].x - ICON_SIZE
+				 && map->icons[i].y < map->icons[j].y + ICON_SIZE * 3
+				 && map->icons[i].y > map->icons[j].y - ICON_SIZE * 3) {
 					collides = 1;
 					break;
 				}					
 			}
 		}
-		originalMap.icons[i].textureId = getRand(ICON_STYLES_AMOUNT);
+		map->icons[i].textureId = getRand(ICON_STYLES_AMOUNT);
 	}
 	
 	free(usedHeights);
+	return map;
 }
 
 
-char* map_getInitData(int* dataLength, int* iconsCount) {
+void map_free(MapData* map) {
+	free(map);
+}
+
+
+char* map_getInitData(MapData* map, int* dataLength, int* iconsCount) {
 	*dataLength = 5 * ICONS_AMOUNT;
 	*iconsCount = ICONS_AMOUNT;
 	
@@ -95,30 +103,12 @@ char* map_getInitData(int* dataLength, int* iconsCount) {
 	
 	for (int i = 0; i < ICONS_AMOUNT; ++i) {
 		char* _data = data + i * 5;
-		pthread_mutex_lock(&mapMutex);
-		memcpy(_data + 0, &originalMap.icons[i].x, 2);
-		memcpy(_data + 2, &originalMap.icons[i].y, 2);
-		_data[4] = originalMap.icons[i].textureId;
-		pthread_mutex_unlock(&mapMutex);
+		memcpy(_data + 0, &map->icons[i].x, 2);
+		memcpy(_data + 2, &map->icons[i].y, 2);
+		_data[4] = map->icons[i].textureId;
 	}
 	
 	return data;
-}
-
-
-MapData* map_clone() {
-	MapData* mapClone = (MapData*)malloc(sizeof(MapData));
-	
-	pthread_mutex_lock(&mapMutex);
-	*mapClone = originalMap;
-	pthread_mutex_unlock(&mapMutex);
-	
-	return mapClone;
-}
-
-
-void map_free(MapData* map) {
-	free(map);
 }
 
 
