@@ -19,16 +19,10 @@ World::World(Renderer* renderer, unsigned int selfID, std::vector<IconData*> map
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 		playersById[i] = nullptr;
 	
-	//playerBodyTexture = new Texture(renderer, "res/player_body_sprites.png");
 	playerBodyTexture = renderer->createTexture("player_body_sprites.png");
-    //playerHandsTexture = new Texture(renderer, "res/player_hands_sprites.png");
     playerHandsTexture = renderer->createTexture("player_hands_sprites.png");
 	
-	selfDirection = DIRECTION_NONE;
-	
-	//players.push_back(Player(playerTexture));
-	//playersById[selfID] = &players.back();
-	
+	selfLeftDirection = selfRightDirection = false;
 }
 
 
@@ -45,9 +39,13 @@ World::~World() {
 void World::update(float delta) {
 	if (playersById[selfID] != nullptr
 	 && playersById[selfID]->isAlive()) {
-		if (selfDirection != DIRECTION_NONE) {
-			playersById[selfID]->setSpeed(MAX_MOVEMENT_SPEED * selfDirection, 0);
-		}
+		if (selfLeftDirection == selfRightDirection)
+			playersById[selfID]->applyFriction(PLAYER_ACCELERATION);
+		else if (selfLeftDirection)
+			playersById[selfID]->addSpeed(-PLAYER_ACCELERATION);
+		else if (selfRightDirection)
+			playersById[selfID]->addSpeed(PLAYER_ACCELERATION);
+		
 	}
 	
 	for (auto player : players) {
@@ -72,7 +70,6 @@ void World::draw() {
 
 
 void World::addPlayer(int id) {
-	// prevent memory leak
 	if (playersById[id] != nullptr)
 		removePlayer(id);
 	
@@ -82,6 +79,7 @@ void World::addPlayer(int id) {
 
 
 void World::removePlayer(int id) {
+	// TODO: make sure there is no memory leak
 	for(auto it = players.begin(); it != players.end(); ++it) {
 		if (*it == playersById[id]) {
 			
@@ -173,17 +171,21 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 // CONTROLLER PLAYER //
 ///////////////////////
 
-void World::selfStartMoving(int direction) {
-	selfDirection = (PlayerDirections)direction;
+void World::selfStartMoving(PlayerDirections direction) {
+	if (direction == DIRECTION_LEFT)
+		selfLeftDirection = true;
+	
+	if (direction == DIRECTION_RIGHT)
+		selfRightDirection = true;
 }
 
 
-void World::selfStopMoving(int direction) {
-	if (selfDirection == direction) {
-		selfDirection = DIRECTION_NONE;
-		if (playersById[selfID]->canMove())
-			playersById[selfID]->setSpeed(0, 0);
-	}
+void World::selfStopMoving(PlayerDirections direction) {
+	if (direction == DIRECTION_LEFT)
+		selfLeftDirection = false;
+	
+	if (direction == DIRECTION_RIGHT)
+		selfRightDirection = false;
 }
 
 

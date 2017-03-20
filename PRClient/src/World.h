@@ -28,8 +28,8 @@ public:
 	
 	void parseEvent(EventTypes type, uint8_t* data);
 	
-	void selfStartMoving(int direction);
-	void selfStopMoving(int direction);
+	void selfStartMoving(PlayerDirections direction);
+	void selfStopMoving(PlayerDirections direction);
     bool selfAttack();
 	bool selfJump();
 	bool selfHasMoved();
@@ -52,7 +52,7 @@ private:
 	Player** playersById;         // Players "sorted" by their server id
 	
 	int selfID;
-	PlayerDirections selfDirection;
+	bool selfLeftDirection, selfRightDirection;
 };
 
 #endif /* WORLD_H */

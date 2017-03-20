@@ -27,9 +27,11 @@ public:
 	void spawn(int x, int y);
 	void kill();
 	void teleportToPosition(int x, int y);
+	void setSpeed(int vx, int vy);
 	
 	void applyGravity(Map* map, float g);
-	void setSpeed(float x, float y);
+	void addSpeed(float x);
+	void applyFriction(float x);
 	
 	bool tryToJump(float speed);
 	

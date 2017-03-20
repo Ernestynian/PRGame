@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 
+#include "../../Common/networkInterface.h"
+
 #include "Texture.h"
 #include "Player.h"
 
@@ -55,6 +57,12 @@ void Player::teleportToPosition(int x, int y) {
 }
 
 
+void Player::setSpeed(int vx, int vy) {
+	x_speed = vx;
+	y_speed = vy;
+}
+
+
 void Player::applyGravity(Map* map, float g) {
 	if(isAlive()) {
 		SDL_Rect boundaries = {(int)x, (int)y, w, h};
@@ -68,11 +76,39 @@ void Player::applyGravity(Map* map, float g) {
 }
 
 
-void Player::setSpeed(float x, float y) {
+void Player::addSpeed(float x) {
 	if(canMove()) {
-		x_speed = x;
-		y_speed = y;
+		if (x_speed > 0 && x_speed + x > PLAYER_MAX_MOVEMENT_SPEED)
+			x_speed = PLAYER_MAX_MOVEMENT_SPEED;
+		else if (x_speed < 0 && x_speed + x < -PLAYER_MAX_MOVEMENT_SPEED)
+			x_speed = -PLAYER_MAX_MOVEMENT_SPEED;
+		else
+			x_speed += x;
+		
 		changeStateTo(PLAYER_MOVING);
+	}
+}
+
+
+void Player::applyFriction(float x) {
+	if(canMove()) {
+		if (x_speed != 0) {
+			if (x_speed < 0) {
+				if (x_speed - x > 0) {
+					x_speed = 0;
+					if (y_speed > 0)
+						changeStateTo(PLAYER_STILL);
+				} else
+					x_speed += x;
+			} else if (x_speed > 0) {
+				if (x_speed - x < 0) {
+					x_speed = 0;
+					if (y_speed > 0)
+						changeStateTo(PLAYER_STILL);
+				} else
+					x_speed -= x;
+			} 
+		}
 	}
 }
 
