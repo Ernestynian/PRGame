@@ -82,7 +82,7 @@ MapData* map_create() {
 				}					
 			}
 		}
-		map->icons[i].textureId = getRand(ICON_STYLES_AMOUNT);
+		map->icons[i].textureId = getRand(ICON_STYLES_AMOUNT - 1);
 	}
 	
 	free(usedHeights);

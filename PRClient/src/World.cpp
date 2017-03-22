@@ -79,10 +79,9 @@ void World::addPlayer(int id) {
 
 
 void World::removePlayer(int id) {
-	// TODO: make sure there is no memory leak
 	for(auto it = players.begin(); it != players.end(); ++it) {
 		if (*it == playersById[id]) {
-			
+			delete *it;
 			players.erase(it);
 			break;
 		}

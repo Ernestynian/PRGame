@@ -30,6 +30,7 @@ double          msTimeToSendPacket = 1000.0 / FRAMERATE;
 
 MapData*        map;
 
+
 int srv_start() {
 	map = map_create();
 	
