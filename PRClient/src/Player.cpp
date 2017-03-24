@@ -8,8 +8,8 @@
 
 Player::Player(Texture* bodyTexture, Texture* handsTexture)
 : tileW(320), tileH(320), animCycleTime(0.4), animFrameCount(4),
-attackAnimFrameCount(4), attackAnimTime(0.4), deltaAttackTime(0.0),
-flip(SDL_FLIP_NONE), handsAnimationID(RUNNING) {
+  attackAnimFrameCount(4), attackAnimTime(0.4), deltaAttackTime(0.0),
+  flip(SDL_FLIP_NONE), handsAnimationID(RUNNING) {
 	this->bodyTexture = bodyTexture;
 	this->handsTexture = handsTexture;
 
@@ -28,8 +28,7 @@ flip(SDL_FLIP_NONE), handsAnimationID(RUNNING) {
 }
 
 
-Player::~Player() {
- }
+Player::~Player() {}
 
 
 void Player::spawn(int x, int y) {
@@ -57,30 +56,30 @@ void Player::teleportToPosition(int x, int y) {
 }
 
 
-void Player::setSpeed(int vx, int vy) {
+void Player::setSpeed(float vx, float vy) {
 	x_speed = vx;
 	y_speed = vy;
 }
 
 
 void Player::applyGravity(Map* map, float g) {
-	if(isAlive()) {
-		SDL_Rect boundaries = {(int)x, (int)y, w, h};
-		if(map->canFall(boundaries)) {
-			y_speed += g;
+	SDL_Rect boundaries = {(int)x, (int)y, w, h};
+	if(map->canFall(boundaries)) {
+		y_speed += g;
 
-			if(y_speed > 0.0)
-				changeStateTo(PLAYER_FALLING);
-		}
+		if(y_speed > 0.0)
+			changeStateTo(PLAYER_FALLING);
 	}
 }
 
 
 void Player::addSpeed(float x) {
 	if(canMove()) {
-		if (x_speed > 0 && x_speed + x > PLAYER_MAX_MOVEMENT_SPEED)
+		if (x_speed > 0
+		 && x_speed + x > PLAYER_MAX_MOVEMENT_SPEED)
 			x_speed = PLAYER_MAX_MOVEMENT_SPEED;
-		else if (x_speed < 0 && x_speed + x < -PLAYER_MAX_MOVEMENT_SPEED)
+		else if (x_speed < 0
+		      && x_speed + x < -PLAYER_MAX_MOVEMENT_SPEED)
 			x_speed = -PLAYER_MAX_MOVEMENT_SPEED;
 		else
 			x_speed += x;
@@ -231,6 +230,16 @@ bool Player::hasMoved() {
 }
 
 
+bool Player::hasStopped() {
+	if (stopped) {
+		stopped = false;
+		return true;
+	}
+	
+	return false;
+}
+
+
 void Player::calculateAnimation(float delta) {
 	if(x_speed == 0.0) {
 		deltaAnimTime = 0;
@@ -312,6 +321,7 @@ void Player::changeStateTo(PlayerState newState) {
 	if(newState == PLAYER_STILL) {
 		x_speed = 0;
 		y_speed = 0;
+		stopped = true;
 	}
 
 	state = newState;

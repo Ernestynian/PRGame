@@ -33,6 +33,7 @@ public:
     bool selfAttack();
 	bool selfJump();
 	bool selfHasMoved();
+	bool selfStopped();
 	float getSelfPosX();
 	float getSelfPosY();
 	float getSelfSpeedX();

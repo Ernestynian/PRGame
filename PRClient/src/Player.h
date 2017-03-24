@@ -27,7 +27,7 @@ public:
 	void spawn(int x, int y);
 	void kill();
 	void teleportToPosition(int x, int y);
-	void setSpeed(int vx, int vy);
+	void setSpeed(float vx, float vy);
 	
 	void applyGravity(Map* map, float g);
 	void addSpeed(float x);
@@ -37,6 +37,7 @@ public:
 	
 	void move(Map* map, float delta);
 	bool hasMoved();
+	bool hasStopped();
     
     bool attack();
 	
@@ -64,6 +65,8 @@ private:
 	
 	float x_speed;
 	float y_speed;
+	
+	bool stopped;
         
     float deltaAnimTime;
     double animCycleTime;//const
@@ -81,7 +84,7 @@ private:
 	bool alive;
 	
 	Texture* bodyTexture;
-        Texture* handsTexture;
+    Texture* handsTexture;
 };
 
 #endif /* PLAYER_H */

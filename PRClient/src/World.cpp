@@ -48,10 +48,12 @@ void World::update(float delta) {
 		
 	}
 	
-	for (auto player : players) {
-		player->applyGravity(map, gravity * delta);
-		player->move(map, delta);
-        player->calculateAnimation(delta);
+	for (Player* player : players) {
+		if (player->isAlive()) {
+			player->applyGravity(map, gravity * delta);
+			player->move(map, delta);
+			player->calculateAnimation(delta);
+		}
     }
 }
 
@@ -134,6 +136,7 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			break;
 		}
 		case NET_EVENT_PLAYER_MOVE_DENIED: {
+			printf("NET_EVENT_PLAYER_MOVE_DENIED\n");
 			char id  = binaryRead1B();
 			float x  = binaryReadFloat();
 			float y  = binaryReadFloat();
@@ -196,15 +199,25 @@ bool World::selfJump() {
 	return playersById[selfID]->tryToJump(JUMP_ACCELERATION);		
 }
 
+
 bool World::selfAttack() {
     return playersById[selfID]->attack();
 }
+
 
 bool World::selfHasMoved() {
 	if (playersById[selfID] == nullptr)
 		return false;
 	
 	return playersById[selfID]->hasMoved();
+}
+
+
+bool World::selfStopped() {
+	if (playersById[selfID] == nullptr)
+		return false;
+	
+	return playersById[selfID]->hasStopped();
 }
 
 
