@@ -16,6 +16,8 @@ typedef struct {
 	
 	position pos;
 	position speed;
+	
+	pthread_mutex_t alive_mutex;
 	char alive;
 	
 	char moved;
@@ -37,9 +39,13 @@ void player_reset(int id);
  */
 int player_moved(char id, float x, float y, float vx, float vy);
 void player_getPos(char id, float* x, float* y);
+void player_stopMovement(int id);
 
 void player_spawn(int id, float x, float y);
 void player_kill(int id);
+
+int player_isAlive(int id);
+int player_collides(int id, int x, int y, int w, int h);
 
 #endif /* PLAYERS_H */
 

@@ -25,6 +25,9 @@ typedef struct {
 	struct timeval lastPacketTime;
 	int spawningPlayer;
 	struct timeval spawnTimerStart;
+	
+	struct timeval attackTimerStart;
+	int attacking;
 } client_privateData;
 
 
@@ -79,6 +82,7 @@ void* client_process(void* threadData) {
 	gettimeofday(&private.lastPacketTime, NULL);
 	// Spawn player at the start (right after he joins)
 	private.spawningPlayer = 1;
+	private.attacking = 0;
 	private.spawnTimerStart = private.lastPacketTime;
 	private.map = (MapData*)(dataArray[1]);
 	
@@ -112,9 +116,9 @@ void* client_process(void* threadData) {
 							 && player_moved(public->id, x, y, vx, vy))
 								srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "1ffff", public->id, x, y, vx, vy);
 							else {
-								float x;
-								float y;
+								float x, y;
 								player_getPos(public->id, &x, &y);
+								player_stopMovement(public->id);
 								srv_addNewEvent(NET_EVENT_PLAYER_MOVE_DENIED, "1ff", public->id, x, y);
 							}
 							break;
@@ -124,7 +128,11 @@ void* client_process(void* threadData) {
 							break;
 						}
 						case NET_EVENT_PLAYER_ATTACK: {
-							srv_addNewEvent(NET_EVENT_PLAYER_ATTACK, "1", public->id);
+							if (!private.attacking) {
+								private.attacking = 1;
+								gettimeofday(&private.attackTimerStart, NULL);
+								srv_addNewEvent(NET_EVENT_PLAYER_ATTACK, "1", public->id);
+							}
 							break;
 						}
 					}
@@ -143,6 +151,30 @@ void* client_process(void* threadData) {
 			return client_stop(public, &private);
 		}
 		
+		if (private.attacking) {
+			timerDiff = getMsDifference(private.attackTimerStart);
+			if (timerDiff > MS_TO_ATTACK) {
+				private.attacking = 0;
+				// check if killed someone
+				float x, y;
+				player_getPos(public->id, &x, &y);
+				// TODO: more precise values of the hand
+				x += PLAYER_WIDTH;
+				y += 10;
+				for (int i = 0; i < MAX_CLIENTS; ++i) {
+					if (i == public->id)
+						continue;
+					
+					if (player_isAlive(i)) {
+						if (player_collides(i, x, y, 10, 5)) {
+							srv_addNewEvent(NET_EVENT_PLAYER_DIED, "1", i);
+							player_kill(i);
+						}
+					}
+				}
+			}
+		}
+		
 		if (private.spawningPlayer) {
 			timerDiff = getMsDifference(private.spawnTimerStart);
 			if (timerDiff > MS_TO_SPAWN) {
@@ -152,6 +184,9 @@ void* client_process(void* threadData) {
 				player_spawn(public->id, x, y);
 				srv_addNewEvent(NET_EVENT_PLAYER_SPAWN, "1ff", public->id, x, y);
 			}
+		} else if (!player_isAlive(public->id)) {
+			private.spawningPlayer = 1;
+			gettimeofday(&private.spawnTimerStart, NULL);
 		}
 		
 		usleep(1);
