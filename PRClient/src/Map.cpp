@@ -64,7 +64,7 @@ bool Map::canFall(SDL_Rect object) {
 		return false;
 	
 	for (auto icon : icons) {
-		if (icon->downCollision(object.x, object.y, object.w, object.h))
+		if (icon->downCollision(object.x, object.y + 1, object.w, object.h))
 			return false;
 	}
 	
@@ -111,11 +111,14 @@ bool Map::vcollides(int* y, int h) {
 }
 
 
-CollisionSide Map::collides(int x, int y, int w, int h) {
+CollisionSide Map::collides(int x, int y, int w, int h, SDL_Rect* collider) {
 	for (Icon* icon : icons) {
 		if (icon->collides(x, y, w, h)) {
+			icon->fetchCollisionBox(collider);
+			
 			float hx = (h + 32) * ((x + w * 0.5) - icon->getCenterX());
 			float wy = (w + 32) * ((y + h * 0.5) - icon->getCenterY());
+			
 			if (wy > hx) {
 				if (wy > -hx)
 					return CollidedBottom;

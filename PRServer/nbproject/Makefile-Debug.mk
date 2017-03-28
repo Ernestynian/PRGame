@@ -72,42 +72,42 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prserver: ${OBJECTFILES}
 ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o: ../Common/byteConverter.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o ../Common/byteConverter.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o ../Common/byteConverter.c
 
 ${OBJECTDIR}/_ext/7daaf93a/networkInterface.o: ../Common/networkInterface.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/networkInterface.o ../Common/networkInterface.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/networkInterface.o ../Common/networkInterface.c
 
 ${OBJECTDIR}/src/client.o: src/client.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/client.o src/client.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/client.o src/client.c
 
 ${OBJECTDIR}/src/main.o: src/main.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
 
 ${OBJECTDIR}/src/map.o: src/map.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/map.o src/map.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/map.o src/map.c
 
 ${OBJECTDIR}/src/players.o: src/players.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/players.o src/players.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/players.o src/players.c
 
 ${OBJECTDIR}/src/server.o: src/server.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/server.o src/server.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/server.o src/server.c
 
 ${OBJECTDIR}/src/timer.o: src/timer.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/timer.o src/timer.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/timer.o src/timer.c
 
 # Subprojects
 .build-subprojects:

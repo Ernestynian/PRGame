@@ -17,6 +17,8 @@ public:
 	float getCenterX();
 	float getCenterY();
 	
+	void fetchCollisionBox(SDL_Rect* box);
+	
 private:
 	SDL_Rect collisionBox;
 };

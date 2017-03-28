@@ -29,7 +29,7 @@ public:
 	bool canFall(SDL_Rect object);
 	bool hcollides(int* x, int w);
 	bool vcollides(int* y, int h);
-	CollisionSide collides(int x, int y, int w, int h);
+	CollisionSide collides(int x, int y, int w, int h, SDL_Rect* collider);
 	
 	void draw();
 	void drawObjects();

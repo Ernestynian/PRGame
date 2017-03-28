@@ -60,3 +60,11 @@ float Icon::getCenterX() {
 float Icon::getCenterY() {
 	return collisionBox.y + collisionBox.h * 0.5;
 }
+
+
+void Icon::fetchCollisionBox(SDL_Rect* box) {
+	box->x = collisionBox.x;
+	box->y = collisionBox.y;
+	box->w = collisionBox.w;
+	box->h = collisionBox.h;
+}

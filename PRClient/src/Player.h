@@ -3,6 +3,7 @@
 
 #include "Map.h"
 
+
 enum PlayerState {
 	PLAYER_STILL,
 	PLAYER_MOVING,
@@ -53,6 +54,8 @@ public:
 	float getSpeedY();
 	
 private:
+	SDL_Rect getCollisionBox();
+	SDL_Rect getCollisionBox(float x_offset, float y_offset);
 	void changeStateTo(PlayerState newState);
 	PlayerState state;
 	

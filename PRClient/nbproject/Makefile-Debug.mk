@@ -77,67 +77,67 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prclient: ${OBJECTFILES}
 ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o: ../Common/byteConverter.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o ../Common/byteConverter.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o ../Common/byteConverter.c
 
 ${OBJECTDIR}/_ext/7daaf93a/networkInterface.o: ../Common/networkInterface.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
 	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/networkInterface.o ../Common/networkInterface.c
+	$(COMPILE.c) -g -DDEBUG -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/networkInterface.o ../Common/networkInterface.c
 
 ${OBJECTDIR}/src/Game.o: src/Game.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Game.o src/Game.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Game.o src/Game.cpp
 
 ${OBJECTDIR}/src/Icon.o: src/Icon.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Icon.o src/Icon.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Icon.o src/Icon.cpp
 
 ${OBJECTDIR}/src/Map.o: src/Map.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Map.o src/Map.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Map.o src/Map.cpp
 
 ${OBJECTDIR}/src/Network.o: src/Network.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Network.o src/Network.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Network.o src/Network.cpp
 
 ${OBJECTDIR}/src/Player.o: src/Player.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Player.o src/Player.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Player.o src/Player.cpp
 
 ${OBJECTDIR}/src/Renderer.o: src/Renderer.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Renderer.o src/Renderer.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Renderer.o src/Renderer.cpp
 
 ${OBJECTDIR}/src/Sprite.o: src/Sprite.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Sprite.o src/Sprite.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Sprite.o src/Sprite.cpp
 
 ${OBJECTDIR}/src/Texture.o: src/Texture.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Texture.o src/Texture.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Texture.o src/Texture.cpp
 
 ${OBJECTDIR}/src/Window.o: src/Window.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Window.o src/Window.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Window.o src/Window.cpp
 
 ${OBJECTDIR}/src/World.o: src/World.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/World.o src/World.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/World.o src/World.cpp
 
 ${OBJECTDIR}/src/main.o: src/main.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -s -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
+	$(COMPILE.cc) -g -s -DDEBUG -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
 
 # Subprojects
 .build-subprojects:

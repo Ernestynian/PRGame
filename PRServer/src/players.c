@@ -32,9 +32,6 @@ void player_reset(int id) {
 
 
 int player_moved(char id, float x, float y, float vx, float vy) {
-	// TODO: Check collisions
-	// TODO: verify if this move can be accepted
-	
 	pthread_mutex_lock(&players[id].mutex);
 	players[id].pos.x   = x;
 	players[id].pos.y   = y;

@@ -93,9 +93,17 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <cTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </cTool>
         <ccTool>
           <stripSymbols>true</stripSymbols>
           <standard>8</standard>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
         </ccTool>
         <linkerTool>
           <commandLine>-lSDL2main -lSDL2 -lSDL2_net</commandLine>

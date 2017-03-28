@@ -1,3 +1,5 @@
+#include <limits>
+
 #include <SDL2/SDL.h>
 
 #include "../../Common/networkInterface.h"
@@ -8,8 +10,8 @@
 
 Player::Player(Texture* bodyTexture, Texture* handsTexture)
 : tileW(320), tileH(320), animCycleTime(0.4), animFrameCount(4),
-  attackAnimFrameCount(4), attackAnimTime(0.4), deltaAttackTime(0.0),
-  flip(SDL_FLIP_NONE), handsAnimationID(RUNNING) {
+attackAnimFrameCount(4), attackAnimTime(0.4), deltaAttackTime(0.0),
+flip(SDL_FLIP_NONE), handsAnimationID(RUNNING) {
 	this->bodyTexture = bodyTexture;
 	this->handsTexture = handsTexture;
 
@@ -28,7 +30,7 @@ Player::Player(Texture* bodyTexture, Texture* handsTexture)
 }
 
 
-Player::~Player() {}
+Player::~Player() { }
 
 
 void Player::spawn(int x, int y) {
@@ -63,7 +65,7 @@ void Player::setSpeed(float vx, float vy) {
 
 
 void Player::applyGravity(Map* map, float g) {
-	SDL_Rect boundaries = {(int)x, (int)y, w, h};
+	SDL_Rect boundaries = getCollisionBox();
 	if(map->canFall(boundaries)) {
 		y_speed += g;
 
@@ -75,15 +77,15 @@ void Player::applyGravity(Map* map, float g) {
 
 void Player::addSpeed(float x) {
 	if(canMove()) {
-		if (x_speed > 0
-		 && x_speed + x > PLAYER_MAX_MOVEMENT_SPEED)
+		if(x_speed > 0
+		&& x_speed + x > PLAYER_MAX_MOVEMENT_SPEED)
 			x_speed = PLAYER_MAX_MOVEMENT_SPEED;
-		else if (x_speed < 0
-		      && x_speed + x < -PLAYER_MAX_MOVEMENT_SPEED)
+		else if(x_speed < 0
+		&& x_speed + x < -PLAYER_MAX_MOVEMENT_SPEED)
 			x_speed = -PLAYER_MAX_MOVEMENT_SPEED;
 		else
 			x_speed += x;
-		
+
 		changeStateTo(PLAYER_MOVING);
 	}
 }
@@ -91,22 +93,22 @@ void Player::addSpeed(float x) {
 
 void Player::applyFriction(float x) {
 	if(canMove()) {
-		if (x_speed != 0) {
-			if (x_speed < 0) {
-				if (x_speed - x > 0) {
+		if(x_speed != 0) {
+			if(x_speed < 0) {
+				if(x_speed - x > 0) {
 					x_speed = 0;
-					if (y_speed > 0)
+					if(y_speed > 0)
 						changeStateTo(PLAYER_STILL);
 				} else
 					x_speed += x;
-			} else if (x_speed > 0) {
-				if (x_speed - x < 0) {
+			} else if(x_speed > 0) {
+				if(x_speed - x < 0) {
 					x_speed = 0;
-					if (y_speed > 0)
+					if(y_speed > 0)
 						changeStateTo(PLAYER_STILL);
 				} else
 					x_speed -= x;
-			} 
+			}
 		}
 	}
 }
@@ -152,74 +154,106 @@ void Player::move(Map* map, float delta) {
 	&& x_speed == 0.0 && y_speed == 0.0)
 		return;
 
-	int x = (int)(this->x + x_speed * delta);
-	int y = (int)(this->y + y_speed * delta);
+	SDL_Rect boundaries = getCollisionBox();
+	SDL_Rect newBoundaries = getCollisionBox(x_speed * delta, y_speed * delta);
 
 	if(state != PLAYER_STILL) {
-		CollisionSide collisionSide = map->collides(x, y, w, h);
+		SDL_Rect collider;
+		CollisionSide collisionSide = map->collides(newBoundaries.x, newBoundaries.y, boundaries.w, boundaries.h, &collider);
 		if(collisionSide != NotCollided) {
-			for(int i = this->x; i < x; ++i)
-				if(!map->collides(i, this->y, w, h))
-					this->x = i;
+			int x_offset = newBoundaries.x - boundaries.x;
+			int y_offset = newBoundaries.y - boundaries.y;
+			
+			if (x_offset != 0 || y_offset != 0) {
+				float xInvEntry, yInvEntry;
 
-			for(int i = this->y; i < y; ++i)
-				if(!map->collides(this->x, i, w, h))
-					this->y = i;
+				if(x_offset > 0.0f)
+					xInvEntry = collider.x - (boundaries.x + boundaries.w);
+				else
+					xInvEntry = (collider.x + collider.w) - boundaries.x;
+
+				if(y_offset > 0.0f) 
+					yInvEntry = collider.y - (boundaries.y + boundaries.h);
+				else
+					yInvEntry = (collider.y + collider.h) - boundaries.y;
+
+				float xEntry = -std::numeric_limits<float>::infinity();
+				float yEntry = -std::numeric_limits<float>::infinity();
+
+				if (x_offset != 0)
+					xEntry = xInvEntry / x_offset;
+				if (y_offset != 0)
+					yEntry = yInvEntry / y_offset;
+
+				float entryTime = std::max(xEntry, yEntry);
+
+				this->x += x_offset * entryTime;
+				boundaries.x += x_offset * entryTime;
+
+				this->y += y_offset * entryTime;
+				boundaries.y += y_offset * entryTime;
+			}
+			
+			/*if (x_offset) {
+				int direction = x_offset > 0 ? 1 : -1;
+				int i = direction;
+				for(; i != (x_offset + direction); i += direction) {
+					if(map->collides(boundaries.x + i, boundaries.y, 
+									 boundaries.w,     boundaries.h))
+						break;
+					else {
+						this->x += direction;
+						boundaries.x += direction;
+					}
+				}
+			}
+			
+			if (y_offset) {
+				int direction = y_offset > 0 ? 1 : -1;
+				int i = direction;
+				for(; i != (y_offset + direction); i += direction) {
+					if(map->collides(boundaries.x, boundaries.y + i, 
+									 boundaries.w, boundaries.h))
+						break;
+					else {
+						this->y += direction;
+						boundaries.y += direction;
+					}
+						
+				}
+			}*/
 
 			if(collisionSide == CollidedBottom)
-				x_speed *= 0.6;
+				x_speed *= 0.75;
 			else
 				x_speed = 0;
+
 			y_speed = 0;
 
-			SDL_Rect boundaries = {(int)this->x, (int)this->y, w, h};
-			if(map->canFall(boundaries))
-				changeStateTo(PLAYER_FALLING);
-			else
-				changeStateTo(PLAYER_STILL);
+			if(y_offset) {
+				if(map->canFall(boundaries))
+					changeStateTo(PLAYER_FALLING);
+				else
+					changeStateTo(PLAYER_STILL);
+			}
 
 			return;
 		}
 	}
 
-	if(!map->hcollides(&x, w)) {
+	if(!map->hcollides(&newBoundaries.x, boundaries.w)) {
 		this->x += x_speed * delta;
-	} else {
-		x_speed = 0;
-		y_speed = 0;
-		if(state == PLAYER_MOVING) {
-			this->x = x;
-			changeStateTo(PLAYER_STILL);
-		}
-	}
-
-	if(!map->vcollides(&y, h)) {
-		this->y += y_speed * delta;
-	} else if(state == PLAYER_FALLING) {
-		this->y = y;
+	} else if(state == PLAYER_MOVING) {
+		this->x = newBoundaries.x - PLAYER_X_OFFSET;
 		changeStateTo(PLAYER_STILL);
 	}
 
-	/*switch(state) {
-	case PLAYER_STILL:
-		printf("PLAYER_STILL\n");
-		break;
-	case PLAYER_FALLING:
-		printf("PLAYER_FALLING\n");
-		break;
-	case PLAYER_MOVING:
-		printf("PLAYER_MOVING\n");
-		break;
-	case PLAYER_JUMPING:
-		printf("PLAYER_JUMPING\n");
-		break;
-	case PLAYER_DYING:
-		printf("PLAYER_DYING\n");
-		break;
-	case PLAYER_CROUCHING:
-		printf("PLAYER_CROUCHING\n");
-		break;
-	}*/
+	if(!map->vcollides(&newBoundaries.y, boundaries.h)) {
+		this->y += y_speed * delta;
+	} else if(state == PLAYER_FALLING) {
+		this->y = newBoundaries.y - PLAYER_Y_OFFSET;
+		changeStateTo(PLAYER_STILL);
+	}
 }
 
 
@@ -230,12 +264,12 @@ bool Player::hasMoved() {
 }
 
 
-bool Player::hasStopped() {
-	if (stopped) {
+bool Player::hasStopped() { // TODO: change to onEvent design pattern
+	if(stopped) {
 		stopped = false;
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -314,6 +348,24 @@ float Player::getSpeedX() {
 
 float Player::getSpeedY() {
 	return y_speed;
+}
+
+
+SDL_Rect Player::getCollisionBox() {
+	return SDL_Rect{
+		(int)x + PLAYER_X_OFFSET,
+		(int)y + PLAYER_Y_OFFSET,
+		PLAYER_WIDTH,
+		PLAYER_HEIGHT};
+}
+
+
+SDL_Rect Player::getCollisionBox(float x_offset, float y_offset) {
+	return SDL_Rect{
+		(int)(x + x_offset) + PLAYER_X_OFFSET,
+		(int)(y + y_offset) + PLAYER_Y_OFFSET,
+		PLAYER_WIDTH,
+		PLAYER_HEIGHT};
 }
 
 

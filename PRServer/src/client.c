@@ -112,8 +112,11 @@ void* client_process(void* threadData) {
 							float  y = binaryReadFloat();
 							float vx = binaryReadFloat();
 							float vy = binaryReadFloat();
-							if (!map_collides(private.map, x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
-							 && player_moved(public->id, x, y, vx, vy))
+							
+							int colX = x + PLAYER_X_OFFSET;
+							int colY = y + PLAYER_Y_OFFSET;
+							int canMove = !map_collides(private.map, colX, colY, PLAYER_WIDTH, PLAYER_HEIGHT);
+							if (canMove && player_moved(public->id, x, y, vx, vy))
 								srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "1ffff", public->id, x, y, vx, vy);
 							else {
 								float x, y;
@@ -181,6 +184,8 @@ void* client_process(void* threadData) {
 				private.spawningPlayer = 0;
 				float x, y;
 				map_getSpawnPosition(private.map, &x, &y, PLAYER_WIDTH, PLAYER_HEIGHT);
+				x -= PLAYER_X_OFFSET;
+				y -= PLAYER_Y_OFFSET;
 				player_spawn(public->id, x, y);
 				srv_addNewEvent(NET_EVENT_PLAYER_SPAWN, "1ff", public->id, x, y);
 			}

@@ -3,8 +3,6 @@
 
 #include "pthread.h"
 
-#define PLAYER_WIDTH 16
-#define PLAYER_HEIGHT 38
 
 typedef struct {
 	float x;
