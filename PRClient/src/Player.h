@@ -53,6 +53,8 @@ public:
 	float getSpeedX();
 	float getSpeedY();
 	
+	void printStatus(); // TODO: remove
+	
 private:
 	SDL_Rect getCollisionBox();
 	SDL_Rect getCollisionBox(float x_offset, float y_offset);

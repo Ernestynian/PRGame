@@ -46,6 +46,9 @@ void World::update(float delta) {
 		else if (selfRightDirection)
 			playersById[selfID]->addSpeed(PLAYER_ACCELERATION);
 		
+#ifdef DEBUG
+		playersById[selfID]->printStatus();
+#endif
 	}
 	
 	for (Player* player : players) {

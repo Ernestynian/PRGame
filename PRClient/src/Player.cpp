@@ -92,23 +92,17 @@ void Player::addSpeed(float x) {
 
 
 void Player::applyFriction(float x) {
-	if(canMove()) {
-		if(x_speed != 0) {
-			if(x_speed < 0) {
-				if(x_speed - x > 0) {
-					x_speed = 0;
-					if(y_speed > 0)
-						changeStateTo(PLAYER_STILL);
-				} else
-					x_speed += x;
-			} else if(x_speed > 0) {
-				if(x_speed - x < 0) {
-					x_speed = 0;
-					if(y_speed > 0)
-						changeStateTo(PLAYER_STILL);
-				} else
-					x_speed -= x;
-			}
+	if(state == PLAYER_MOVING) {
+		if(x_speed < 0) {
+			if(x_speed - x > 0)
+				changeStateTo(PLAYER_STILL);
+			else
+				x_speed += x;
+		} else if(x_speed > 0) {
+			if(x_speed - x < 0)
+				changeStateTo(PLAYER_STILL);
+			else
+				x_speed -= x;
 		}
 	}
 }
@@ -193,35 +187,6 @@ void Player::move(Map* map, float delta) {
 				this->y += y_offset * entryTime;
 				boundaries.y += y_offset * entryTime;
 			}
-			
-			/*if (x_offset) {
-				int direction = x_offset > 0 ? 1 : -1;
-				int i = direction;
-				for(; i != (x_offset + direction); i += direction) {
-					if(map->collides(boundaries.x + i, boundaries.y, 
-									 boundaries.w,     boundaries.h))
-						break;
-					else {
-						this->x += direction;
-						boundaries.x += direction;
-					}
-				}
-			}
-			
-			if (y_offset) {
-				int direction = y_offset > 0 ? 1 : -1;
-				int i = direction;
-				for(; i != (y_offset + direction); i += direction) {
-					if(map->collides(boundaries.x, boundaries.y + i, 
-									 boundaries.w, boundaries.h))
-						break;
-					else {
-						this->y += direction;
-						boundaries.y += direction;
-					}
-						
-				}
-			}*/
 
 			if(collisionSide == CollidedBottom)
 				x_speed *= 0.75;
@@ -351,29 +316,56 @@ float Player::getSpeedY() {
 }
 
 
+void Player::printStatus() {
+	switch(state) {
+	case PLAYER_STILL:
+		printf("PLAYER_STILL  ");
+		break;
+	case PLAYER_FALLING:
+		printf("PLAYER_FALLING");
+		break;
+	case PLAYER_MOVING:
+		printf("PLAYER_MOVING ");
+		break;
+	case PLAYER_JUMPING:
+		printf("PLAYER_JUMPING");
+		break;
+	case PLAYER_DYING:
+		printf("PLAYER_DYING  ");
+		break;
+	case PLAYER_CROUCHING:
+		printf("PLAYER_CROUCHING");
+		break;
+	}
+	
+	printf(" %.5f %.5f\n", x_speed, y_speed);
+}
+
+
 SDL_Rect Player::getCollisionBox() {
-	return SDL_Rect{
-		(int)x + PLAYER_X_OFFSET,
-		(int)y + PLAYER_Y_OFFSET,
-		PLAYER_WIDTH,
-		PLAYER_HEIGHT};
+	return getCollisionBox(0, 0);
 }
 
 
 SDL_Rect Player::getCollisionBox(float x_offset, float y_offset) {
-	return SDL_Rect{
+	return SDL_Rect {
 		(int)(x + x_offset) + PLAYER_X_OFFSET,
 		(int)(y + y_offset) + PLAYER_Y_OFFSET,
 		PLAYER_WIDTH,
-		PLAYER_HEIGHT};
+		PLAYER_HEIGHT };
 }
 
 
 void Player::changeStateTo(PlayerState newState) {
 	if(newState == PLAYER_STILL) {
-		x_speed = 0;
+		if (state != PLAYER_FALLING)
+			x_speed = 0;
+		else {
+			x_speed *= 0.5;
+			stopped = true;
+		}
+		
 		y_speed = 0;
-		stopped = true;
 	}
 
 	state = newState;
