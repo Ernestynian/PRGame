@@ -94,7 +94,7 @@ void Player::addSpeed(float x) {
 void Player::applyFriction(float x) {
 	if(state == PLAYER_MOVING) {
 		if(x_speed < 0) {
-			if(x_speed - x > 0)
+			if(x_speed + x > 0)
 				changeStateTo(PLAYER_STILL);
 			else
 				x_speed += x;
@@ -144,8 +144,7 @@ bool Player::attack() {
 
 
 void Player::move(Map* map, float delta) {
-	if(state == PLAYER_STILL
-	&& x_speed == 0.0 && y_speed == 0.0)
+	if(state == PLAYER_STILL && x_speed ==  y_speed == 0.0)
 		return;
 
 	SDL_Rect boundaries = getCollisionBox();
@@ -340,7 +339,7 @@ void Player::printStatus() {
 		break;
 	}
 	
-	printf(" %.5f %.5f\n", x_speed, y_speed);
+	printf(" % .5f % .5f\n", x_speed, y_speed);
 }
 
 
