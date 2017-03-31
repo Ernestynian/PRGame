@@ -10,12 +10,15 @@ typedef struct {
 } position;
 
 typedef struct {
-	pthread_mutex_t mutex;
-	
+	pthread_mutex_t pos_mutex_w; // mutex for write access
+	pthread_mutex_t pos_mutex_c; // mutex for readers counter
+	int pos_readersCount;
 	position pos;
 	position speed;
 	
-	pthread_mutex_t alive_mutex;
+	pthread_mutex_t alive_mutex_w; // mutex for write access
+	pthread_mutex_t alive_mutex_c; // mutex for readers counter
+	int alive_readersCount;
 	char alive;
 	
 	char moved;

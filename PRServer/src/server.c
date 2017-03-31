@@ -128,16 +128,16 @@ void srv_sendCurrentState(char newClientID, struct sockaddr_in client_address, s
 	
 	pthread_mutex_lock(&clientListMutex);
 	for (int i = 0; i < MAX_CLIENTS; ++i) {
-		if (newClientID != i && clients[i].cd != NULL) {
+		if (newClientID != i && clients[i].pd != NULL) {
 			srv_addNewEventTo(buffer, &len, NET_EVENT_CLIENT_JOIN, 
-					"1", (char)clients[i].cd->id);
+					"1", (char)clients[i].pd->id);
 			
-			pthread_mutex_lock(&players[i].mutex);
-			if (players[i].alive) {
+			if (player_isAlive(i)) {
+				float x, y;
+				player_getPos(i, &x, &y);
 				srv_addNewEventTo(buffer, &len, NET_EVENT_PLAYER_SPAWN, 
-					"1ff", (char)clients[i].cd->id, players[i].pos.x, players[i].pos.y);
+					"1ff", (char)clients[i].pd->id, x, y);
 			}
-			pthread_mutex_unlock(&players[i].mutex);
 		}
 	}
 	pthread_mutex_unlock(&clientListMutex);

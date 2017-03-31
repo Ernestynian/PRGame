@@ -31,22 +31,26 @@ typedef struct {
 } client_privateData;
 
 
-client clients[MAX_CLIENTS];
+Client clients[MAX_CLIENTS];
 pthread_mutex_t clientListMutex = PTHREAD_MUTEX_INITIALIZER;
 
-//unsigned int currentClients = 0;
-//pthread_mutex_t clientsMutex = PTHREAD_MUTEX_INITIALIZER;
 
-
-void* client_stop(client_publicData* data, client_privateData* priv) {
+void* client_stop(client_PublicData* data, client_privateData* priv) {
 	srv_addNewEvent(NET_EVENT_CLIENT_EXIT, "1", data->id);
 	
-	//pthread_mutex_lock(&clientsMutex);
-	//currentClients--;
-	//pthread_mutex_unlock(&clientsMutex);
+	pthread_mutex_lock(&data->packets_mutex);
+	Packet* p = data->packets;
+	do {
+		free((char*)p->data);
+		free(p);
+		p = p->next;
+	} while (p != NULL);
+	pthread_mutex_unlock(&data->packets_mutex);	
+	
+	player_kill(data->id);
 	
 	pthread_mutex_lock(&clientListMutex);
-	clients[data->id].cd = NULL;
+	clients[data->id].pd = NULL;
 	pthread_mutex_unlock(&clientListMutex);	
 	
 	map_free(priv->map);
@@ -57,9 +61,9 @@ void* client_stop(client_publicData* data, client_privateData* priv) {
 }
 
 
-int client_getNextEvent(char** currentEvent, client_publicData* data) {
-	int currentPosition = *currentEvent - data->packetData;
-	int lastPosition    = data->packetLength - ((*currentEvent)[1] + 1 + 1);
+int client_getNextEvent(const char** currentEvent, Packet* packet) {
+	int currentPosition = *currentEvent - packet->data;
+	int lastPosition    = packet->length - ((*currentEvent)[1] + 1 + 1);
 	if (currentPosition < lastPosition) {
 		*currentEvent += (*currentEvent)[1] + 2;
 		return 1;
@@ -71,11 +75,7 @@ int client_getNextEvent(char** currentEvent, client_publicData* data) {
 
 void* client_process(void* threadData) {
 	void** dataArray = threadData;
-	client_publicData* public = (client_publicData*)(dataArray[0]);
-	
-	//pthread_mutex_lock(&clientsMutex);
-	//currentClients++;
-	//pthread_mutex_unlock(&clientsMutex);
+	client_PublicData* public = (client_PublicData*)(dataArray[0]);
 	
 	client_privateData private;
 	private.previousTick = 0;
@@ -89,64 +89,75 @@ void* client_process(void* threadData) {
 	free(threadData);
 	
 	for (;;) {
-		pthread_mutex_lock(&public->mutex);
-		if (public->packetStatus) {
-			private.currentTick = public->packetData[0];
-
-			if (isPacketNewer(private.currentTick, &private.previousTick)) {
-				char* currentEvent = public->packetData + 1;
+		pthread_mutex_lock(&public->packets_mutex);
+		Packet* packet = public->packets;
+		pthread_mutex_unlock(&public->packets_mutex);
+		
+		if (packet != NULL) {
+			do {
+				private.currentTick = packet->data[0];
 				
-				do {
-					initBinaryReader(currentEvent + 2);
+				if (isPacketNewer(private.currentTick, &private.previousTick)) {
+					const char* currentEvent = packet->data + 1;
 
-					switch(*currentEvent) {
-						case NET_EVENT_CLIENT_EXIT:
-							printf("EVENT_CLIENT_EXIT %hhu\n", public->id);
-							return client_stop(public, &private);
-						case NET_EVENT_PLAYER_DIED: {
-							player_kill(public->id);
-							break;
-						}
-						case NET_EVENT_PLAYER_MOVED: {
-							float  x = binaryReadFloat();
-							float  y = binaryReadFloat();
-							float vx = binaryReadFloat();
-							float vy = binaryReadFloat();
-							
-							int colX = x + PLAYER_X_OFFSET;
-							int colY = y + PLAYER_Y_OFFSET;
-							int canMove = !map_collides(private.map, colX, colY, PLAYER_WIDTH, PLAYER_HEIGHT);
-							if (canMove && player_moved(public->id, x, y, vx, vy))
-								srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "1ffff", public->id, x, y, vx, vy);
-							else {
-								float x, y;
-								player_getPos(public->id, &x, &y);
-								player_stopMovement(public->id);
-								srv_addNewEvent(NET_EVENT_PLAYER_MOVE_DENIED, "1ff", public->id, x, y);
+					do {
+						initBinaryReader(currentEvent + 2);
+
+						switch(*currentEvent) {
+							case NET_EVENT_CLIENT_EXIT:
+								printf("EVENT_CLIENT_EXIT %hhu\n", public->id);
+								return client_stop(public, &private);
+							case NET_EVENT_PLAYER_DIED:
+								player_kill(public->id);
+								break;
+							case NET_EVENT_PLAYER_MOVED: {
+								float  x = binaryReadFloat();
+								float  y = binaryReadFloat();
+								float vx = binaryReadFloat();
+								float vy = binaryReadFloat();
+
+								int colX = x + PLAYER_X_OFFSET;
+								int colY = y + PLAYER_Y_OFFSET;
+								int canMove = !map_collides(private.map, colX, colY, PLAYER_WIDTH, PLAYER_HEIGHT);
+								if (canMove && player_moved(public->id, x, y, vx, vy))
+									srv_addNewEvent(NET_EVENT_PLAYER_MOVED, "1ffff", public->id, x, y, vx, vy);
+								else {
+									float x, y;
+									player_getPos(public->id, &x, &y);
+									player_stopMovement(public->id);
+									srv_addNewEvent(NET_EVENT_PLAYER_MOVE_DENIED, "1ff", public->id, x, y);
+								}
+								break;
 							}
-							break;
-						}
-						case NET_EVENT_PLAYER_JUMP: {
-							srv_addNewEvent(NET_EVENT_PLAYER_JUMP, "1", public->id);
-							break;
-						}
-						case NET_EVENT_PLAYER_ATTACK: {
-							if (!private.attacking) {
-								private.attacking = 1;
-								gettimeofday(&private.attackTimerStart, NULL);
-								srv_addNewEvent(NET_EVENT_PLAYER_ATTACK, "1", public->id);
+							case NET_EVENT_PLAYER_JUMP: {
+								srv_addNewEvent(NET_EVENT_PLAYER_JUMP, "1", public->id);
+								break;
 							}
-							break;
+							case NET_EVENT_PLAYER_ATTACK: {
+								if (!private.attacking) {
+									private.attacking = 1;
+									gettimeofday(&private.attackTimerStart, NULL);
+									srv_addNewEvent(NET_EVENT_PLAYER_ATTACK, "1", public->id);
+								}
+								break;
+							}
 						}
-					}
-				} while (client_getNextEvent(&currentEvent, public));
+					} while (client_getNextEvent(&currentEvent, packet));
+
+					gettimeofday(&private.lastPacketTime, NULL);
+				}
 				
-				gettimeofday(&private.lastPacketTime, NULL);
-			}
-			
-			public->packetStatus = 0;
+				free((char*)packet->data);
+
+				pthread_mutex_lock(&public->packets_mutex);
+				public->packets = packet->next;
+				
+				free(packet);
+				
+				packet = public->packets;
+				pthread_mutex_unlock(&public->packets_mutex);
+			} while (packet != NULL);
 		}
-		pthread_mutex_unlock(&public->mutex);
 		
 		double timerDiff = getMsDifference(private.lastPacketTime);
 		if (timerDiff > MS_TO_TIMEOUT) {
@@ -158,7 +169,7 @@ void* client_process(void* threadData) {
 			timerDiff = getMsDifference(private.attackTimerStart);
 			if (timerDiff > MS_TO_ATTACK) {
 				private.attacking = 0;
-				// check if killed someone
+				// Check if killed someone
 				float x, y;
 				player_getPos(public->id, &x, &y);
 				// TODO: more precise values of the hand
@@ -210,7 +221,7 @@ uint32_t client_create(struct sockaddr_in client_address, MapData* mapClone) {
 	
 	pthread_mutex_lock(&clientListMutex);
 	for (int i = 0; i < MAX_CLIENTS; ++i) {
-		if (clients[i].cd == NULL) {
+		if (clients[i].pd == NULL) {
 			id = i;
 			break;
 		}
@@ -222,14 +233,19 @@ uint32_t client_create(struct sockaddr_in client_address, MapData* mapClone) {
 		return MAX_CLIENTS;
 	
 	
-	client_publicData* data = malloc(sizeof(client_publicData));
+	client_PublicData* data = malloc(sizeof(client_PublicData));
 	*(unsigned int*)&data->id = id;
-	pthread_mutex_init(&(data->mutex), NULL);
-	data->packetStatus = 0;
+	pthread_mutex_init(&(data->packets_mutex), NULL);
+	data->packets = NULL;
 	
 	void** threadData = malloc(sizeof(void*) * 2);
 	threadData[0] = (void*)data;
 	threadData[1] = (void*)mapClone;
+	
+	pthread_mutex_lock(&clientListMutex);
+	clients[id].pd = data;
+	clients[id].address = client_address;
+	pthread_mutex_unlock(&clientListMutex);
 	
 	int rc = pthread_create((pthread_t*)&(data->thread), NULL, client_process, (void*)threadData);
 	if (rc) {
@@ -237,29 +253,38 @@ uint32_t client_create(struct sockaddr_in client_address, MapData* mapClone) {
 		return MAX_CLIENTS;
 	}
 	
-	pthread_mutex_lock(&clientListMutex);
-	clients[id].cd = data;
-	clients[id].address = client_address;
-	pthread_mutex_unlock(&clientListMutex);
-	
 	return id;
 }
 
 
-// FIXME: what if packet is not parsed and another one comes?
 void client_transferPacket(struct sockaddr_in client_address, char* data, int dataLen) {
+	Packet* packet = malloc(sizeof(Packet));
+	*(char**)&packet->data = malloc(dataLen);
+	memcpy((char*)packet->data, data, dataLen);
+	*(int*)&packet->length = dataLen;
+	packet->next = NULL;
+	
 	pthread_mutex_lock(&clientListMutex);
-	for (int i = 0;i < MAX_CLIENTS; ++i) {
-		if (clients[i].cd == NULL)
+	for (int i = 0; i < MAX_CLIENTS; ++i) {
+		if (clients[i].pd == NULL)
 			continue;
 		
 		if (clients[i].address.sin_addr.s_addr == client_address.sin_addr.s_addr
 		 && clients[i].address.sin_port        == client_address.sin_port) {
-			pthread_mutex_lock(&(clients[i].cd->mutex));
-			memcpy(clients[i].cd->packetData, data, dataLen);
-			clients[i].cd->packetLength = dataLen;
-			clients[i].cd->packetStatus = 1;
-			pthread_mutex_unlock(&(clients[i].cd->mutex));
+			pthread_mutex_lock(&(clients[i].pd->packets_mutex));
+			
+			Packet* curPacket = clients[i].pd->packets;
+			if (curPacket == NULL)
+				clients[i].pd->packets = packet;
+			else {
+				while (curPacket->next != NULL)
+					curPacket = curPacket->next;
+				
+				curPacket->next = packet;
+			}
+			
+			pthread_mutex_unlock(&(clients[i].pd->packets_mutex));
+			break;
 		}
 	}
 	pthread_mutex_unlock(&clientListMutex);
