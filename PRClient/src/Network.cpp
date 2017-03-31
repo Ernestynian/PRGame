@@ -19,10 +19,13 @@ Network::Network() {
 Network::~Network() {
 	if(initialized) {
 		// Notify Server
+		printf("Closing network...\n");
 		sendEvent(NET_EVENT_CLIENT_EXIT, 0, 0);
 		
 		// Clean up
+		SDLNet_FreePacket(packetOut);
 		SDLNet_FreePacket(packetIn);
+		SDLNet_FreePacket(packetDirect);
 		SDLNet_Quit();
 	}
 }
@@ -202,6 +205,9 @@ bool Network::receivePacket() {
 
 
 bool Network::isThereMoreEvents() {
+	if (packetIn->len < 3)
+		return false;
+	
 	int currentPosition = currentEvent - packetIn->data;
 	// + 1 is a tick byte and another + 1 a "next" event type
 	int lastPosition    = packetIn->len - (getCurrentEventDataLength() + 1 + 1);
