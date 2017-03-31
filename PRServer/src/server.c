@@ -40,19 +40,19 @@ int srv_start() {
 		return 0;
 	}
 	
-	struct sockaddr_in srv_address;
+	Address_in srv_address;
 	memset(&srv_address, 0, sizeof(srv_address));
 	srv_address.sin_family      = AF_INET;
 	srv_address.sin_addr.s_addr = htonl(INADDR_ANY);
 	srv_address.sin_port        = htons(PORT);
 
-	if (bind(srv_fd, (struct sockaddr*)&srv_address, sizeof(srv_address)) < 0) {
+	if (bind(srv_fd, (Address*)&srv_address, sizeof(srv_address)) < 0) {
 		printf("ERROR: Bind failed");
 		return 0;
 	}
 	
 	unsigned char* ip = (unsigned char*)&srv_address.sin_addr.s_addr;
-	printf("Binded the server to %hhu.%hhu.%hhu.%hhu:%hhu\n", 
+	printf("Binded the server to %hhu.%hhu.%hhu.%hhu:%d\n", 
 			ip[0], ip[1], ip[2], ip[3], PORT);
 
 	int nonBlocking = 1;
@@ -77,7 +77,7 @@ void srv_stop() {
 }
 
 
-void srv_send(char eventType, struct sockaddr_in client_address, socklen_t addrlen, const char* format, ...) {
+void srv_send(char eventType, Address_in client_address, socklen_t addrlen, const char* format, ...) {
 	va_list args;
 	va_start(args, format);
 	
@@ -93,7 +93,7 @@ void srv_send(char eventType, struct sockaddr_in client_address, socklen_t addrl
 	
 	releaseEvent(event);
 
-	sendto(srv_fd, buffer, buflen, 0, (struct sockaddr *)&client_address, addrlen);
+	sendto(srv_fd, buffer, buflen, 0, (Address*)&client_address, addrlen);
 	
 	free(buffer);
 	
@@ -121,7 +121,7 @@ void srv_addNewEventTo(char* buffer, int* pos, char eventType, const char* forma
 }
 
 
-void srv_sendCurrentState(char newClientID, struct sockaddr_in client_address, socklen_t addrlen) {
+void srv_sendCurrentState(char newClientID, Address_in client_address, socklen_t addrlen) {
 	int len = 1;
 	char buffer[MAX_SERVER_PACKET_SIZE];
 	buffer[0] = 0;
@@ -142,11 +142,11 @@ void srv_sendCurrentState(char newClientID, struct sockaddr_in client_address, s
 	}
 	pthread_mutex_unlock(&clientListMutex);
 	
-	sendto(srv_fd, buffer, len, 0, (struct sockaddr *)&client_address, addrlen);
+	sendto(srv_fd, buffer, len, 0, (Address*)&client_address, addrlen);
 }
 
 
-void srv_sendClientAcceptAndData(char newClientId, struct sockaddr_in client_address, socklen_t addrlen) {
+void srv_sendClientAcceptAndMapData(char newClientId, Address_in client_address, socklen_t addrlen) {
 	int mapDataLength;
 	int mapIconsCount;
 	char* mapData = map_getInitData(map, &mapDataLength, &mapIconsCount);
@@ -161,7 +161,8 @@ void srv_sendClientAcceptAndData(char newClientId, struct sockaddr_in client_add
 	
 	free(mapData);
 	
-	sendto(srv_fd, packetData, mapDataLength + 5, 0, (struct sockaddr *)&client_address, addrlen);
+	sendto(srv_fd, packetData, mapDataLength + 5, 0, 
+			(Address*)&client_address, addrlen);
 	
 	free(packetData);	
 }
@@ -183,7 +184,7 @@ int srv_sendEventsToAll(unsigned char tick) {
 		pthread_mutex_lock(&clientListMutex);
 		for (int i = 0; i < MAX_CLIENTS; ++i) {
 			sendto(srv_fd, outBuffer, outBufferPosition, 0, 
-					(struct sockaddr *)&clients[i].address, 
+					(Address*)&clients[i].address, 
 					sizeof(clients[i].address));
 		}
 		pthread_mutex_unlock(&clientListMutex);
@@ -200,10 +201,11 @@ int srv_sendEventsToAll(unsigned char tick) {
 
 
 int srv_transferPackets() {
-	struct sockaddr_in client_address;
+	Address_in client_address;
 	socklen_t addrlen = sizeof(client_address);
 	
-	int recvlen = recvfrom(srv_fd, inBuffer, MAX_CLIENT_PACKET_SIZE, 0, (struct sockaddr*)&client_address, &addrlen);
+	int recvlen = recvfrom(srv_fd, inBuffer, MAX_CLIENT_PACKET_SIZE, 0, 
+							(Address*)&client_address, &addrlen);
 	
 	if (recvlen > 0) {
 		if (inBuffer[1] == NET_EVENT_CLIENT_JOIN) {
@@ -212,8 +214,7 @@ int srv_transferPackets() {
 			
 			int newClientID = client_create(client_address, mapClone);
 			if (newClientID != CLIENT_NOT_CREATED) {
-				srv_sendClientAcceptAndData(newClientID, client_address, addrlen);
-				player_reset(newClientID);
+				srv_sendClientAcceptAndMapData(newClientID, client_address, addrlen);
 				srv_sendCurrentState(newClientID, client_address, addrlen);
 				
 				srv_addNewEvent(NET_EVENT_CLIENT_JOIN, "1", (char)newClientID);

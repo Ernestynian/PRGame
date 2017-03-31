@@ -11,6 +11,7 @@ int main(int argc, const char* argv[]) {
 	
 	players_init();
 	
+	printf("Server is ready!\n");
 	for (;;) {
 		while(srv_transferPackets());
 

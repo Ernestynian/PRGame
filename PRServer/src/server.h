@@ -3,6 +3,10 @@
 
 #include "../../Common/networkInterface.h"
 
+typedef struct sockaddr Address;
+typedef struct sockaddr_in Address_in;
+
+
 int  srv_start();
 void srv_stop();
 int  srv_transferPackets();

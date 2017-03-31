@@ -62,6 +62,9 @@ void* client_stop(client_PublicData* data, client_privateData* priv) {
 
 
 int client_getNextEvent(const char** currentEvent, Packet* packet) {
+	if (packet->length < 3)
+		return 0;
+	
 	int currentPosition = *currentEvent - packet->data;
 	int lastPosition    = packet->length - ((*currentEvent)[1] + 1 + 1);
 	if (currentPosition < lastPosition) {
@@ -76,6 +79,8 @@ int client_getNextEvent(const char** currentEvent, Packet* packet) {
 void* client_process(void* threadData) {
 	void** dataArray = threadData;
 	client_PublicData* public = (client_PublicData*)(dataArray[0]);
+	
+	player_reset(public->id);
 	
 	client_privateData private;
 	private.previousTick = 0;
@@ -102,14 +107,16 @@ void* client_process(void* threadData) {
 
 					do {
 						initBinaryReader(currentEvent + 2);
-
-						switch(*currentEvent) {
+						
+						switch(currentEvent[0]) {
 							case NET_EVENT_CLIENT_EXIT:
 								printf("EVENT_CLIENT_EXIT %hhu\n", public->id);
 								return client_stop(public, &private);
+								
 							case NET_EVENT_PLAYER_DIED:
 								player_kill(public->id);
 								break;
+								
 							case NET_EVENT_PLAYER_MOVED: {
 								float  x = binaryReadFloat();
 								float  y = binaryReadFloat();
@@ -129,18 +136,18 @@ void* client_process(void* threadData) {
 								}
 								break;
 							}
-							case NET_EVENT_PLAYER_JUMP: {
+							
+							case NET_EVENT_PLAYER_JUMP:
 								srv_addNewEvent(NET_EVENT_PLAYER_JUMP, "1", public->id);
 								break;
-							}
-							case NET_EVENT_PLAYER_ATTACK: {
+								
+							case NET_EVENT_PLAYER_ATTACK:
 								if (!private.attacking) {
 									private.attacking = 1;
 									gettimeofday(&private.attackTimerStart, NULL);
 									srv_addNewEvent(NET_EVENT_PLAYER_ATTACK, "1", public->id);
 								}
 								break;
-							}
 						}
 					} while (client_getNextEvent(&currentEvent, packet));
 
@@ -169,18 +176,25 @@ void* client_process(void* threadData) {
 			timerDiff = getMsDifference(private.attackTimerStart);
 			if (timerDiff > MS_TO_ATTACK) {
 				private.attacking = 0;
+				
 				// Check if killed someone
 				float x, y;
+				int w = 10, h = 5;
 				player_getPos(public->id, &x, &y);
-				// TODO: more precise values of the hand
-				x += PLAYER_WIDTH;
+				
+				if (player_isLookingRight(public->id))
+					x += PLAYER_WIDTH;
+				else
+					x -= w;
+				
 				y += 10;
+				
 				for (int i = 0; i < MAX_CLIENTS; ++i) {
 					if (i == public->id)
 						continue;
 					
 					if (player_isAlive(i)) {
-						if (player_collides(i, x, y, 10, 5)) {
+						if (player_collides(i, x, y, w, h)) {
 							srv_addNewEvent(NET_EVENT_PLAYER_DIED, "1", i);
 							player_kill(i);
 						}

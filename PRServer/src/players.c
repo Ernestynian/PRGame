@@ -6,7 +6,7 @@
 #include "players.h"
 
 
-player players[MAX_CLIENTS];
+Player players[MAX_CLIENTS];
 
 
 void players_init() {
@@ -22,6 +22,14 @@ void players_init() {
 
 
 void player_reset(int id) {
+	pthread_mutex_lock(&players[id].pos_mutex_c);
+	players[id].pos_readersCount = 0;
+	pthread_mutex_unlock(&players[id].pos_mutex_c);
+	
+	pthread_mutex_lock(&players[id].alive_mutex_c);
+	players[id].alive_readersCount = 0;
+	pthread_mutex_unlock(&players[id].alive_mutex_c);
+	
 	pthread_mutex_lock(&players[id].pos_mutex_w);
 	players[id].pos.x   = 0;
 	players[id].pos.y   = 0;
@@ -42,6 +50,8 @@ int player_moved(char id, float x, float y, float vx, float vy) {
 	players[id].pos.y   = y;
 	players[id].speed.x = vx;
 	players[id].speed.y = vy;
+	if (vx != 0)
+		players[id].isLookingRight = vx > 0;
 	players[id].moved   = 1;
 	pthread_mutex_unlock(&players[id].pos_mutex_w);
 	
@@ -64,6 +74,25 @@ void player_getPos(char id, float* x, float* y) {
 	if (players[id].pos_readersCount == 0)
 		pthread_mutex_unlock(&players[id].pos_mutex_w);
 	pthread_mutex_unlock(&players[id].pos_mutex_c);
+}
+
+
+int player_isLookingRight(char id) {
+	pthread_mutex_lock(&players[id].pos_mutex_c);
+	players[id].pos_readersCount++;
+	if (players[id].pos_readersCount == 1)
+		pthread_mutex_lock(&players[id].pos_mutex_w);
+	pthread_mutex_unlock(&players[id].pos_mutex_c);
+	
+	int isLookingRight = players[id].isLookingRight;
+	
+	pthread_mutex_lock(&players[id].pos_mutex_c);
+	players[id].pos_readersCount--;
+	if (players[id].pos_readersCount == 0)
+		pthread_mutex_unlock(&players[id].pos_mutex_w);
+	pthread_mutex_unlock(&players[id].pos_mutex_c);
+	
+	return isLookingRight;
 }
 
 

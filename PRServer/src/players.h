@@ -15,6 +15,7 @@ typedef struct {
 	int pos_readersCount;
 	position pos;
 	position speed;
+	int isLookingRight;
 	
 	pthread_mutex_t alive_mutex_w; // mutex for write access
 	pthread_mutex_t alive_mutex_c; // mutex for readers counter
@@ -22,10 +23,10 @@ typedef struct {
 	char alive;
 	
 	char moved;
-} player;
+} Player;
 
 
-extern player players[MAX_CLIENTS];
+extern Player players[MAX_CLIENTS];
 
 
 void players_init();
@@ -40,6 +41,7 @@ void player_reset(int id);
  */
 int player_moved(char id, float x, float y, float vx, float vy);
 void player_getPos(char id, float* x, float* y);
+int player_isLookingRight(char id);
 void player_stopMovement(int id);
 
 void player_spawn(int id, float x, float y);
