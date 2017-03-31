@@ -206,6 +206,8 @@ void Player::move(Map* map, float delta) {
 		}
 	}
 
+	// Collision with map borders (the window itself)
+	
 	if(!map->hcollides(&newBoundaries.x, boundaries.w)) {
 		this->x += x_speed * delta;
 	} else if(state == PLAYER_MOVING) {
@@ -358,14 +360,18 @@ SDL_Rect Player::getCollisionBox(float x_offset, float y_offset) {
 
 void Player::changeStateTo(PlayerState newState) {
 	if(newState == PLAYER_STILL) {
-		if (state != PLAYER_FALLING)
-			x_speed = 0;
-		else {
-			x_speed *= 0.5;
-			stopped = true;
-		}
-		
 		y_speed = 0;
+		
+		if (state == PLAYER_FALLING) {
+			x_speed *= 0.5;
+			if (x_speed != 0.0) {
+				state = PLAYER_MOVING;
+				return;
+			}
+		} else {
+			x_speed = 0;
+			stopped = true;
+		}		
 	}
 
 	state = newState;

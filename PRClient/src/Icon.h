@@ -17,6 +17,8 @@ public:
 	float getCenterX();
 	float getCenterY();
 	
+	int getSize();
+	
 	void fetchCollisionBox(SDL_Rect* box);
 	
 private:

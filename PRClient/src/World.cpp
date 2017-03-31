@@ -98,11 +98,11 @@ void World::removePlayer(int id) {
 void World::parseEvent(EventTypes type, uint8_t* data) {
 	switch (type) {
 		case NET_EVENT_PLAYER_SPAWN: {
-			printf("NET_EVENT_PLAYER_SPAWN\n");
 			char id = binaryRead1B();
 			float x = binaryReadFloat();
 			float y = binaryReadFloat();
 			if (isIdCorrect(id)) {
+				printf("NET_EVENT_PLAYER_SPAWN %hhu %.2f %.2f\n", id, x, y);
 				if (playersById[id] != nullptr)
 					playersById[id]->spawn(x, y);
 				else

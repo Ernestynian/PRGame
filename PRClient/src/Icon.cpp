@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include <SDL2/SDL.h>
 
 #include "Icon.h"
@@ -59,6 +61,13 @@ float Icon::getCenterX() {
 
 float Icon::getCenterY() {
 	return collisionBox.y + collisionBox.h * 0.5;
+}
+
+
+int Icon::getSize() {
+	assert(collisionBox.w == collisionBox.h);
+	
+	return collisionBox.w;
 }
 
 

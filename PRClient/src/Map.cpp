@@ -116,8 +116,10 @@ CollisionSide Map::collides(int x, int y, int w, int h, SDL_Rect* collider) {
 		if (icon->collides(x, y, w, h)) {
 			icon->fetchCollisionBox(collider);
 			
-			float hx = (h + 32) * ((x + w * 0.5) - icon->getCenterX());
-			float wy = (w + 32) * ((y + h * 0.5) - icon->getCenterY());
+			float cx = x + w * 0.5;
+			float cy = y + h * 0.5;
+			float hx = (h + icon->getSize()) * (cx - icon->getCenterX());
+			float wy = (w + icon->getSize()) * (cy - icon->getCenterY());
 			
 			if (wy > hx) {
 				if (wy > -hx)
