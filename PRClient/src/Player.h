@@ -72,8 +72,9 @@ private:
 	float x_speed;
 	float y_speed;
 	
-	bool sideHit;
 	float iconSideHitSpeed;
+	float iconSideHitHeight;
+	bool sideHit;
 	bool stopped;
         
     float deltaAnimTime;

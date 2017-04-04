@@ -202,9 +202,10 @@ void Player::move(Map* map, float delta) {
 			}
 
 			if (collisionSide == CollidedLeft
-			 || collisionSide == CollidedRight)
+			 || collisionSide == CollidedRight) {
 				iconSideHitSpeed = x_speed;
-			else
+				iconSideHitHeight = collider.y + collider.h;
+			} else
 				iconSideHitSpeed = 0;
 			
 			if(collisionSide == CollidedBottom)
@@ -328,8 +329,12 @@ bool Player::canBounce(Map* map) {
 	switch(state) {
 	case PLAYER_JUMPING:
 	case PLAYER_FALLING: {
-		return sideHit
-		    || iconSideHitSpeed != 0;
+		if (sideHit)
+			return true;
+		
+		if (iconSideHitSpeed != 0
+		 && iconSideHitHeight > y + PLAYER_HEIGHT * 0.5)
+			return true;
 	}
 	default:
 		return false;
