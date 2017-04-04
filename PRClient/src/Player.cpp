@@ -25,6 +25,8 @@ flip(SDL_FLIP_NONE), handsAnimationID(RUNNING) {
 	y_speed = 0;
 
 	alive = false;
+	sideHit = false;
+	iconSideHitSpeed = 0;
 
 	state = PLAYER_STILL;
 }
@@ -108,9 +110,20 @@ void Player::applyFriction(float x) {
 }
 
 
-bool Player::tryToJump(float speed) {
+bool Player::tryToJump(Map* map, float speed) {
 	if(canMove()) {
 		y_speed = speed;
+		changeStateTo(PLAYER_JUMPING);
+		return true;
+	} else if (canBounce(map)) {
+		if (x_speed == 0)
+			x_speed = -iconSideHitSpeed;	
+		else
+			x_speed = -x_speed;
+		
+		iconSideHitSpeed = 0;
+		
+		y_speed = speed * 0.75;
 		changeStateTo(PLAYER_JUMPING);
 		return true;
 	}
@@ -152,7 +165,8 @@ void Player::move(Map* map, float delta) {
 
 	if(state != PLAYER_STILL) {
 		SDL_Rect collider;
-		CollisionSide collisionSide = map->collides(newBoundaries.x, newBoundaries.y, boundaries.w, boundaries.h, &collider);
+		CollisionSide collisionSide = map->collides(newBoundaries.x, newBoundaries.y,
+										boundaries.w, boundaries.h, &collider);
 		if(collisionSide != NotCollided) {
 			int x_offset = newBoundaries.x - boundaries.x;
 			int y_offset = newBoundaries.y - boundaries.y;
@@ -187,11 +201,17 @@ void Player::move(Map* map, float delta) {
 				boundaries.y += y_offset * entryTime;
 			}
 
+			if (collisionSide == CollidedLeft
+			 || collisionSide == CollidedRight)
+				iconSideHitSpeed = x_speed;
+			else
+				iconSideHitSpeed = 0;
+			
 			if(collisionSide == CollidedBottom)
 				x_speed *= 0.75;
 			else
 				x_speed = 0;
-
+			
 			y_speed = 0;
 
 			if(y_offset) {
@@ -209,11 +229,15 @@ void Player::move(Map* map, float delta) {
 	
 	if(!map->hcollides(&newBoundaries.x, boundaries.w)) {
 		this->x += x_speed * delta;
-	} else if(state == PLAYER_MOVING) {
-		this->x = newBoundaries.x - PLAYER_X_OFFSET;
-		changeStateTo(PLAYER_STILL);
+		sideHit = false;
+	} else {
+		sideHit = true;
+		if(state == PLAYER_MOVING) {
+			this->x = newBoundaries.x - PLAYER_X_OFFSET;
+			changeStateTo(PLAYER_STILL);
+		}
 	}
-
+	
 	if(!map->vcollides(&newBoundaries.y, boundaries.h)) {
 		this->y += y_speed * delta;
 	} else if(state == PLAYER_FALLING) {
@@ -297,6 +321,22 @@ bool Player::canMove() {
 }
 
 
+bool Player::canBounce(Map* map) {
+	if (!isAlive())
+		return false;
+	
+	switch(state) {
+	case PLAYER_JUMPING:
+	case PLAYER_FALLING: {
+		return sideHit
+		    || iconSideHitSpeed != 0;
+	}
+	default:
+		return false;
+	}
+}
+
+
 float Player::getPosX() {
 	return x;
 }
@@ -369,6 +409,7 @@ void Player::changeStateTo(PlayerState newState) {
 			}
 		} else {
 			x_speed = 0;
+			iconSideHitSpeed = 0;
 			stopped = true;
 		}		
 	}

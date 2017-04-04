@@ -34,7 +34,7 @@ public:
 	void addSpeed(float x);
 	void applyFriction(float x);
 	
-	bool tryToJump(float speed);
+	bool tryToJump(Map* map, float speed);
 	
 	void move(Map* map, float delta);
 	bool hasMoved();
@@ -47,6 +47,7 @@ public:
 	
 	bool isAlive();
 	bool canMove();
+	bool canBounce(Map* map);
 	
 	float getPosX();
 	float getPosY();
@@ -71,6 +72,8 @@ private:
 	float x_speed;
 	float y_speed;
 	
+	bool sideHit;
+	float iconSideHitSpeed;
 	bool stopped;
         
     float deltaAnimTime;

@@ -47,7 +47,7 @@ void World::update(float delta) {
 			playersById[selfID]->addSpeed(PLAYER_ACCELERATION);
 		
 #ifdef DEBUG
-		playersById[selfID]->printStatus();
+		//playersById[selfID]->printStatus();
 #endif
 	}
 	
@@ -154,7 +154,7 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			char id = binaryRead1B();
 			if (isIdCorrect(id)) {
 				if (id != selfID)
-					playersById[id]->tryToJump(JUMP_ACCELERATION);
+					playersById[id]->tryToJump(map, JUMP_ACCELERATION);
 			}
 			
 			break;
@@ -199,7 +199,7 @@ void World::selfStopMoving(PlayerDirections direction) {
  * @return true when acually jumped
  */
 bool World::selfJump() {
-	return playersById[selfID]->tryToJump(JUMP_ACCELERATION);		
+	return playersById[selfID]->tryToJump(map, JUMP_ACCELERATION);		
 }
 
 
