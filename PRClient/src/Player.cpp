@@ -332,9 +332,12 @@ bool Player::canBounce(Map* map) {
 		if (sideHit)
 			return true;
 		
-		if (iconSideHitSpeed != 0
-		 && iconSideHitHeight > y + PLAYER_HEIGHT * 0.5)
-			return true;
+		if (iconSideHitSpeed != 0) {
+			if (iconSideHitHeight > y + PLAYER_HEIGHT * 0.5)
+				return true;
+			else
+				iconSideHitSpeed = 0;
+		}
 	}
 	default:
 		return false;
