@@ -332,12 +332,9 @@ bool Player::canBounce(Map* map) {
 		if (sideHit)
 			return true;
 		
-		if (iconSideHitSpeed != 0) {
-			if (iconSideHitHeight > y + PLAYER_HEIGHT * 0.5)
-				return true;
-			else
-				iconSideHitSpeed = 0;
-		}
+		if (iconSideHitSpeed != 0
+		 && iconSideHitHeight > y + PLAYER_HEIGHT * 0.5)
+			return true;
 	}
 	default:
 		return false;
@@ -405,22 +402,27 @@ SDL_Rect Player::getCollisionBox(float x_offset, float y_offset) {
 }
 
 
-void Player::changeStateTo(PlayerState newState) {
+void Player::changeStateTo(PlayerState newState) {	
+	if (newState == state)
+		return;
+	
 	if(newState == PLAYER_STILL) {
 		y_speed = 0;
 		
 		if (state == PLAYER_FALLING) {
 			x_speed *= 0.5;
 			if (x_speed != 0.0) {
-				state = PLAYER_MOVING;
+				changeStateTo(PLAYER_MOVING);
 				return;
 			}
 		} else {
 			x_speed = 0;
-			iconSideHitSpeed = 0;
 			stopped = true;
-		}		
+		}
 	}
 
+	if (state == PLAYER_FALLING)
+		iconSideHitSpeed = 0;
+	
 	state = newState;
 }
