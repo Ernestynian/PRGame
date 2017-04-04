@@ -5,37 +5,35 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <pthread.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 #include "../../Common/networkInterface.h"
 #include "../../Common/byteConverter.h"
 
 #include "server.h"
-#include "map.h"
 #include "client.h"
 #include "players.h"
 
 
-int srv_fd = 0;
-struct timeval lastSentPacketTime;
-
-char            inBuffer[MAX_CLIENT_PACKET_SIZE];
-char            outBuffer[MAX_SERVER_PACKET_SIZE];
-int             outBufferPosition;
-unsigned char   outBufferTick;
-pthread_mutex_t outBufferMutex = PTHREAD_MUTEX_INITIALIZER;
-double          msTimeToSendPacket = 1000.0 / FRAMERATE;
-
-MapData*        map;
-
+Server srv;
 
 int srv_start() {
-	map = map_create();
+	srv.socket = 0;
+	pthread_mutex_init(&srv.outBufferMutex, NULL);
+	*(double*)&srv.msTimeToSendPacket = 1000.0 / FRAMERATE;
 	
-	srv_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (srv_fd < 0) {
+	srv.outBufferTick = 1;
+	
+	memset(srv.inBuffer, 0, sizeof(srv.inBuffer));
+	memset(srv.outBuffer, 0, sizeof(srv.outBuffer));
+	srv.outBufferPosition = 1;
+	
+	srv.map = map_create();
+	
+	// Initialize network connection
+	
+	srv.socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (srv.socket < 0) {
 		printf("ERROR: Cannot create socket");
 		return 0;
 	}
@@ -46,7 +44,7 @@ int srv_start() {
 	srv_address.sin_addr.s_addr = htonl(INADDR_ANY);
 	srv_address.sin_port        = htons(PORT);
 
-	if (bind(srv_fd, (Address*)&srv_address, sizeof(srv_address)) < 0) {
+	if (bind(srv.socket, (Address*)&srv_address, sizeof(srv_address)) < 0) {
 		printf("ERROR: Bind failed");
 		return 0;
 	}
@@ -56,24 +54,18 @@ int srv_start() {
 			ip[0], ip[1], ip[2], ip[3], PORT);
 
 	int nonBlocking = 1;
-	if (fcntl(srv_fd, F_SETFL, O_NONBLOCK, nonBlocking) < 0) {
+	if (fcntl(srv.socket, F_SETFL, O_NONBLOCK, nonBlocking) < 0) {
 		printf("ERROR: Failed to set non-blocking\n");
 		return 0;
 	}
-
-	outBufferTick = 1;
 	
-	memset(inBuffer, 0, sizeof(inBuffer));
-	memset(outBuffer, 0, sizeof(outBuffer));
-	outBufferPosition = 1;
-
 	return 1;
 }
 
 
 void srv_stop() {
-	map_free(map);
-	close(srv_fd);
+	map_free(srv.map);
+	close(srv.socket);
 }
 
 
@@ -93,7 +85,7 @@ void srv_send(char eventType, Address_in client_address, socklen_t addrlen, cons
 	
 	releaseEvent(event);
 
-	sendto(srv_fd, buffer, buflen, 0, (Address*)&client_address, addrlen);
+	sendto(srv.socket, buffer, buflen, 0, (Address*)&client_address, addrlen);
 	
 	free(buffer);
 	
@@ -142,14 +134,14 @@ void srv_sendCurrentState(char newClientID, Address_in client_address, socklen_t
 	}
 	pthread_mutex_unlock(&clientListMutex);
 	
-	sendto(srv_fd, buffer, len, 0, (Address*)&client_address, addrlen);
+	sendto(srv.socket, buffer, len, 0, (Address*)&client_address, addrlen);
 }
 
 
 void srv_sendClientAcceptAndMapData(char newClientId, Address_in client_address, socklen_t addrlen) {
 	int mapDataLength;
 	int mapIconsCount;
-	char* mapData = map_getInitData(map, &mapDataLength, &mapIconsCount);
+	char* mapData = map_getInitData(srv.map, &mapDataLength, &mapIconsCount);
 	
 	char* packetData = (char*)malloc(5 + mapDataLength);
 	packetData[0] = 0;
@@ -161,7 +153,7 @@ void srv_sendClientAcceptAndMapData(char newClientId, Address_in client_address,
 	
 	free(mapData);
 	
-	sendto(srv_fd, packetData, mapDataLength + 5, 0, 
+	sendto(srv.socket, packetData, mapDataLength + 5, 0, 
 			(Address*)&client_address, addrlen);
 	
 	free(packetData);	
@@ -176,25 +168,25 @@ void srv_sendClientAcceptAndMapData(char newClientId, Address_in client_address,
 int srv_sendEventsToAll(unsigned char tick) {
 	int result;
 	
-	pthread_mutex_lock(&outBufferMutex);
-	if (outBufferPosition > 1) {
-		outBuffer[0] = tick;
+	pthread_mutex_lock(&srv.outBufferMutex);
+	if (srv.outBufferPosition > 1) {
+		srv.outBuffer[0] = tick;
 		//printf("Sent %d bytes to everyone\n", outBufferPosition);
 
 		pthread_mutex_lock(&clientListMutex);
 		for (int i = 0; i < MAX_CLIENTS; ++i) {
-			sendto(srv_fd, outBuffer, outBufferPosition, 0, 
+			sendto(srv.socket, srv.outBuffer, srv.outBufferPosition, 0, 
 					(Address*)&clients[i].address, 
 					sizeof(clients[i].address));
 		}
 		pthread_mutex_unlock(&clientListMutex);
 
 		// outBufferPosition must be reset before unlocking mutex
-		outBufferPosition = 1;
+		srv.outBufferPosition = 1;
 		result = 1;
 	} else
 		result = 0;
-	pthread_mutex_unlock(&outBufferMutex);
+	pthread_mutex_unlock(&srv.outBufferMutex);
 	
 	return result;
 }
@@ -204,13 +196,13 @@ int srv_transferPackets() {
 	Address_in client_address;
 	socklen_t addrlen = sizeof(client_address);
 	
-	int recvlen = recvfrom(srv_fd, inBuffer, MAX_CLIENT_PACKET_SIZE, 0, 
+	int recvlen = recvfrom(srv.socket, srv.inBuffer, MAX_CLIENT_PACKET_SIZE, 0, 
 							(Address*)&client_address, &addrlen);
 	
 	if (recvlen > 0) {
-		if (inBuffer[1] == NET_EVENT_CLIENT_JOIN) {
+		if (srv.inBuffer[1] == NET_EVENT_CLIENT_JOIN) {
 			MapData* mapClone = (MapData*)malloc(sizeof(MapData));
-			memcpy(mapClone, map, sizeof(MapData));
+			memcpy(mapClone, srv.map, sizeof(MapData));
 			
 			int newClientID = client_create(client_address, mapClone);
 			if (newClientID != CLIENT_NOT_CREATED) {
@@ -223,7 +215,7 @@ int srv_transferPackets() {
 			} else
 				printf("EVENT_CLIENT_JOIN not accepted\n");
 		} else {
-			client_transferPacket(client_address, inBuffer, recvlen);
+			client_transferPacket(client_address, srv.inBuffer, recvlen);
 		}
 		
 		return 1;
@@ -233,14 +225,14 @@ int srv_transferPackets() {
 	struct timeval current;
 	gettimeofday(&current, NULL);
 	double 
-	diff =  (current.tv_sec - lastSentPacketTime.tv_sec) * 1000.0;
-	diff += (current.tv_usec - lastSentPacketTime.tv_usec) / 1000.0;
-	if (diff > msTimeToSendPacket) {
-		if (srv_sendEventsToAll(outBufferTick)) {
-			gettimeofday(&lastSentPacketTime, NULL);
-			outBufferTick++;
-			if (outBufferTick == 0)
-				outBufferTick++;
+	diff =  (current.tv_sec - srv.lastSentPacketTime.tv_sec) * 1000.0;
+	diff += (current.tv_usec - srv.lastSentPacketTime.tv_usec) / 1000.0;
+	if (diff > srv.msTimeToSendPacket) {
+		if (srv_sendEventsToAll(srv.outBufferTick)) {
+			gettimeofday(&srv.lastSentPacketTime, NULL);
+			srv.outBufferTick++;
+			if (srv.outBufferTick == 0)
+				srv.outBufferTick++;
 		}
 	}
 	
@@ -256,12 +248,12 @@ void srv_addNewEvent(char eventType, const char* format, ...) {
 	char* bytes = toBytes(&size, format, args);
 	NetworkEvent* event = createEvent(eventType, bytes, size);
 	
-	pthread_mutex_lock(&outBufferMutex);	
-	if (outBufferPosition + event->length < MAX_SERVER_PACKET_SIZE) {
-		memcpy(outBuffer + outBufferPosition, event->data, event->length);
-		outBufferPosition += event->length;
+	pthread_mutex_lock(&srv.outBufferMutex);	
+	if (srv.outBufferPosition + event->length < MAX_SERVER_PACKET_SIZE) {
+		memcpy(srv.outBuffer + srv.outBufferPosition, event->data, event->length);
+		srv.outBufferPosition += event->length;
 	}
-	pthread_mutex_unlock(&outBufferMutex);	
+	pthread_mutex_unlock(&srv.outBufferMutex);	
 	
 	releaseEvent(event);
 	free(bytes);
