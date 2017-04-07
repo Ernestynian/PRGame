@@ -52,7 +52,10 @@ void World::update(float delta) {
 	}
 	
 	for (Player* player : players) {
-		if (player->isAlive()) {
+		if (player->isDying())
+			player->applyFriction(0.002);
+		
+		if (player->isAlive() || player->isDying()) {
 			player->applyGravity(map, gravity * delta);
 			player->move(map, delta);
 			player->calculateAnimation(delta);
@@ -66,8 +69,8 @@ void World::draw() {
 	
 	map->draw();
 	
-	for (auto player : players)
-		if (player->isAlive())
+	for (Player* player : players)
+		if (player->isAlive() || player->isDying())
 			player->draw();
 	
 	renderer->render();
@@ -102,7 +105,7 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			float x = binaryReadFloat();
 			float y = binaryReadFloat();
 			if (isIdCorrect(id)) {
-				printf("NET_EVENT_PLAYER_SPAWN %hhu %.2f %.2f\n", id, x, y);
+				printf("NET_EVENT_PLAYER_SPAWN %hhu %.0f %.0f\n", id, x, y);
 				if (playersById[id] != nullptr)
 					playersById[id]->spawn(x, y);
 				else
@@ -114,9 +117,10 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 		case NET_EVENT_PLAYER_DIED: {
 			printf("NET_EVENT_PLAYER_DIED\n");
 			char id = binaryRead1B();
+			char direction = binaryRead1B();
 			if (isIdCorrect(id)) {
 				if (playersById[id] != nullptr)
-					playersById[id]->kill();
+					playersById[id]->kill(direction);
 				else
 					printf("%d is nullptr!!!!\n", id);
 			}

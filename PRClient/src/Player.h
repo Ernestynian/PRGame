@@ -26,7 +26,7 @@ public:
 	virtual ~Player();
 	
 	void spawn(int x, int y);
-	void kill();
+	void kill(char direction);
 	void teleportToPosition(int x, int y);
 	void setSpeed(float vx, float vy);
 	
@@ -46,6 +46,7 @@ public:
 	void draw();
 	
 	bool isAlive();
+	bool isDying();
 	bool canMove();
 	bool canBounce(Map* map);
 	

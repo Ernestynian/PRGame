@@ -182,10 +182,14 @@ void* client_process(void* threadData) {
 				int w = 10, h = 5;
 				player_getPos(public->id, &x, &y);
 				
-				if (player_isLookingRight(public->id))
+				char direction;
+				if (player_isLookingRight(public->id)) {
 					x += PLAYER_WIDTH;
-				else
+					direction = 1;
+				} else {
 					x -= w;
+					direction = -1;
+				}
 				
 				y += 10;
 				
@@ -195,7 +199,7 @@ void* client_process(void* threadData) {
 					
 					if (player_isAlive(i)) {
 						if (player_collides(i, x, y, w, h)) {
-							srv_addNewEvent(NET_EVENT_PLAYER_DIED, "1", i);
+							srv_addNewEvent(NET_EVENT_PLAYER_DIED, "11", i, direction);
 							player_kill(i);
 						}
 					}

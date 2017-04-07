@@ -40,14 +40,17 @@ void Player::spawn(int x, int y) {
 		alive = true;
 		this->x = x;
 		this->y = y;
-
+		
 		changeStateTo(PLAYER_STILL);
 	}
 }
 
 
-void Player::kill() {
+void Player::kill(char direction) {
 	alive = false;
+	state = PLAYER_DYING;
+	
+	setSpeed(0.15 * direction, -0.2);
 }
 
 
@@ -94,7 +97,7 @@ void Player::addSpeed(float x) {
 
 
 void Player::applyFriction(float x) {
-	if(state == PLAYER_MOVING) {
+	if(state == PLAYER_MOVING || state == PLAYER_DYING) {
 		if(x_speed < 0) {
 			if(x_speed + x > 0)
 				changeStateTo(PLAYER_STILL);
@@ -308,6 +311,11 @@ bool Player::isAlive() {
 }
 
 
+bool Player::isDying() {
+	return state == PLAYER_DYING;
+}
+
+
 bool Player::canMove() {
 	if(!isAlive())
 		return false;
@@ -404,6 +412,9 @@ SDL_Rect Player::getCollisionBox(float x_offset, float y_offset) {
 
 void Player::changeStateTo(PlayerState newState) {	
 	if (newState == state)
+		return;
+	
+	if (state == PLAYER_DYING && newState != PLAYER_STILL)
 		return;
 	
 	if(newState == PLAYER_STILL) {
