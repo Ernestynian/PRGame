@@ -17,7 +17,8 @@ enum PlayerState {
 enum HandsAnimation {
     RUNNING,
     RUNNING_AND_ATTACKING,
-    STILL_AND_ATTACKING
+    STILL_AND_ATTACKING,
+    DYING
 };
 
 class Player {
@@ -84,6 +85,7 @@ private:
     SDL_RendererFlip flip;
     int bodyAnimFrame;
     int handsAnimFrame;
+    int bodyAnimOffset;
     
     int attackAnimFrameCount;//const
     float attackAnimTime;//const

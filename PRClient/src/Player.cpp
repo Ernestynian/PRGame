@@ -9,9 +9,9 @@
 
 
 Player::Player(Texture* bodyTexture, Texture* handsTexture)
-: tileW(320), tileH(320), animCycleTime(0.4), animFrameCount(4),
+: tileW(320), tileH(320), /*animCycleTime(0.4), animFrameCount(4),*/
 attackAnimFrameCount(4), attackAnimTime(0.4), deltaAttackTime(0.0),
-flip(SDL_FLIP_NONE), handsAnimationID(RUNNING) {
+flip(SDL_FLIP_NONE), handsAnimationID(RUNNING), bodyAnimOffset(0) {
 	this->bodyTexture = bodyTexture;
 	this->handsTexture = handsTexture;
 
@@ -269,18 +269,48 @@ bool Player::hasStopped() { // TODO: change to onEvent design pattern
 
 
 void Player::calculateAnimation(float delta) {
-	if(x_speed == 0.0) {
-		deltaAnimTime = 0;
-		//flip = SDL_FLIP_NONE;
-	} else {
-		deltaAnimTime += fabs(x_speed * 0.01 * delta);
-		if(deltaAnimTime > animCycleTime)
-			deltaAnimTime = deltaAnimTime - animCycleTime;
-		if(x_speed > 0)
-			flip = SDL_FLIP_NONE;
-		else
-			flip = SDL_FLIP_HORIZONTAL;
-	}
+    bodyAnimOffset = 0;//test it or change it
+    switch(state)//can be optimised a little
+    {
+        case PLAYER_STILL:
+            animFrameCount = 1;
+            animCycleTime = 1;
+            break;
+        case PLAYER_MOVING:
+            animFrameCount = 2;
+            animCycleTime = 0.2;
+            if(abs(x_speed) > PLAYER_MAX_MOVEMENT_SPEED*0.90f)
+            {
+                bodyAnimOffset = 2;
+            }
+            else
+            {
+                bodyAnimOffset = 0;
+            }
+            break;
+        case PLAYER_FALLING:
+            animFrameCount = 2;
+            animCycleTime = 0.4;
+            break;
+        case PLAYER_JUMPING:
+            animFrameCount = 4;
+            animCycleTime = 0.6;
+            break;
+        case PLAYER_DYING:
+            animFrameCount = 8;//4 of animation and 4 placeholders
+            animCycleTime = 2;//to be corrected
+            break;
+        default:
+            break;
+    }
+    
+    deltaAnimTime += fabs(x_speed * 0.01 * delta);
+    if(deltaAnimTime > animCycleTime)
+        deltaAnimTime = deltaAnimTime - animCycleTime;
+    if(x_speed > 0)
+        flip = SDL_FLIP_NONE;
+    else
+        flip = SDL_FLIP_HORIZONTAL;
 
 	bodyAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime);
 
@@ -298,8 +328,8 @@ void Player::calculateAnimation(float delta) {
 
 void Player::draw() {
 	SDL_Rect renderQuad = {(int)x, (int)y, w, h};
-	SDL_Rect bodySourceQuad = {0 + bodyAnimFrame * tileW, 0, tileW, tileH};
-	SDL_Rect handsSourceQuad = {0 + handsAnimFrame * tileW, handsAnimationID * tileH, tileW, tileH}; //to be tested
+	SDL_Rect bodySourceQuad = {(bodyAnimOffset + bodyAnimFrame) * tileW, state * tileH, tileW, tileH}; //to be tested
+	SDL_Rect handsSourceQuad = {0 + handsAnimFrame * tileW, handsAnimationID * tileH, tileW, tileH};
 
 	bodyTexture->draw(&bodySourceQuad, &renderQuad, 0, NULL, flip);
 	handsTexture->draw(&handsSourceQuad, &renderQuad, 0, NULL, flip); //
