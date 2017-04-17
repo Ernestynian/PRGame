@@ -80,16 +80,16 @@ private:
 	bool stopped;
         
     float deltaAnimTime;
-    double animCycleTime;//const
-    int animFrameCount;//const
+    double animCycleTime;
+    int animFrameCount;
     SDL_RendererFlip flip;
     int bodyAnimFrame;
     int handsAnimFrame;
     int bodyAnimOffset;
     
-    int attackAnimFrameCount;//const
-    float attackAnimTime;//const
-    int handsAnimationID;
+    int attackAnimFrameCount;
+    float attackAnimTime;
+    HandsAnimation handsAnimation;
     float deltaAttackTime;
         
 	

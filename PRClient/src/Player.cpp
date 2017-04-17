@@ -11,7 +11,7 @@
 Player::Player(Texture* bodyTexture, Texture* handsTexture)
 : tileW(320), tileH(320), /*animCycleTime(0.4), animFrameCount(4),*/
 attackAnimFrameCount(4), attackAnimTime(0.4), deltaAttackTime(0.0),
-flip(SDL_FLIP_NONE), handsAnimationID(RUNNING), bodyAnimOffset(0) {
+flip(SDL_FLIP_NONE), handsAnimation(RUNNING), bodyAnimOffset(0) {
 	this->bodyTexture = bodyTexture;
 	this->handsTexture = handsTexture;
 
@@ -66,6 +66,10 @@ void Player::teleportToPosition(int x, int y) {
 void Player::setSpeed(float vx, float vy) {
 	x_speed = vx;
 	y_speed = vy;
+        
+        //kind of a bandaid to a bug with connected clients not moving properly
+        if(vx != 0 || vy != 0)
+            changeStateTo(PLAYER_MOVING);
 }
 
 
@@ -142,9 +146,9 @@ bool Player::attack() {
 		deltaAttackTime = 0.99;
 
 		if(x_speed == 0) {
-			handsAnimationID = STILL_AND_ATTACKING;
+			handsAnimation = STILL_AND_ATTACKING;
 		} else {
-			handsAnimationID = RUNNING_AND_ATTACKING;
+			handsAnimation = RUNNING_AND_ATTACKING;
 		}
 		return true;
 	} else {
@@ -277,16 +281,18 @@ void Player::calculateAnimation(float delta) {
             animCycleTime = 1;
             break;
         case PLAYER_MOVING:
-            animFrameCount = 2;
-            animCycleTime = 0.2;
-            if(abs(x_speed) > PLAYER_MAX_MOVEMENT_SPEED*0.90f)
+            animFrameCount = 4;
+            animCycleTime = 0.4;
+            if(fabs(x_speed) > PLAYER_MAX_MOVEMENT_SPEED*0.90f)
             {
-                bodyAnimOffset = 2;
+                bodyAnimOffset = 4;
             }
             else
             {
                 bodyAnimOffset = 0;
             }
+            if(deltaAttackTime <= 0.0) 
+                handsAnimation = RUNNING;
             break;
         case PLAYER_FALLING:
             animFrameCount = 2;
@@ -299,6 +305,8 @@ void Player::calculateAnimation(float delta) {
         case PLAYER_DYING:
             animFrameCount = 8;//4 of animation and 4 placeholders
             animCycleTime = 2;//to be corrected
+            if(deltaAttackTime <= 0.0) 
+                handsAnimation = DYING;
             break;
         default:
             break;
@@ -307,6 +315,7 @@ void Player::calculateAnimation(float delta) {
     deltaAnimTime += fabs(x_speed * 0.01 * delta);
     if(deltaAnimTime > animCycleTime)
         deltaAnimTime = deltaAnimTime - animCycleTime;
+    
     if(x_speed > 0)
         flip = SDL_FLIP_NONE;
     else
@@ -315,12 +324,13 @@ void Player::calculateAnimation(float delta) {
 	bodyAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime);
 
 	if(deltaAttackTime > 0.0) {
-		handsAnimFrame = 3 - floor(deltaAttackTime * attackAnimFrameCount);
+		handsAnimFrame = 4 - floor(deltaAttackTime * attackAnimFrameCount);
 		deltaAttackTime -= 0.005 * delta; //const to be tweaked
 	} else {
-		if(handsAnimationID != RUNNING) {
-			handsAnimationID = RUNNING;
-		}
+		//if(handsAnimation != RUNNING) {
+		//	handsAnimation = RUNNING;
+		//}
+                
 		handsAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime); //temp
 	}
 }
@@ -329,7 +339,7 @@ void Player::calculateAnimation(float delta) {
 void Player::draw() {
 	SDL_Rect renderQuad = {(int)x, (int)y, w, h};
 	SDL_Rect bodySourceQuad = {(bodyAnimOffset + bodyAnimFrame) * tileW, state * tileH, tileW, tileH}; //to be tested
-	SDL_Rect handsSourceQuad = {0 + handsAnimFrame * tileW, handsAnimationID * tileH, tileW, tileH};
+	SDL_Rect handsSourceQuad = {(bodyAnimOffset + handsAnimFrame) * tileW, handsAnimation * tileH, tileW, tileH};
 
 	bodyTexture->draw(&bodySourceQuad, &renderQuad, 0, NULL, flip);
 	handsTexture->draw(&handsSourceQuad, &renderQuad, 0, NULL, flip); //
