@@ -59,14 +59,11 @@ void Network::packetSendingThread(unsigned int tickrate) {
         int delta = SDL_GetTicks() - last;
         SDL_Delay((int)(1000.0/tickrate) - delta);
         last = SDL_GetTicks();
-        //SDL_Delay(33);
-        printf("%d\n", last);
     }
 }
 
 void Network::start(unsigned int tickrate) {
     sendingThread = std::thread(&Network::packetSendingThread, this, tickrate);
-    printf("test222222222222222222222222\n");
 }
 
 
