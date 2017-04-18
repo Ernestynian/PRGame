@@ -327,9 +327,10 @@ void Player::calculateAnimation(float delta) {
 		handsAnimFrame = 4 - floor(deltaAttackTime * attackAnimFrameCount);
 		deltaAttackTime -= 0.005 * delta; //const to be tweaked
 	} else {
-		//if(handsAnimation != RUNNING) {
-		//	handsAnimation = RUNNING;
-		//}
+            if( state == PLAYER_STILL ||
+                state == PLAYER_JUMPING ||
+                state == PLAYER_FALLING)
+                handsAnimation = RUNNING;
                 
 		handsAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime); //temp
 	}
