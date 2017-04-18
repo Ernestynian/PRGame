@@ -18,7 +18,8 @@ private:
 	std::pair<int, std::vector<IconData*>> makeConnection();
 	void processEvents();
 	void checkPackets();
-	
+	void packetSendingThread();
+        
 	bool running;
 	Window* window;
 	World* world;
@@ -27,7 +28,6 @@ private:
 	const unsigned int networkTickrate;
 	
 	Network* network;
-	unsigned char frame;
 };
 
 #endif /* GAME_H */

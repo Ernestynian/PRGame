@@ -46,6 +46,29 @@ bool Network::init() {
 	return true;
 }
 
+void Network::packetSendingThread(unsigned int tickrate) {
+    int last = SDL_GetTicks();
+    for(;;) {
+        frame++;
+        if (frame == 0)
+                frame++;
+        
+        sendPacket(frame);
+        
+        //ticking
+        int delta = SDL_GetTicks() - last;
+        SDL_Delay((int)(1000.0/tickrate) - delta);
+        last = SDL_GetTicks();
+        //SDL_Delay(33);
+        printf("%d\n", last);
+    }
+}
+
+void Network::start(unsigned int tickrate) {
+    sendingThread = std::thread(&Network::packetSendingThread, this, tickrate);
+    printf("test222222222222222222222222\n");
+}
+
 
 /**
  * Set destination IP and port number with correct endianess
@@ -97,7 +120,7 @@ bool Network::createPackets() {
 }
 
 
-bool Network::recieviedAcceptMessage() {
+bool Network::receivedAcceptMessage() {
 	if (receivePacket()) {
 		if (packetIn->data[1] == NET_EVENT_CLIENT_ACCEPTED) {
 			printf("NET_EVENT_CLIENT_ACCEPTED\n");

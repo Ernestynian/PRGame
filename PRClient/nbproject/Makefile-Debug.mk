@@ -72,7 +72,7 @@ LDLIBSOPTIONS=
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prclient: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prclient ${OBJECTFILES} ${LDLIBSOPTIONS} -lSDL2main -lSDL2 -lSDL2_net
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/prclient ${OBJECTFILES} ${LDLIBSOPTIONS} -lSDL2main -lSDL2 -lSDL2_net -pthread
 
 ${OBJECTDIR}/_ext/7daaf93a/byteConverter.o: ../Common/byteConverter.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a

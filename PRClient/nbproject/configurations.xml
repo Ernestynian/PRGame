@@ -106,7 +106,7 @@
           </preprocessorList>
         </ccTool>
         <linkerTool>
-          <commandLine>-lSDL2main -lSDL2 -lSDL2_net</commandLine>
+          <commandLine>-lSDL2main -lSDL2 -lSDL2_net -pthread</commandLine>
         </linkerTool>
       </compileType>
       <item path="../Common/byteConverter.c" ex="false" tool="0" flavor2="0">

@@ -17,7 +17,7 @@ Game::Game(int argc, const char* argv[])
 	
 	running = true;
 	
-	frame   = 0;
+	//frame   = 0;
 }
 
 
@@ -43,6 +43,8 @@ int Game::run() {
 		world = new World(window->getRenderer(), worldData.first, 
 												 worldData.second);
 	
+        network->start(networkTickrate);
+        
 	while (running) {
 		int startTime = SDL_GetTicks();
 		
@@ -59,19 +61,17 @@ int Game::run() {
 					world->getSelfSpeedX(), world->getSelfSpeedY());
 		}
 		
-		network->sendPacket(frame);
+		//network->sendPacket(frame);
 		
 		world->draw();
+                
+                printf("test\n");
 		
 		int delta = SDL_GetTicks() - startTime;
 		
 		// Upper bound of FPS
 		if (msPerFrame > delta)
 			SDL_Delay((int)msPerFrame - delta);
-		
-		frame++;
-		if (frame == 0)
-			frame++;
 	}
 	
 	return 0;
@@ -93,7 +93,7 @@ std::pair<int, std::vector<IconData*>> Game::makeConnection() {
 		// Normally there should be also NEGATIVE response and so repetitive
 		//  JOIN messages, but we won't go into such lengths. Let's just
 		//  try once and if no response - end the suffering
-		if (network->recieviedAcceptMessage()) {
+		if (network->receivedAcceptMessage()) {
 			if (network->getCurrentEventDataLength() > 0) {
 				initBinaryReader((char*)network->getCurrentEventData());
 				char id = binaryRead1B();
