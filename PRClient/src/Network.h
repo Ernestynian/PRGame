@@ -3,6 +3,8 @@
 
 #include <string>
 #include <thread>
+#include <queue>
+#include <mutex>
 
 #include <SDL2/SDL_net.h>
 
@@ -14,7 +16,9 @@ public:
 	Network();
 	~Network();
 	
-	bool receivePacket();
+	bool openNextPacket();
+    bool receivePacket();
+    void discardOpenedPacket();
 	bool isThereMoreEvents();
 	EventTypes getNextEvent();
 	EventTypes getCurrentEventDataType();
@@ -26,13 +30,14 @@ public:
 	void addNewEvent(EventTypes eventType, const char* format, ...);
 	void addNewEvent(EventTypes eventType);
 	bool sendPacket(unsigned char frameTime);
-        void start(unsigned int tickrate);
+    void start(unsigned int tickrate);
+    int getPacketCount();
 private:
 	bool init();
 	bool setServer(const char* host, uint16_t port);
 	bool createPackets();
         
-        void packetSendingThread(unsigned int tickrate);
+        void networkThread(unsigned int tickrate);
 	
 	void sendEvent(EventTypes eventType, const char* data, int length);
 	
@@ -50,7 +55,10 @@ private:
 	const char* LOCALHOST = "127.0.0.1";
         
 	unsigned char frame;
-        std::thread sendingThread;
+    std::thread netThread;
+    
+    std::queue<UDPpacket*> packetQueue;
+    std::mutex packetQueueMutex;
 };
 
 #endif /* NETWORK_H */

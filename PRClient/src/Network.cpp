@@ -46,14 +46,27 @@ bool Network::init() {
 	return true;
 }
 
-void Network::packetSendingThread(unsigned int tickrate) {
+void Network::networkThread(unsigned int tickrate) {
     int last = SDL_GetTicks();
+    
     for(;;) {
+        //sending
         frame++;
         if (frame == 0)
                 frame++;
         
         sendPacket(frame);
+        
+        //receiving
+        while(SDLNet_UDP_Recv(UDPSocket, packetIn)) {
+            if (isPacketNewer(packetIn->data[0], &previousServerTick))
+            {
+                //then add it
+                packetQueue.push(packetIn);
+                //and alocate space for packet in the future
+                packetIn = SDLNet_AllocPacket(MAX_SERVER_PACKET_SIZE);
+            }
+        }
         
         //ticking
         int delta = SDL_GetTicks() - last;
@@ -63,7 +76,7 @@ void Network::packetSendingThread(unsigned int tickrate) {
 }
 
 void Network::start(unsigned int tickrate) {
-    sendingThread = std::thread(&Network::packetSendingThread, this, tickrate);
+    netThread = std::thread(&Network::networkThread, this, tickrate);
 }
 
 
@@ -119,10 +132,11 @@ bool Network::createPackets() {
 
 bool Network::receivedAcceptMessage() {
 	if (receivePacket()) {
-		if (packetIn->data[1] == NET_EVENT_CLIENT_ACCEPTED) {
+		if (packetQueue.front()->data[1] == NET_EVENT_CLIENT_ACCEPTED) {
 			printf("NET_EVENT_CLIENT_ACCEPTED\n");
 			return true;
 		}
+        discardOpenedPacket();//
 	}
 	
 	return false;
@@ -211,11 +225,17 @@ bool Network::sendPacket(unsigned char frameTime) {
  * @return whether new packet was received
  */
 bool Network::receivePacket() {
-	int status = SDLNet_UDP_Recv(UDPSocket, packetIn);
+    int status = SDLNet_UDP_Recv(UDPSocket, packetIn);
 	
 	if (status > 0) {
 		if (isPacketNewer(packetIn->data[0], &previousServerTick))
+        {
 			currentEvent = packetIn->data + 1;
+            packetQueueMutex.lock();
+            packetQueue.push(packetIn);
+            packetIn = SDLNet_AllocPacket(MAX_SERVER_PACKET_SIZE);
+            packetQueueMutex.unlock();
+        }
 		else
 			status = 0;
 	}
@@ -224,13 +244,42 @@ bool Network::receivePacket() {
 }
 
 
+bool Network::openNextPacket() {
+    packetQueueMutex.lock();
+    if(packetQueue.size() > 0)
+    {
+        //then no phroblem
+        currentEvent = packetQueue.front()->data + 1;
+        packetQueueMutex.unlock();
+        return 1;
+    }
+    else
+    {
+        packetQueueMutex.unlock();
+        return 0;
+    }
+}
+
+void Network::discardOpenedPacket() {
+    //delete packetQueue.front();//to be tested
+    packetQueueMutex.lock();
+    SDLNet_FreePacket(packetQueue.front());
+    packetQueue.pop();
+    packetQueueMutex.unlock();
+}
+
+int Network::getPacketCount() {
+    return packetQueue.size();//
+}
+
+
 bool Network::isThereMoreEvents() {
-	if (packetIn->len < 3)
+	if (packetQueue.front()->len < 3)
 		return false;
 	
-	int currentPosition = currentEvent - packetIn->data;
+	int currentPosition = currentEvent - packetQueue.front()->data;
 	// + 1 is a tick byte and another + 1 a "next" event type
-	int lastPosition    = packetIn->len - (getCurrentEventDataLength() + 1 + 1);
+	int lastPosition    = packetQueue.front()->len - (getCurrentEventDataLength() + 1 + 1);
 	return currentPosition < lastPosition;
 }
 

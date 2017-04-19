@@ -64,8 +64,6 @@ int Game::run() {
 		//network->sendPacket(frame);
 		
 		world->draw();
-                
-                printf("test\n");
 		
 		int delta = SDL_GetTicks() - startTime;
 		
@@ -168,31 +166,34 @@ void Game::processEvents() {
 
 
 void Game::checkPackets() {
-	if (network->receivePacket()) {
-		for(;;) {
-			switch (network->getCurrentEventDataType()) {
-			case NET_EVENT_CLIENT_JOIN: {
-				int pid = binaryRead1B();
-				world->addPlayer(pid);
-				printf("Added client: %d\n", pid);
-				break;
-			}
-			case NET_EVENT_CLIENT_EXIT: {
-				int pid = binaryRead1B();
-				world->removePlayer(pid);
-				printf("Removed client: %d\n", pid);
-				break;
-			}
-			default:
-				world->parseEvent(network->getCurrentEventDataType(), 
-								  network->getCurrentEventData());
-				break;
-			}
-			
-			if (network->isThereMoreEvents())
-				network->getNextEvent();
-			else
-				break;
-		};
-	}
+    int packetCount = network->getPacketCount();
+    for(int i = 0; i < packetCount; i++) {
+        network->openNextPacket();//
+        for(;;) {
+            switch (network->getCurrentEventDataType()) {
+            case NET_EVENT_CLIENT_JOIN: {
+                int pid = binaryRead1B();
+                world->addPlayer(pid);
+                printf("Added client: %d\n", pid);
+                break;
+            }
+            case NET_EVENT_CLIENT_EXIT: {
+                int pid = binaryRead1B();
+                world->removePlayer(pid);
+                printf("Removed client: %d\n", pid);
+                break;
+            }
+            default:
+                world->parseEvent(network->getCurrentEventDataType(), 
+                                  network->getCurrentEventData());
+                break;
+            }
+
+            if (network->isThereMoreEvents())
+                network->getNextEvent();
+            else
+                break;
+        }
+        network->discardOpenedPacket();//
+    }
 }
