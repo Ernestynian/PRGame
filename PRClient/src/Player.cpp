@@ -284,6 +284,10 @@ void Player::updateDirection() {
 void Player::calculateAnimation(float delta) {
     switch(state)//can be optimised a little
     {
+		case PLAYER_STILL:
+			animFrameCount = 1;
+			animCycleTime = 1;
+			break;
         case PLAYER_MOVING:
             animFrameCount = 4;
             animCycleTime = 0.4;
@@ -463,10 +467,10 @@ void Player::changeStateTo(PlayerState newState) {
 	if (newState == state)
 		return;
     
-    bodyAnimOffset = 0;
-	
 	if (state == PLAYER_DYING && newState != PLAYER_STILL)
 		return;
+	
+	bodyAnimOffset = 0;
 	
 	if(newState == PLAYER_STILL) {
 		y_speed = 0;
@@ -481,10 +485,11 @@ void Player::changeStateTo(PlayerState newState) {
 			x_speed = 0;
 			stopped = true;
 		}
+		
+		animFrameCount = 1;
+		animCycleTime = 1;
 	}
     
-    animFrameCount = 1;
-    animCycleTime = 1;
 
 	if (state == PLAYER_FALLING)
 		iconSideHitSpeed = 0;
