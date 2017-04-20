@@ -275,13 +275,12 @@ bool Player::hasStopped() { // TODO: change to onEvent design pattern
 void Player::updateDirection() {
     if(x_speed > 0)
         flip = SDL_FLIP_NONE;
-    else
+    else if(x_speed < 0)
         flip = SDL_FLIP_HORIZONTAL;
 }
 
 
 void Player::calculateAnimation(float delta) {
-    bodyAnimOffset = 0;//test it or change it
     switch(state)//can be optimised a little
     {
         case PLAYER_STILL:
@@ -321,7 +320,7 @@ void Player::calculateAnimation(float delta) {
             
             if(x_speed < 0)
                 flip = SDL_FLIP_NONE;
-            else
+            else if(x_speed > 0)
                 flip = SDL_FLIP_HORIZONTAL;
             break;
         default:
@@ -466,6 +465,8 @@ SDL_Rect Player::getCollisionBox(float x_offset, float y_offset) {
 void Player::changeStateTo(PlayerState newState) {	
 	if (newState == state)
 		return;
+    
+    bodyAnimOffset = 0;
 	
 	if (state == PLAYER_DYING && newState != PLAYER_STILL)
 		return;
