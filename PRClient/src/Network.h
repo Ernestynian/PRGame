@@ -30,7 +30,7 @@ public:
 	void addNewEvent(EventTypes eventType, const char* format, ...);
 	void addNewEvent(EventTypes eventType);
 	bool sendPacket(unsigned char frameTime);
-    void start(unsigned int tickrate);
+    void start();
     int getPacketCount();
 private:
 	bool init();

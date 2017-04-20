@@ -75,8 +75,8 @@ void Network::networkThread(unsigned int tickrate) {
     }
 }
 
-void Network::start(unsigned int tickrate) {
-    netThread = std::thread(&Network::networkThread, this, tickrate);
+void Network::start() {
+    netThread = std::thread(&Network::networkThread, this, FRAMERATE);
 }
 
 

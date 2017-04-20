@@ -10,7 +10,7 @@
 
 
 Game::Game(int argc, const char* argv[])
-: msPerFrame(1000.0 / FRAMERATE), networkTickrate(30) {	
+: msPerFrame(1000.0 / FRAMERATE) {	
 	window  = new Window();
 	world   = nullptr;
 	network = nullptr;
@@ -43,7 +43,7 @@ int Game::run() {
 		world = new World(window->getRenderer(), worldData.first, 
 												 worldData.second);
 	
-        network->start(networkTickrate);
+        network->start();
         
 	while (running) {
 		int startTime = SDL_GetTicks();

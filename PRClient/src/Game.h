@@ -25,7 +25,6 @@ private:
 	World* world;
 	
 	const float msPerFrame;
-	const unsigned int networkTickrate;
 	
 	Network* network;
 };

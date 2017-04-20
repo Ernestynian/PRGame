@@ -51,7 +51,7 @@ void World::update(float delta) {
 #endif
 	}
 	
-	for (Player* player : players) {
+	for (Player* player : players) {		
 		if (player->isDying())
 			player->applyFriction(0.002);
 		

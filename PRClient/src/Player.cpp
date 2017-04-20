@@ -50,16 +50,14 @@ void Player::kill(char direction) {
 	alive = false;
 	state = PLAYER_DYING;
 	
-	setSpeed(0.15 * direction, -0.2);
+	x_speed = 0.15 * direction;
+	y_speed = -0.2;
 }
 
 
 void Player::teleportToPosition(int x, int y) {
 	this->x = x;
 	this->y = y;
-	this->x_speed = 0;
-	this->y_speed = 0;
-	this->state = PLAYER_STILL;
 }
 
 
@@ -67,9 +65,9 @@ void Player::setSpeed(float vx, float vy) {
 	x_speed = vx;
 	y_speed = vy;
         
-	//kind of a bandaid to a bug with connected clients not moving properly
-	// wtf?
-	if(vx != 0 || vy != 0)
+	if (vx == 0 && vy == 0)
+		this->state = PLAYER_STILL;
+	else if (state == PLAYER_STILL)
 		changeStateTo(PLAYER_MOVING);
 }
 
