@@ -67,9 +67,10 @@ void Player::setSpeed(float vx, float vy) {
 	x_speed = vx;
 	y_speed = vy;
         
-        //kind of a bandaid to a bug with connected clients not moving properly
-        if(vx != 0 || vy != 0)
-            changeStateTo(PLAYER_MOVING);
+	//kind of a bandaid to a bug with connected clients not moving properly
+	// wtf?
+	if(vx != 0 || vy != 0)
+		changeStateTo(PLAYER_MOVING);
 }
 
 
@@ -103,12 +104,12 @@ void Player::addSpeed(float x) {
 void Player::applyFriction(float x) {
 	if(state == PLAYER_MOVING || state == PLAYER_DYING) {
 		if(x_speed < 0) {
-			if(x_speed + x > 0)
+			if(x_speed + x >= 0)
 				changeStateTo(PLAYER_STILL);
 			else
 				x_speed += x;
 		} else if(x_speed > 0) {
-			if(x_speed - x < 0)
+			if(x_speed - x <= 0)
 				changeStateTo(PLAYER_STILL);
 			else
 				x_speed -= x;
