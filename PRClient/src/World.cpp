@@ -135,8 +135,10 @@ void World::parseEvent(EventTypes type, uint8_t* data) {
 			float vy = binaryReadFloat();
 			if (isIdCorrect(id)) {
 				if (id != selfID) {
-					playersById[id]->teleportToPosition(x, y);
-					playersById[id]->setSpeed(vx, vy);
+					if (!playersById[id]->isDying()) {
+						playersById[id]->teleportToPosition(x, y);
+						playersById[id]->setSpeed(vx, vy);
+					}
 				}
 			}
 			
