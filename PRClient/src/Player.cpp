@@ -272,6 +272,14 @@ bool Player::hasStopped() { // TODO: change to onEvent design pattern
 }
 
 
+void Player::updateDirection() {
+    if(x_speed > 0)
+        flip = SDL_FLIP_NONE;
+    else
+        flip = SDL_FLIP_HORIZONTAL;
+}
+
+
 void Player::calculateAnimation(float delta) {
     bodyAnimOffset = 0;//test it or change it
     switch(state)//can be optimised a little
@@ -293,6 +301,7 @@ void Player::calculateAnimation(float delta) {
             }
             if(deltaAttackTime <= 0.0) 
                 handsAnimation = RUNNING;
+            updateDirection();
             break;
         case PLAYER_FALLING:
             animFrameCount = 2;
@@ -301,12 +310,19 @@ void Player::calculateAnimation(float delta) {
         case PLAYER_JUMPING:
             animFrameCount = 4;
             animCycleTime = 0.6;
+            
+            updateDirection();
             break;
         case PLAYER_DYING:
             animFrameCount = 8;//4 of animation and 4 placeholders
             animCycleTime = 2;//to be corrected
             if(deltaAttackTime <= 0.0) 
                 handsAnimation = DYING;
+            
+            if(x_speed < 0)
+                flip = SDL_FLIP_NONE;
+            else
+                flip = SDL_FLIP_HORIZONTAL;
             break;
         default:
             break;
@@ -316,10 +332,6 @@ void Player::calculateAnimation(float delta) {
     if(deltaAnimTime > animCycleTime)
         deltaAnimTime = deltaAnimTime - animCycleTime;
     
-    if(x_speed > 0)
-        flip = SDL_FLIP_NONE;
-    else
-        flip = SDL_FLIP_HORIZONTAL;
 
 	bodyAnimFrame = static_cast<int>(((float)animFrameCount / animCycleTime) * deltaAnimTime);
 

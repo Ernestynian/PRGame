@@ -62,6 +62,8 @@ private:
 	SDL_Rect getCollisionBox();
 	SDL_Rect getCollisionBox(float x_offset, float y_offset);
 	void changeStateTo(PlayerState newState);
+    void updateDirection();
+    
 	PlayerState state;
 	
 	const int tileW;
