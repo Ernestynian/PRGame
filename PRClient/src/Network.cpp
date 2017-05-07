@@ -2,11 +2,25 @@
 
 #include "../../Common/byteConverter.h"
 
-Network::Network() {
-	if (!init()
-	 || !setServer(LOCALHOST, PORT)
-	 || !createPackets())
+Network::Network() {	
+	if (!init())
 		initialized = false;
+	else {
+		bool serverSuccessed;
+		
+		// Try to read host from a file
+		FILE* fp = fopen("host", "r");
+		if (fp != nullptr) {
+			char line[256];
+			fgets(line, sizeof(line), fp);
+			fclose(fp);
+			serverSuccessed = setServer(line, PORT);
+		} else
+			serverSuccessed = setServer(LOCALHOST, PORT);
+
+		if (!serverSuccessed || !createPackets())
+			initialized = false;
+	}
 	
 	initialized = true;
 	
@@ -85,7 +99,7 @@ void Network::start() {
  * 
  * @return true on success
  */
-bool Network::setServer(const char* host, uint16_t port) {
+bool Network::setServer(const char* host, uint16_t port) {	
 	if(SDLNet_ResolveHost(&serverAddress, host, port) == -1) {
 		printf("SDLNet_ResolveHost failed: %s", SDLNet_GetError());
 		return false;

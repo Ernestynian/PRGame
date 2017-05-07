@@ -37,7 +37,7 @@ private:
 	bool setServer(const char* host, uint16_t port);
 	bool createPackets();
         
-        void networkThread(unsigned int tickrate);
+    void networkThread(unsigned int tickrate);
 	
 	void sendEvent(EventTypes eventType, const char* data, int length);
 	
